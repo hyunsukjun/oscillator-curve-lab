@@ -1,0 +1,29 @@
+{
+  "rows": [
+    {
+      "mode": "off",
+      "oldError": 0,
+      "wavError": 1.1920928955078125e-7,
+      "dbError": 0.00009918212890625
+    },
+    {
+      "mode": "fm",
+      "oldError": 0,
+      "wavError": 1.1920928955078125e-7,
+      "dbError": 0.00011444091796875
+    },
+    {
+      "mode": "am",
+      "oldError": 0,
+      "wavError": 8.940696716308594e-8,
+      "dbError": 0.00006866455078125
+    },
+    {
+      "mode": "ring",
+      "oldError": 0,
+      "wavError": 8.940696716308594e-8,
+      "dbError": 0.00006103515625
+    }
+  ],
+  "pass": true
+}

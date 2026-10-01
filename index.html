@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Oscillator Curve Lab</title>
+    <link rel="stylesheet" href="src/styles.css?v=20261001-playback3">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <svg class="brandMark" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M5 24h5m28 0h5M10 19v10m5-17v24m6-30v36m6-29v22m6-17v12m5-7v2"/>
+          </svg>
+          <div class="brandCopy">
+            <h1><span>Oscillator </span><span class="brandAccent">Curve Lab</span></h1>
+            <p class="tagline">Draw base pitch, oscillator spread, and spectral slope across time.</p>
+            <p class="statusLine"><span id="engineStatus">48 kHz target / native preview fallback</span><span class="privacyNote">Local browser synthesis. No upload.</span></p>
+          </div>
+        </div>
+        <div class="transport">
+          <button id="openAudioButton" type="button">Open Audio</button>
+          <input id="impulseInput" type="file" accept="audio/*,.wav,.aif,.aiff,.mp3,.m4a,.flac" hidden>
+          <label class="durationSelect">
+            <span>Sound Duration</span>
+            <input id="durationInput" type="number" min="1" max="180" step="0.5" value="20">
+            <span>sec</span>
+          </label>
+          <label class="outputSelect">
+            <select id="formatSelect" aria-label="Final output format">
+              <option value="stereo">Stereo 2ch</option>
+              <option value="mono">Mono 1ch</option>
+            </select>
+          </label>
+          <button id="downloadButton" type="button">Download WAV</button>
+        </div>
+      </header>
+
+      <section class="editor">
+        <div class="controlBand" id="oscillatorControls">
+          <div class="waveformButtons" aria-label="Waveform">
+            <span>Waveform</span>
+            <button class="waveformButton active" type="button" data-waveform="sine">Sine</button>
+            <button class="waveformButton" type="button" data-waveform="triangle">Triangle</button>
+            <button class="waveformButton" type="button" data-waveform="saw">Saw</button>
+            <button class="waveformButton" type="button" data-waveform="square">Square</button>
+          </div>
+          <label class="compactField countField">
+            Oscillators
+            <select id="countSelect">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="4" selected>4</option>
+              <option value="8">8</option>
+              <option value="16">16</option>
+            </select>
+          </label>
+          <label class="compactField stackField">
+            Stack
+            <select id="stackSelect">
+              <option value="unison">Unison</option>
+              <option value="harmonic">Harmonic</option>
+              <option value="odd">Odd Harmonics</option>
+              <option value="multiplier">Multiplier</option>
+            </select>
+          </label>
+          <label class="compactField modulationField">
+            Modulation
+            <select id="modulationSelect">
+              <option value="off">Off</option>
+              <option value="fm">FM</option>
+              <option value="am">AM</option>
+              <option value="ring">Ring</option>
+            </select>
+          </label>
+          <label id="modulationRatioField" class="compactField ratioField" hidden>
+            Mod Freq ×
+            <input id="modulationRatioInput" type="number" min="0.25" max="8" step="0.25" value="1" inputmode="decimal">
+          </label>
+          <div id="resynthesisControls" class="resynthesisControls" hidden>
+            <span id="resynthesisSource" class="impulseStatus" role="status">No sound file loaded</span>
+            <button id="analyzeButton" type="button" disabled>Analyze</button>
+            <label class="compactField resynthesisCount">Partials
+              <select id="partialCountSelect"><option value="32">32</option><option value="64">64</option></select>
+            </label>
+            <span id="analysisStatus" role="status">Open a sound file to analyze</span>
+          </div>
+        </div>
+
+        <div class="impulseBand">
+          <div class="soundModes" role="group" aria-label="Sound generation mode">
+            <button id="oscillatorMode" class="active" type="button" aria-pressed="true">Oscillator</button>
+            <button id="resynthesisMode" type="button" aria-pressed="false">Resynthesis</button>
+            <button id="convolutionButton" type="button" aria-pressed="false">Convolution</button>
+          </div>
+          <span id="impulseStatus" class="impulseStatus" role="status" hidden>No audio loaded</span>
+          <div id="convolutionControls" class="convolutionControls" hidden>
+            <label class="wetControl">Dry/Wet
+              <input id="convolutionWet" type="range" min="0" max="100" value="50">
+              <output id="convolutionWetValue" for="convolutionWet">50%</output>
+            </label>
+            <label class="wetControl">IR Length
+              <input id="impulseLength" type="range" min="0" max="100" value="0">
+              <output id="impulseLengthValue" for="impulseLength">0%</output>
+            </label>
+            <span id="impulseUsedLength" class="impulseUsedLength">3.00 s</span>
+          </div>
+        </div>
+
+        <div id="modulationInfo" class="modulationInfo" hidden aria-live="polite">
+          <span id="modulationFrequencyInfo"></span>
+          <span id="modulationAmountInfo"></span>
+        </div>
+
+        <div class="legend">
+          <div class="modeButtons">
+            <button id="basePitchMode" class="active curveMode" type="button">Base Freq</button>
+            <button id="deviationMode" class="curveMode" type="button">Deviation</button>
+            <button id="slopeMode" class="curveMode" type="button">Spectral Slope</button>
+            <button id="modulationCurveMode" class="curveMode modulationCurveMode" type="button" hidden>FM Strength</button>
+            <div class="toolToggle" role="group" aria-label="Curve editing tool">
+              <button id="penTool" class="active" type="button" aria-label="Pen" aria-pressed="true" title="Pen: add or move points">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L9 17l-4 1 1-4Z"/></svg>
+              </button>
+              <button id="eraserTool" type="button" aria-label="Eraser" aria-pressed="false" title="Eraser: click a point to delete. Mac: Command-click; PC: Ctrl-click">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 21-4-4a2 2 0 0 1 0-3L13 4a2 2 0 0 1 3 0l6 6a2 2 0 0 1 0 3l-8 8"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="curveActions">
+            <label class="toggle compactToggle">
+              <input id="sonogramToggle" type="checkbox">
+              FFT Preview
+            </label>
+            <button id="clearCurveButton" type="button">Clear Current</button>
+            <button id="resetButton" type="button">Reset All</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="readout"><span>Curve</span><strong id="modeReadout">Base Freq</strong></div>
+          <div class="readout"><span>Points</span><strong id="pointsReadout">2</strong></div>
+          <div class="readout"><span>Stack</span><strong id="stackReadout">Unison 4</strong></div>
+          <div class="readout"><span>Base</span><strong id="basePitchReadout">110 Hz</strong></div>
+          <div class="readout"><span>Deviation</span><strong id="deviationReadout">0 c</strong></div>
+          <div class="readout"><span>Slope</span><strong id="slopeReadout">-9.0 dB/oct</strong></div>
+          <div class="readout"><span>Voices</span><strong id="voicesReadout">current values</strong></div>
+          <div class="readout"><span>Safety</span><strong id="safetyReadout">auto gain / limiter</strong></div>
+          <div class="readout"><span>WAV</span><strong id="downloadReadout">ready</strong></div>
+        </div>
+
+        <div class="workspace">
+          <div class="curveStack">
+            <div class="canvasFrame frequencyFrame">
+              <canvas id="frequencyCanvas" width="1800" height="220"></canvas>
+            </div>
+            <div class="canvasFrame curveFrame">
+              <canvas id="curveCanvas" width="1800" height="560"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="fftPanel" class="fftPanel" hidden aria-label="Output spectrogram">
+        <div class="fftControls"><strong>OUTPUT · FFT Preview</strong><button id="fftUpdate" type="button">Update preview</button><span id="fftStatus" role="status">Update needed</span></div>
+        <p>Frequency (Hz, logarithmic) · Time (seconds) · Mean stereo power · Output before WAV quantisation</p>
+        <canvas id="fftCanvas" role="img" aria-label="Output spectrogram with fixed frequency axis"></canvas>
+        <div class="fftScale"><span>−90 dBFS</span><span class="fftGradient"></span><span>0 dBFS</span></div>
+        <p>Overview of current settings. Edits need an update. Stop playback to analyse. Short events may fall between columns.</p>
+      </section>
+      <footer class="playbackBar" aria-label="Playback and output monitoring">
+        <div class="bottomTransport" aria-label="Transport controls">
+          <button id="playButton" type="button">Play</button>
+          <button id="stopButton" type="button" disabled>Stop</button>
+        </div>
+        <output id="timeStatus" aria-label="Current playback time and duration">00:00.00 / 00:20.00</output>
+        <label class="scrubberGroup" for="playbackScrubber">
+          <span>Position</span>
+          <input id="playbackScrubber" type="range" min="0" max="1" step="0.0001" value="0">
+        </label>
+        <section class="outputMeter" aria-label="Stereo output level meter">
+          <div class="meterTitle">OUT</div>
+          <div class="meterChannels">
+            <div class="meterRow" data-meter-channel="0">
+              <span class="meterChannelLabel">L</span>
+              <div class="meterTrack" aria-hidden="true"><div class="meterRms"></div><div class="meterPeak"></div><div class="meterHold"></div></div>
+              <span class="meterValue">-∞</span>
+            </div>
+            <div class="meterRow" data-meter-channel="1">
+              <span class="meterChannelLabel">R</span>
+              <div class="meterTrack" aria-hidden="true"><div class="meterRms"></div><div class="meterPeak"></div><div class="meterHold"></div></div>
+              <span class="meterValue">-∞</span>
+            </div>
+          </div>
+          <button id="meterClipButton" class="meterClip" type="button" aria-pressed="false" title="Clip indicator. Click to reset.">CLIP</button>
+        </section>
+      </footer>
+    </main>
+
+    <script src="src/app.js?v=20261001-playback2" type="module"></script>
+  </body>
+</html>
