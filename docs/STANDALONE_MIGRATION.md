@@ -15,13 +15,13 @@ The future Standalone product should reproduce **behavior and sound**, not neces
 | --- | --- | --- | --- | --- |
 | Curve editor | Canvas + Pointer Events in `app.js` | Normalized points, smoothstep interpolation, endpoint protection, curve-specific mapping | Native drawing/hit testing, high-DPI and accessibility; verify point order and gestures | High |
 | Parameter state | DOM controls + in-memory JS objects | Stable IDs, units, defaults, mappings, mode-retained curves | Versioned preset/automation schema is absent; design before persistence | High |
-| Oscillator stack | `oscillator-core.js` in JS | Waveform semantics, Unison/Harmonic/Odd/Multiplier, deviation, slope, voice normalization | Port sample algorithms precisely; compare sample vectors, aliasing and CPU use | High |
-| Static Resynthesis | Worker analysis plus shared oscillator core | Immutable original peak data, significance selection, 32/64 bank, neutral transformation semantics | Replace browser decode/Worker; compare real-file peaks, CPU, listening and output across engines | High |
+| Oscillator stack | `oscillator-core.js` in JS | Waveform semantics, Unison/Harmonic/Odd/Multiplier, deviation, slope, voice normalization; Harmonic's index sweep plus two-voice-group offset, plain index pan elsewhere | Preserve the selected frequency-to-space progression, not merely numerical L/R balance; compare sample vectors, aliasing and CPU use | High |
+| Static Resynthesis | Worker analysis plus shared oscillator core | Immutable original peak data, significance selection, 32/64 bank, neutral transformation semantics, approved C stereo placement (centered first peak plus 80/20 alternating/sweep), and the user-approved 0.42-to-0.48-rate high-partial fade with continuous phase while silent | Replace browser decode/Worker; compare real-file peaks, CPU, listening and output across engines; do not restore the crackling hard cutoff | High |
 | FM/AM/Ring | Shared per-voice modulation code | Carrier-relative ratio, three amount mappings, high-frequency bounds | Native rate/phase/oversampling decisions could alter sound | High |
-| Edge and safety | `edgeFade`, `softLimit`, WaveShaper | 8/12 ms source fade, gain normalization and limiter response | Match at target/native sample rates; real Stop currently abrupt | High |
+| Edge and safety | `edgeFade`, `softLimit`, safety-limiter Worklet/shared JS | 8/12 ms source fade, stack-specific count lift, -1 dBFS linked sample-peak ceiling, 5 ms lookahead, 1 ms attack, 100 ms release | Preserve equal L/R and dry/wet delay, final flush and transport offset at target/native rates; add true-peak evaluation if required; real Stop currently abrupt | High |
 | Transport | AudioWorklet messages, AudioContext, Spacebar | Play/Stop/end timing, sound vs wet-tail duration, playhead semantics | Native audio engine scheduling; test device changes and underruns | High |
-| Local IR convolution | Browser decode, ConvolverNode, OfflineAudioContext | Optional oscillator/IR route, smooth Dry/Wet law, 3 s-to-full IR selection, bypass identity | Decoder formats, normalization and IR lifecycle may differ across engines | High |
-| WAV export | Offline JS + Blob download | 48 kHz, 24-bit PCM, mono/stereo, optional wet tail | Native renderer/encoder and file-dialog behavior; binary/sample parity | High |
+| Local IR convolution | Shared file decode, ConvolverNode, OfflineAudioContext | One import serves both Convolution IR and Resynthesis analysis; preserve optional oscillator/IR route, smooth Dry/Wet law, 3 s-to-full IR selection, bypass identity | Decoder formats, normalization and shared-file lifecycle may differ across engines | High |
+| WAV export | Offline JS + Blob download | 48 kHz, 24-bit PCM, mono/stereo, optional wet tail plus 5 ms limiter flush | Native renderer/encoder and file-dialog behavior; binary/sample parity including leading delay | High |
 | FFT output overview | Worker + `SpectrogramAnalysis` + Canvas | Observation-only, fixed scale/resolution semantics, stale/update state | Native background job/cancellation and drawing; do not rebrand as precision analyzer | Medium |
 | Visual system | CSS custom properties and Canvas paint | Token meanings, brand/parameter separation, hierarchy, accessible states | Map to native theme/layout; do not blindly copy CSS pixel measurements | Medium |
 
@@ -43,6 +43,7 @@ Use `KNOWLEDGE_PRESERVATION.md` as the capture ledger for the reference corpus, 
 - No persisted project/preset schema or parameter automation contract exists.
 - Native-rate realtime fallback, device underruns, long IR memory/performance and cross-engine Convolver normalization have not been fully characterized.
 - The user-reported IR-dependent tonal variance is open; no automatic timbral correction has been approved.
+- Deviation/FM/AM/Ring/Ratio sample-rate-aware slew and the final linked limiter are portable behavior; AudioWorklet routing is not. The high-FM stress case invokes limiting often, so a native port must not claim transparent safety without matched listening.
 - The FFT panel is deliberately low-resolution and must retain its observation disclaimer.
 - Windows modifier behavior, touch gestures, Reset cancellation in a real browser, and accessibility of a future native workspace need dedicated checks.
 

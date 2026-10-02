@@ -76,12 +76,12 @@ export function parseMultipliers(text) {
   return values.length ? values.slice(0, 16) : [1, 1.5, 2, 2.5];
 }
 
-export function stackFrequencies(settings, t, sampleRate = TARGET_SAMPLE_RATE) {
+export function stackFrequencies(settings, t, sampleRate = TARGET_SAMPLE_RATE, deviationOverride = null) {
   const count = clampCount(settings.count);
   const base = effectiveBaseFrequency(settings, t);
   const stack = settings.stack || "unison";
   const multipliers = parseMultipliers(settings.multiplierText);
-  const deviationNorm = deviationAmountFromCurveY(valueAt(settings.curves?.deviation, t));
+  const deviationNorm = deviationOverride ?? deviationAmountFromCurveY(valueAt(settings.curves?.deviation, t));
   const slopeDb = slopeDbFromNorm(valueAt(settings.curves?.slope, t));
   const nyquist = sampleRate * 0.48;
   const voices = [];
@@ -121,7 +121,7 @@ export function stackFrequencies(settings, t, sampleRate = TARGET_SAMPLE_RATE) {
     });
   }
 
-  return normalizeVoices(voices);
+  return normalizeVoices(voices, stack);
 }
 
 export function effectiveBaseFrequency(settings, t) {
@@ -250,11 +250,41 @@ function multiplierBend(index) {
   return Math.cos((index + 1) * 2.137) * 0.45;
 }
 
-function normalizeVoices(voices) {
+function normalizeVoices(voices, stack = "harmonic") {
   if (!voices.length) return [];
   const sum = voices.reduce((total, voice) => total + Math.abs(voice.amplitude), 0);
-  const scale = 0.82 / Math.max(1, sum);
+  const count = voices.length;
+  const countLift = stack === "unison" ? Math.sqrt(count)
+    : stack === "multiplier" ? Math.pow(count, 0.25) : 1;
+  const scale = 0.82 * countLift / Math.max(1, sum);
   return voices.map((voice) => ({ ...voice, amplitude: voice.amplitude * scale }));
+}
+
+export function voicePan(index, count, stack = "unison") {
+  if (count <= 1) return 0;
+  const sweep = ((index / (count - 1)) * 2) - 1;
+  if (stack !== "harmonic") return sweep;
+  const pairSide = Math.floor(index / 2) % 2 === 0 ? -1 : 1;
+  return clamp(0.8 * sweep + 0.45 + 0.38 * pairSide, -1, 1);
+}
+
+export function createSmoothingState() {
+  return { deviation: null, ratioLog: null, amount: null, mode: null, stack: null, coefficients: {} };
+}
+
+export function resetSmoothingState(state) {
+  if (!state) return;
+  state.deviation = state.ratioLog = state.amount = null;
+  state.mode = state.stack = null;
+}
+
+function smoothValue(state, key, target, milliseconds, sampleRate) {
+  if (!state) return target;
+  if (state[key] == null) return (state[key] = target);
+  const coefficientKey = `${milliseconds}:${sampleRate}`;
+  const alpha = state.coefficients[coefficientKey] ??= 1 - Math.exp(-1000 / (milliseconds * sampleRate));
+  state[key] += (target - state[key]) * alpha;
+  return state[key];
 }
 
 function writeString(view, offset, value) {
@@ -263,17 +293,28 @@ function writeString(view, offset, value) {
   }
 }
 
-export function renderFrame(settings, t, sampleRate, phases, modPhases) {
-  if (settings.soundMode === 'resynthesis') return renderResynthesisFrame(settings, t, sampleRate, phases);
-  const voices = stackFrequencies(settings, t, sampleRate);
+export function renderFrame(settings, t, sampleRate, phases, modPhases, smoothingState = null) {
+  if (smoothingState && smoothingState.stack !== settings.stack) {
+    smoothingState.deviation = null;
+    smoothingState.stack = settings.stack;
+  }
+  const deviationTarget = deviationAmountFromCurveY(valueAt(settings.curves?.deviation, t));
+  const deviation = smoothValue(smoothingState, "deviation", deviationTarget, 8, sampleRate);
+  if (settings.soundMode === 'resynthesis') return renderResynthesisFrame(settings, t, sampleRate, phases, deviation);
+  const voices = stackFrequencies(settings, t, sampleRate, deviation);
   const mode = settings.modulationMode || "off";
-  const ratio = clamp(Number(settings.modulationRatio) || 1, 0.25, 8);
-  const amount = modulationAmountAt(settings, t);
+  if (smoothingState && smoothingState.mode !== mode) {
+    smoothingState.amount = smoothingState.mode === null ? null : 0;
+    smoothingState.mode = mode;
+  }
+  const ratioTarget = clamp(Number(settings.modulationRatio) || 1, 0.25, 8);
+  const ratio = Math.exp(smoothValue(smoothingState, "ratioLog", Math.log(ratioTarget), 10, sampleRate));
+  const amount = smoothValue(smoothingState, "amount", modulationAmountAt(settings, t), mode === "fm" ? 5 : 8, sampleRate);
   let left = 0;
   let right = 0;
 
   for (const voice of voices) {
-    const pan = voices.length <= 1 ? 0 : ((voice.index / (voices.length - 1)) * 2) - 1;
+    const pan = voicePan(voice.index, voices.length, settings.stack || "unison");
     const phase = (phases[voice.index] + voice.phaseOffset) % 1;
     const modPhase = (modPhases[voice.index] + voice.phaseOffset) % 1;
     const sample = modulatedOscillatorSample(
@@ -304,25 +345,35 @@ export function resynthesisVoices(settings, t, sampleRate = TARGET_SAMPLE_RATE) 
     const ratio = partial.frequency / reference;
     const bend = deviation * harmonicBend(partial.index - 1);
     const frequency = base * Math.max(0.125, ratio + bend);
-    if (frequency >= sampleRate * 0.48) continue;
+    const nyquistGain = resynthesisNyquistGain(frequency, sampleRate);
+    if (nyquistGain <= 0) continue;
     const slope = Math.pow(10, slopeDb * Math.log2(Math.max(1e-6, frequency / base)) / 20);
     voices.push({
       index: partial.index - 1,
       label: partial.index.toString(),
       frequency,
-      amplitude: partial.relativeAmplitude * clamp(slope, 0.03, 1.8),
+      amplitude: partial.relativeAmplitude * clamp(slope, 0.03, 1.8) * nyquistGain,
       phaseOffset: 0
     });
   }
   return normalizeVoices(voices);
 }
 
-function renderResynthesisFrame(settings, t, sampleRate, phases) {
+export function resynthesisNyquistGain(frequency, sampleRate) {
+  const start = sampleRate * 0.42;
+  const end = sampleRate * 0.48;
+  if (frequency <= start) return 1;
+  if (frequency >= end) return 0;
+  const x = (frequency - start) / (end - start);
+  return 1 - x * x * (3 - 2 * x);
+}
+
+function renderResynthesisFrame(settings, t, sampleRate, phases, deviationOverride = null) {
   const result = settings.analysisResult;
   if (!result?.partials?.length) return { left: 0, right: 0, voices: 0 };
   const base = effectiveBaseFrequency(settings, t);
   const reference = clamp(result.fundamentalEstimate, MIN_BASE_FREQUENCY, MAX_BASE_FREQUENCY);
-  const deviation = partialDeviationFromNorm(deviationAmountFromCurveY(valueAt(settings.curves?.deviation, t)));
+  const deviation = partialDeviationFromNorm(deviationOverride ?? deviationAmountFromCurveY(valueAt(settings.curves?.deviation, t)));
   const slopeDb = slopeDbFromNorm(valueAt(settings.curves?.slope, t));
   let left = 0;
   let right = 0;
@@ -331,18 +382,26 @@ function renderResynthesisFrame(settings, t, sampleRate, phases) {
   for (const partial of result.partials) {
     const index = partial.index - 1;
     const frequency = base * Math.max(0.125, partial.frequency / reference + deviation * harmonicBend(index));
-    if (frequency >= sampleRate * 0.48) continue;
+    const phase = phases[index];
+    phases[index] = (phase + frequency / sampleRate) % 1;
+    const nyquistGain = resynthesisNyquistGain(frequency, sampleRate);
+    if (nyquistGain <= 0) continue;
     const slope = Math.pow(10, slopeDb * Math.log2(Math.max(1e-6, frequency / base)) / 20);
-    const amplitude = partial.relativeAmplitude * clamp(slope, 0.03, 1.8);
-    const pan = result.partials.length <= 1 ? 0 : index / (result.partials.length - 1) * 2 - 1;
+    const amplitude = partial.relativeAmplitude * clamp(slope, 0.03, 1.8) * nyquistGain;
+    const pan = resynthesisPan(index, result.partials.length);
     const angle = (pan + 1) * Math.PI * 0.25;
-    const sample = Math.sin(2 * Math.PI * phases[index]) * amplitude;
+    const sample = Math.sin(2 * Math.PI * phase) * amplitude;
     left += sample * Math.cos(angle);
     right += sample * Math.sin(angle);
-    phases[index] = (phases[index] + frequency / sampleRate) % 1;
     totalAmplitude += Math.abs(amplitude);
     count += 1;
   }
   const scale = 0.82 / Math.max(1, totalAmplitude);
   return { left: softLimit(left * scale), right: softLimit(right * scale), voices: count };
+}
+
+export function resynthesisPan(index, count) {
+  if (count <= 1) return 0;
+  const sweep = index / (count - 1) * 2 - 1;
+  return index === 0 ? 0 : 0.8 * (index % 2 === 1 ? -1 : 1) + 0.2 * sweep;
 }

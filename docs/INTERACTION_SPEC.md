@@ -4,7 +4,7 @@ Snapshot: 2026-09-29. This describes **user intent** independently of Pointer Ev
 
 ## Workbench flow
 
-The three sound-mode buttons are mutually exclusive. Oscillator is initially selected. Switching mode stops playback without reloading the page or rebuilding the AudioContext. Resynthesis reveals Open Sound File, Analyze, Partials 32/64, and concise analysis status while reusing the existing Base Freq, Deviation, and Spectral Slope curve editor. Convolution reveals the existing Dry/Wet and IR Length controls after audio is loaded. The first-version Resynthesis import automatically analyzes; Analyze can run again after changing the partial limit. A sparse source may show fewer voices than the chosen maximum. No new level meter was introduced by this mode work.
+The three sound-mode buttons are mutually exclusive. Oscillator is initially selected. Switching mode stops playback without reloading the page or rebuilding the AudioContext. Open Audio prepares one file for both Resynthesis and Convolution, so switching needs no second import. Resynthesis reveals Analyze, Partials 32/64, and concise analysis status while reusing the existing Base Freq, Deviation, and Spectral Slope curve editor. Its approved C stereo placement is fixed, with no placement selector. Convolution reveals the existing Dry/Wet and IR Length controls after audio is loaded. Import automatically analyzes; Analyze can run again after changing the partial limit. A sparse source may show fewer voices than the chosen maximum. No new level meter was introduced by this mode work.
 
 1. Select waveform, oscillator count, stack, and optional modulation. The selected waveform and stack affect every active voice. Select a curve mode to edit one trajectory while the other trajectories remain visible.
 2. Draw or adjust points in the large curve workspace. Horizontal position is normalized sound time; vertical position is the selected parameter's mapping. A point tooltip reports time and a parameter-appropriate value. Base Freq additionally displays nearest equal-tempered note and cents relative to A4=440 Hz; this is a reference pitch, not measured output pitch.
@@ -26,6 +26,8 @@ The three sound-mode buttons are mutually exclusive. Oscillator is initially sel
 | Reset All | Ask for confirmation; accept restores every curve; cancel leaves all curves unchanged. | `window.confirm` then `resetAll`. Acceptance is code-defined; browser automation of cancellation was not completed in the design-system pass. |
 
 The web hit-test radius is 12 CSS px. That value is an implementation detail, not a native gesture specification. A Standalone implementation may choose a device-appropriate hit area while preserving point selection and empty-space behavior. Likewise, Canvas resize or scrolling must not change stored normalized curves.
+
+Audio smoothing after curve mapping does not move points, change tooltip values, or redraw a different gesture. A steep Deviation or FM gesture remains steep on screen while its audio target settles over 8 or 5 ms respectively. Numeric Ratio changes settle over 10 ms in log-frequency space.
 
 ## Module controls
 

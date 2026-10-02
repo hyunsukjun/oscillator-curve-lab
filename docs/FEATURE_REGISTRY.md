@@ -29,8 +29,8 @@ Snapshot: 2026-09-29, current web implementation. `IMPLEMENTED` means code exist
 
 - CATEGORY: COMMON. STATUS: VERIFIED for generated 48 kHz/24-bit PCM format and tested paths.
 - PURPOSE/USER BEHAVIOR: Download rendered mono or stereo audio without uploading a source file.
-- INPUT/OUTPUT: Current settings and curves, optional local IR; 48 kHz, signed 24-bit PCM WAV. Sound duration is 1-180 s; an active wet IR adds its tail.
-- PROCESSING: Shared core frame renderer, edge fade, optional offline convolution, 24-bit encoder.
+- INPUT/OUTPUT: Current settings and curves, optional local IR; 48 kHz, signed 24-bit PCM WAV. Sound duration is 1-180 s; an active wet IR adds its tail, then the final limiter adds 5 ms of leading delay and final flush.
+- PROCESSING: Shared core frame renderer, selected parameter slew, edge fade, optional offline convolution, linked final safety limiter, 24-bit encoder.
 - EDGE CASES: An edit marks prior download stale. The renderer accepts an abort signal internally, but the current UI has no user-facing render-cancel button. Browser file-download behavior depends on platform.
 - CURRENT WEB IMPLEMENTATION: `src/offline-render.js`, `src/oscillator-core.js`, `src/convolution.js`, `src/app.js`.
 - TESTS/HISTORY: `tests/modulation.test.mjs`, `tests/convolution.test.mjs`, `tests/output-preview.mjs`; a 3 s stereo file was checked with `ffprobe` at 48 kHz/24-bit on 2026-09-28, and convolution export completed in browser on 2026-09-29.
@@ -51,9 +51,9 @@ Snapshot: 2026-09-29, current web implementation. `IMPLEMENTED` means code exist
 ### OCL-O00: Mutually exclusive sound modes and static Resynthesis
 
 - CATEGORY: MODULE-SPECIFIC. STATUS: IMPLEMENTED; focused numerical and synthetic-file browser checks completed, perceptual approval pending.
-- PURPOSE/USER BEHAVIOR: Oscillator is the default; Resynthesis derives an oscillator bank from a local sound; Convolution is the existing oscillator plus optional IR. Only one mode is active.
+- PURPOSE/USER BEHAVIOR: Oscillator is the default; one opened local file is shared by Resynthesis (partial bank) and Convolution (oscillator plus IR). Only one processing mode is active, and switching between them needs no re-import. Resynthesis uses the user-approved C stereo placement without a placement selector.
 - DATA MODEL/PROCESSING: AnalysisResult stores untouched source peaks and metadata. Base Freq, Deviation, and Spectral Slope curves transform the bank during playback/export. The imported recording is not replayed. See `RESYNTHESIS_SPEC.md`.
-- EDGE CASES: Sparse sources can yield fewer than 32/64 peaks. Mode switching stops playback, retains separate in-memory curves, and does not recreate the audio engine. No time-varying tracking or preset persistence is implemented.
+- EDGE CASES: Sparse sources can yield fewer than 32/64 peaks. Resynthesis partials fade near the high-frequency cutoff and keep phase while silent; the user confirmed that this removed the reported crackle near 2 kHz Base Freq. Mode switching stops playback, retains separate in-memory curves, and does not recreate the audio engine. No time-varying tracking or preset persistence is implemented.
 - TESTS: `tests/resynthesis.test.mjs`; synthetic 3- and 64-partial browser import/Play checks. Real-material listening, device underruns and browser download capture remain open.
 
 ### OCL-O01: Waveform source
@@ -69,7 +69,7 @@ Snapshot: 2026-09-29, current web implementation. `IMPLEMENTED` means code exist
 
 - CATEGORY: MODULE-SPECIFIC. STATUS: IMPLEMENTED.
 - PURPOSE/USER BEHAVIOR: Build 1/2/4/8/16 voices as Unison, Harmonic, Odd Harmonics, or Multiplier and see current voice frequencies.
-- DATA MODEL/PROCESSING: Base curve 20-4000 Hz; Harmonic uses `index+1`, Odd uses `2*index+1`, Multiplier cycles the current fixed `[1,1.5,2,2.5]` pattern. Deviation bends Unison in cents and the others by partial/multiplier offset. Slope weights voice amplitude.
+- DATA MODEL/PROCESSING: Base curve 20-4000 Hz; Harmonic uses `index+1`, Odd uses `2*index+1`, Multiplier cycles the current fixed `[1,1.5,2,2.5]` pattern. Deviation bends Unison in cents and the others by partial/multiplier offset. Slope weights voice amplitude. Unison gets square-root active-count lift, Multiplier fourth-root lift, Harmonic/Odd no count lift. Harmonic uses the user-approved broad index sweep with alternating two-voice-group offset; other Oscillator stacks retain plain index pan. See D-011.
 - EDGE CASES: Voices at or above 0.48 * sample rate are omitted; the number sounding can be less than selected count. The Multipliers are not a user-editable Ratio text field in this revision.
 - CURRENT WEB IMPLEMENTATION: `stackFrequencies` and `drawFrequency`.
 - PLATFORM-INDEPENDENT REQUIREMENTS: Preserve each mode's musical relationship and distinguish a displayed frequency from a perceived fundamental.
@@ -87,9 +87,9 @@ Snapshot: 2026-09-29, current web implementation. `IMPLEMENTED` means code exist
 ### OCL-O04: Optional local-audio convolution
 
 - CATEGORY: MODULE-SPECIFIC. STATUS: IMPLEMENTED; helper and browser-file workflows tested, perceptual result still under review.
-- PURPOSE/USER BEHAVIOR: In CONVOLUTION mode open a local audio file **as an impulse response**, adjust Dry/Wet and used IR length; choose OSCILLATOR to bypass convolution. The loaded audio does not replace the oscillator source.
+- PURPOSE/USER BEHAVIOR: Open Audio once for both CONVOLUTION (file as an impulse response) and RESYNTHESIS (file-derived partial analysis); adjust Dry/Wet and used IR length in CONVOLUTION. Choose OSCILLATOR to bypass convolution. The loaded audio does not replace the oscillator source.
 - INPUT/OUTPUT: Files at most 16 MiB, decoded locally; IR Length 0% starts at min(3 s, file length), 100% uses the full file; Convolution Off keeps the oscillator path.
-- PROCESSING: Native Web Audio ConvolverNode with normalization; equal-power-like Dry/Wet after a smoothstep taper; truncated IR gets a 10 ms end taper; safety shaper after routing.
+- PROCESSING: Native Web Audio ConvolverNode with normalization; equal-power-like Dry/Wet after a smoothstep taper; truncated IR gets a 10 ms end taper; linked safety limiter after routing.
 - EDGE CASES: Source material can strongly color output, including harsh results; Convolver normalization and limiter do not imply constant perceived loudness. Decode failure retains prior valid IR.
 - CURRENT WEB IMPLEMENTATION: `src/convolution.js`, `src/app.js`, `src/offline-render.js`.
 - TESTS/HISTORY: Convolution helper tests and bypass identity; actual 4 s test WAV loaded and convolved WAV exported in browser on 2026-09-29. Broader listening and long-IR performance remain open.
@@ -98,10 +98,10 @@ Snapshot: 2026-09-29, current web implementation. `IMPLEMENTED` means code exist
 
 - CATEGORY: MODULE-SPECIFIC processing. STATUS: IMPLEMENTED; numerical tests cover key bounds.
 - PURPOSE/USER BEHAVIOR: Avoid obvious overload and hard sound-duration edges without adding user controls.
-- DATA MODEL/PROCESSING: Sum-normalized voice amplitudes target 0.82; sample-level soft limit is unchanged through +/-0.9 and asymptotically approaches +/-0.99. Voice/FM bounds are separately applied. Oscillator source has an 8 ms start and 12 ms end linear fade in Worklet, WAV, and dry FFT synthesis.
+- DATA MODEL/PROCESSING: Stack-specific count lift after sum-normalized amplitudes; sample-level soft limit is unchanged through +/-0.9 and asymptotically approaches +/-0.99. Deviation/FM/AM/Ring/Ratio targets have 5-10 ms one-pole slew; Feedback is absent. A final stereo-linked -1 dBFS sample-peak limiter with 5 ms lookahead follows routing in realtime, WAV, and FFT. Voice/FM bounds are separately applied. Oscillator source has an 8 ms start and 12 ms end linear fade in Worklet, WAV, and dry FFT synthesis.
 - EDGE CASES: Immediate Stop zeros output without a dedicated Stop-release ramp. Safety limits peaks, not harsh timbre, aliasing in every condition, or stable loudness across arbitrary IRs.
 - CURRENT WEB IMPLEMENTATION: `src/oscillator-core.js`, `src/oscillator-worklet.js`, `src/offline-render.js`, `src/fft-worker.js`, `src/convolution.js`.
-- TESTS/HISTORY: `tests/modulation.test.mjs` limiter and fade tests; four-mode Worklet/WAV/FFT numerical comparison. Fade introduced 2026-09-29 to address onset/end clicks; no documented human listening approval yet.
+- TESTS/HISTORY: `tests/modulation.test.mjs` and `tests/safety-dsp.test.mjs` bounds and fade tests; five-case Worklet/WAV/FFT numerical comparison including limiter-active FM stress. Fade introduced 2026-09-29; count lift and final limiter 2026-10-01. No documented human listening approval yet.
 
 ## Not implemented / held
 

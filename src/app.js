@@ -1,4 +1,4 @@
-import {createFFTPreview} from "./fft-preview.js?v=20260929-axis-fade1";
+import {createFFTPreview} from "./fft-preview.js?v=20261002-lookahead1";
 import {
   TARGET_SAMPLE_RATE,
   baseFrequencyFromNorm,
@@ -16,18 +16,18 @@ import {
   slopeDbFromNorm,
   stackFrequencies,
   valueAt
-} from "./oscillator-core.js?v=20260928-audio1";
+} from "./oscillator-core.js?v=20261002-fixedpan1";
 
-import { renderOscillator } from "./offline-render.js?v=20260929-axis-fade1";
+import { renderOscillator } from "./offline-render.js?v=20261002-lookahead1";
+import { LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261002-lookahead1";
 import { OutputMeterAnalyzer } from "./output-meter.js?v=20261001-playback1";
 import {
   MAX_IR_FILE_BYTES,
-  createSafetyShaper,
   impulseLength,
   mixGains,
   prepareImpulse,
   tailSeconds
-} from "./convolution.js?v=20260928-audio1";
+} from "./convolution.js?v=20261002-stereotail1";
 
 const timeStatus = document.getElementById("timeStatus");
 const playbackScrubber = document.getElementById("playbackScrubber");
@@ -124,7 +124,7 @@ let node;
 let bypassGain;
 let effectDryGain;
 let effectWetGain;
-let effectSafety;
+let safetyLimiterNode;
 let outputGain;
 let outputMeter;
 let convolver;
@@ -175,6 +175,16 @@ let editedCurves = Object.fromEntries(Object.keys(curves).map((name) => [name, f
 const oscillatorState = { curves, editedCurves };
 let resynthesisState = null;
 
+function ensureResynthesisState() {
+  if (resynthesisState) return;
+  const savedCurves = Object.fromEntries(Object.entries(curveDefaults).map(([name, y]) => [name, defaultCurve(y)]));
+  savedCurves.slope = defaultCurve(normFromSlopeDb(0));
+  resynthesisState = {
+    curves: savedCurves,
+    editedCurves: Object.fromEntries(Object.keys(savedCurves).map((name) => [name, false]))
+  };
+}
+
 function defaultCurve(y) {
   return [{ x: 0, y }, { x: 1, y }];
 }
@@ -210,7 +220,7 @@ function settings() {
 
 function outputDuration() {
   const current = settings();
-  return current.durationSeconds + current.tailSeconds;
+  return current.durationSeconds + current.tailSeconds + LOOKAHEAD_SECONDS;
 }
 
 function resizeCanvas() {
@@ -343,7 +353,8 @@ async function ensureAudio() {
 
 async function setupAudio() {
   if (!audioContext.audioWorklet) throw new Error("AudioWorklet is not available. Use a current browser over localhost or HTTPS.");
-  await audioContext.audioWorklet.addModule("src/oscillator-worklet.js?v=20261001-playback2");
+  await audioContext.audioWorklet.addModule("src/oscillator-worklet.js?v=20261002-lookahead1");
+  await audioContext.audioWorklet.addModule("src/safety-limiter-worklet.js?v=20261002-lookahead1");
   node = new AudioWorkletNode(audioContext, "oscillator-curve-processor", {
     numberOfInputs: 0,
     numberOfOutputs: 1,
@@ -352,22 +363,26 @@ async function setupAudio() {
   bypassGain = audioContext.createGain();
   effectDryGain = audioContext.createGain();
   effectWetGain = audioContext.createGain();
-  effectSafety = createSafetyShaper(audioContext);
+  safetyLimiterNode = new AudioWorkletNode(audioContext, "oscillator-safety-limiter", {
+    numberOfInputs: 1,
+    numberOfOutputs: 1,
+    outputChannelCount: [2]
+  });
   outputGain = audioContext.createGain();
   bypassGain.gain.value = 1;
   effectDryGain.gain.value = 0;
   effectWetGain.gain.value = 0;
-  node.connect(bypassGain).connect(effectSafety);
-  node.connect(effectDryGain).connect(effectSafety);
-  effectWetGain.connect(effectSafety);
+  node.connect(bypassGain).connect(safetyLimiterNode);
+  node.connect(effectDryGain).connect(safetyLimiterNode);
+  effectWetGain.connect(safetyLimiterNode);
   outputMeter = new OutputMeterAnalyzer(audioContext, { channelCount: 2 });
-  effectSafety.connect(outputGain).connect(outputMeter.input);
+  safetyLimiterNode.connect(outputGain).connect(outputMeter.input);
   outputMeter.connect(audioContext.destination);
   node.port.onmessage = (event) => {
     if (event.data.token != null && event.data.token !== playbackToken) return;
     if (event.data.type === "position") {
       if (isPlaying && !isScrubbing) {
-        playheadSeconds = event.data.seconds;
+        playheadSeconds = Math.max(0, event.data.seconds - LOOKAHEAD_SECONDS);
         updateTransport();
         draw();
       }
@@ -388,11 +403,11 @@ async function setupAudio() {
     bypassGain.disconnect();
     effectDryGain.disconnect();
     effectWetGain.disconnect();
-    effectSafety.disconnect();
+    safetyLimiterNode.disconnect();
     outputGain.disconnect();
     outputMeter.input.disconnect();
     outputMeter = null;
-    bypassGain = effectDryGain = effectWetGain = effectSafety = outputGain = convolver = null;
+    bypassGain = effectDryGain = effectWetGain = safetyLimiterNode = outputGain = convolver = null;
     throw error;
   }
   sendSettings();
@@ -444,7 +459,7 @@ function updateConvolutionRouting() {
 
 function updateTransport() {
   const current = settings();
-  const duration = current.durationSeconds + current.tailSeconds;
+  const duration = outputDuration();
   timeStatus.textContent = `${formatClock(playheadSeconds)} / ${formatClock(duration)}`;
   if (!isScrubbing) playbackScrubber.value = String(Math.max(0, Math.min(1, playheadSeconds / duration)));
   playbackScrubber.setAttribute("aria-valuetext", `${formatClock(playheadSeconds)} of ${formatClock(duration)}`);
@@ -490,6 +505,7 @@ function seekFromScrubber() {
   playheadSeconds = Math.min(soundDuration, requested);
   if (requested !== playheadSeconds) playbackScrubber.value = String(playheadSeconds / duration);
   node?.port.postMessage({ type: "seek", seconds: playheadSeconds, token: playbackToken });
+  safetyLimiterNode?.port.postMessage({ type: "reset" });
   updateTransport();
   draw();
 }
@@ -512,6 +528,7 @@ async function play() {
     sendSettings();
     sendCurves();
     node.port.postMessage({ type: "seek", seconds: playheadSeconds, token });
+    safetyLimiterNode.port.postMessage({ type: "reset" });
     node.port.postMessage({ type: "play", token });
   } catch (error) {
     alert(error.message || String(error));
@@ -528,6 +545,7 @@ function stop(reset = true) {
     outputGain.gain.setValueAtTime(0, now);
   }
   node?.port.postMessage({ type: "stop", reset, token });
+  safetyLimiterNode?.port.postMessage({ type: "reset" });
   disconnectConvolver();
   updateConvolutionRouting();
   updateTransport();
@@ -1007,10 +1025,9 @@ function setSoundMode(nextMode) {
     editedCurves = nextState.editedCurves;
   }
   if (nextMode === "resynthesis" && !resynthesisState) {
-    curves = Object.fromEntries(Object.entries(curveDefaults).map(([name, y]) => [name, defaultCurve(y)]));
-    curves.slope = defaultCurve(normFromSlopeDb(0));
-    editedCurves = Object.fromEntries(Object.keys(curves).map((name) => [name, false]));
-    resynthesisState = { curves, editedCurves };
+    ensureResynthesisState();
+    curves = resynthesisState.curves;
+    editedCurves = resynthesisState.editedCurves;
   }
   if (nextMode === "resynthesis" && Object.values(modulationCurves).includes(activeCurve)) activeCurve = "basePitch";
   for (const [mode, button] of [["oscillator", oscillatorModeButton], ["resynthesis", resynthesisModeButton], ["convolution", convolutionButton]]) {
@@ -1024,7 +1041,7 @@ function setSoundMode(nextMode) {
   convolutionControls.hidden = nextMode !== "convolution" || !impulseBuffer48k;
   modulationInfo.hidden = nextMode === "resynthesis" || modulationSelect.value === "off";
   modulationCurveButton.hidden = nextMode === "resynthesis" || modulationSelect.value === "off";
-  openAudioButton.textContent = nextMode === "resynthesis" ? "Open Sound File" : "Open Audio";
+  openAudioButton.textContent = "Open Audio";
   readouts.safety.textContent = "auto gain / limiter";
   setActiveCurve(activeCurve);
   sendSettings();
@@ -1069,20 +1086,7 @@ async function runResynthesisAnalysis() {
   worker.postMessage({ samples, sampleRate: TARGET_SAMPLE_RATE, partials: Number(partialCountSelect.value), source: analysisSource }, [samples.buffer]);
 }
 
-async function loadResynthesisFile(file) {
-  if (isPlaying) stop(true);
-  const maxBytes = 32 * 1024 * 1024;
-  if (file.size > maxBytes) throw new Error("Sound file too large (32 MB max)");
-  analysisWorker?.terminate();
-  analysisGeneration += 1;
-  analysisResult = null;
-  analysisSamples = null;
-  resynthesisSource.textContent = file.name;
-  analysisStatus.textContent = "Decoding sound file...";
-  sendSettings();
-  const bytes = await file.arrayBuffer();
-  const decoder = new OfflineAudioContext(2, 1, TARGET_SAMPLE_RATE);
-  const decoded = await decoder.decodeAudioData(bytes);
+async function prepareResynthesisInput(file, decoded) {
   const length = Math.min(decoded.length, 30 * TARGET_SAMPLE_RATE);
   const start = Math.max(0, Math.floor((decoded.length - length) / 2));
   const mono = new Float32Array(length);
@@ -1101,14 +1105,10 @@ async function loadResynthesisFile(file) {
     mono.set(channels[chosenChannel].subarray(start + offset, start + end), offset);
     await new Promise((resolve) => setTimeout(resolve, 0));
   }
-  for (const [name, y] of Object.entries(curveDefaults)) {
-    resynthesisState.curves[name] = defaultCurve(name === "slope" ? normFromSlopeDb(0) : y);
-    resynthesisState.editedCurves[name] = false;
-  }
-  analysisSamples = mono;
-  analysisSource = { name: file.name, byteLength: file.size, channels: decoded.numberOfChannels, analyzedChannel: chosenChannel + 1, sourceDurationSeconds: decoded.duration, analyzedStartSeconds: start / TARGET_SAMPLE_RATE };
-  analyzeButton.disabled = false;
-  await runResynthesisAnalysis();
+  return {
+    samples: mono,
+    source: { name: file.name, byteLength: file.size, channels: decoded.numberOfChannels, analyzedChannel: chosenChannel + 1, sourceDurationSeconds: decoded.duration, analyzedStartSeconds: start / TARGET_SAMPLE_RATE }
+  };
 }
 
 oscillatorModeButton.addEventListener("click", () => setSoundMode("oscillator"));
@@ -1121,29 +1121,28 @@ openAudioButton.addEventListener("click", () => impulseInput.click());
 impulseInput.addEventListener("change", async () => {
   const file = impulseInput.files?.[0];
   if (!file) return;
-  if (soundMode === "resynthesis") {
-    openAudioButton.disabled = true;
-    try { await loadResynthesisFile(file); }
-    catch (error) { console.error(error); analysisStatus.textContent = error.message || String(error); }
-    finally { openAudioButton.disabled = false; impulseInput.value = ""; }
-    return;
-  }
   if (file.size > MAX_IR_FILE_BYTES) {
     impulseStatus.textContent = "File too large (16 MB max)";
+    analysisStatus.textContent = "File too large (16 MB max)";
     impulseInput.value = "";
     return;
   }
+  const modeAtOpen = soundMode;
+  if (isPlaying) stop(true);
   openAudioButton.disabled = true;
   impulseLengthInput.disabled = true;
   impulseStatus.textContent = "Decoding audio…";
+  analysisStatus.textContent = "Decoding audio…";
   try {
     const bytes = await file.arrayBuffer();
     const decoder = new OfflineAudioContext(2, 1, TARGET_SAMPLE_RATE);
     const decoded = await decoder.decodeAudioData(bytes.slice(0));
     const prepared = prepareImpulse(decoder, decoded, Number(impulseLengthInput.value));
-    const nativeSource = node && audioContext.sampleRate !== TARGET_SAMPLE_RATE
+    const input = await prepareResynthesisInput(file, decoded);
+    const nativeSource = node && soundMode === "convolution" && audioContext.sampleRate !== TARGET_SAMPLE_RATE
       ? await audioContext.decodeAudioData(bytes.slice(0)) : null;
-    const installedNative = node ? await installConvolver(prepared, bytes, nativeSource) : nativeSource;
+    const installedNative = node && soundMode === "convolution"
+      ? await installConvolver(prepared, bytes, nativeSource) : nativeSource;
     impulseBytes = bytes;
     impulseSource48k = decoded;
     impulseSourceNative = installedNative;
@@ -1151,13 +1150,26 @@ impulseInput.addEventListener("change", async () => {
     impulseFileName = file.name;
     appliedImpulsePercent = Number(impulseLengthInput.value);
     impulseRevision += 1;
-    convolutionControls.hidden = false;
+    convolutionControls.hidden = soundMode !== "convolution";
     updateImpulseStatus();
-    if (soundMode === "oscillator") setSoundMode("convolution");
+    ensureResynthesisState();
+    analysisWorker?.terminate();
+    analysisGeneration += 1;
+    analysisResult = null;
+    analysisSamples = input.samples;
+    analysisSource = input.source;
+    resynthesisSource.textContent = file.name;
+    for (const [name, y] of Object.entries(curveDefaults)) {
+      resynthesisState.curves[name] = defaultCurve(name === "slope" ? normFromSlopeDb(0) : y);
+      resynthesisState.editedCurves[name] = false;
+    }
+    if (modeAtOpen === "oscillator" && soundMode === "oscillator") setSoundMode("convolution");
+    await runResynthesisAnalysis();
     sendSettings();
   } catch (error) {
     console.error(error);
     impulseStatus.textContent = impulseBuffer48k ? "Open failed · previous audio kept" : "Could not decode audio file";
+    analysisStatus.textContent = error.message || String(error);
   } finally {
     openAudioButton.disabled = false;
     impulseLengthInput.disabled = false;

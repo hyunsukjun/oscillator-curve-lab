@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { curveDefaults, edgeFade, modulatedOscillatorSample, oscillatorSample, softLimit, stackFrequencies } from "../src/oscillator-core.js";
 import { renderOscillator } from "../src/offline-render.js";
+import { LOOKAHEAD_SECONDS } from "../src/safety-limiter.js";
 
 const curves = Object.fromEntries(Object.entries(curveDefaults).map(([name, y]) => [
   name, [{ x: 0, y }, { x: 1, y }]
@@ -20,7 +21,7 @@ const settings = {
 async function wavBytes(mode, overrides = {}) {
   const result = await renderOscillator({ settings: { ...settings, ...overrides, modulationMode: mode } });
   assert.equal(result.channelCount, 2);
-  assert.equal(result.blob.size, 44 + (48000 * 2 * 3));
+  assert.equal(result.blob.size, 44 + ((48000 + Math.round(48000 * LOOKAHEAD_SECONDS)) * 2 * 3));
   assert.ok(Number.isFinite(result.peak) && result.peak > 0 && result.peak < 1);
   return new Uint8Array(await result.blob.arrayBuffer());
 }

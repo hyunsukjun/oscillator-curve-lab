@@ -1,4 +1,5 @@
-import {clamp, edgeFade, renderFrame} from "./oscillator-core.js?v=20260929-edge-fade1";
+import {clamp, createSmoothingState, edgeFade, renderFrame, resetSmoothingState} from "./oscillator-core.js?v=20261002-fixedpan1";
+import {LOOKAHEAD_SECONDS} from "./safety-limiter.js?v=20261002-lookahead1";
 
 class OscillatorCurveProcessor extends AudioWorkletProcessor {
   constructor() {
@@ -8,6 +9,7 @@ class OscillatorCurveProcessor extends AudioWorkletProcessor {
     this.token = 0;
     this.phases = new Float64Array(64);
     this.modPhases = new Float64Array(64);
+    this.smoothingState = createSmoothingState();
     this.framesUntilUpdate = 0;
     this.settings = {
       waveform: "sine",
@@ -30,12 +32,14 @@ class OscillatorCurveProcessor extends AudioWorkletProcessor {
       } else if (data.type === "play") {
         this.token = data.token ?? this.token;
         this.playing = true;
+        resetSmoothingState(this.smoothingState);
         this.port.postMessage({ type: "started", token: this.token });
       } else if (data.type === "seek") {
         this.token = data.token ?? this.token;
         this.outputTime = Math.max(0, Math.min(this.settings.durationSeconds, Number(data.seconds) || 0));
         this.phases.fill(0);
         this.modPhases.fill(0);
+        resetSmoothingState(this.smoothingState);
         this.framesUntilUpdate = 0;
       } else if (data.type === "stop") {
         this.token = data.token ?? this.token;
@@ -55,10 +59,10 @@ class OscillatorCurveProcessor extends AudioWorkletProcessor {
       let right = 0;
       if (this.playing) {
         const duration = Math.max(0.1, this.settings.durationSeconds);
-        const totalDuration = duration + Math.max(0, this.settings.tailSeconds || 0);
+        const totalDuration = duration + Math.max(0, this.settings.tailSeconds || 0) + LOOKAHEAD_SECONDS;
         let voices = 0;
         if (this.outputTime < duration) {
-          const sample = renderFrame(this.settings, clamp(this.outputTime / duration), sampleRate, this.phases, this.modPhases);
+          const sample = renderFrame(this.settings, clamp(this.outputTime / duration), sampleRate, this.phases, this.modPhases, this.smoothingState);
           const frameCount = Math.ceil(duration * sampleRate);
           const frame = Math.min(frameCount - 1, Math.round(this.outputTime * sampleRate));
           const fade = edgeFade(frame, frameCount, sampleRate);

@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Convolution diagnostic</title>
+<button id="run">Run controlled measurement</button>
+<label>Local candidate IR <input id="audio" type="file" accept="audio/*"></label>
+<button id="runFile">Measure file with default oscillator</button>
+<button id="runDenseHalf">Measure dense stack at 50% wet</button>
+<button id="runDense">Measure file with dense harmonic stack</button>
+<button id="runFullIr">Measure dense stack with full IR</button>
+<pre id="result">Not run</pre>
+<script type="module">
+import { mixGains, prepareImpulse } from '../src/convolution.js';
+import { curveDefaults, normFromBaseFrequency, renderFrame, createSmoothingState, edgeFade } from '../src/oscillator-core.js';
+import { StereoSafetyLimiter } from '../src/safety-limiter.js';
+import { renderOscillator } from '../src/offline-render.js';
+
+const rate = 48000;
+const dryLength = rate / 2;
+const irLength = rate * 2;
+
+function metrics(samples, activeLength = samples.length) {
+  let peak = 0;
+  let power = 0;
+  let activePower = 0;
+  let over = 0;
+  for (let i = 0; i < samples.length; i++) {
+    const sample = samples[i];
+    const absolute = Math.abs(sample);
+    peak = Math.max(peak, absolute);
+    power += sample * sample;
+    if (i < activeLength) activePower += sample * sample;
+    if (absolute > 1) over++;
+  }
+  return {
+    peak: +peak.toFixed(4), rms: +Math.sqrt(power / samples.length).toFixed(4),
+    activeRms: +Math.sqrt(activePower / Math.min(activeLength, samples.length)).toFixed(4), over0dB: over
+  };
+}
+
+async function measure(oscillatorHz, irHz, irAmplitude) {
+  const context = new OfflineAudioContext(2, dryLength + irLength - 1, rate);
+  const dry = context.createBuffer(1, dryLength, rate);
+  const drySamples = dry.getChannelData(0);
+  for (let i = 0; i < dryLength; i++) {
+    const edge = Math.min(1, i / (rate * .008), (dryLength - 1 - i) / (rate * .012));
+    drySamples[i] = .5 * Math.sin(2 * Math.PI * oscillatorHz * i / rate) * Math.max(0, edge);
+  }
+  const impulse = context.createBuffer(1, irLength, rate);
+  const irSamples = impulse.getChannelData(0);
+  for (let i = 0; i < irLength; i++) {
+    irSamples[i] = irAmplitude * Math.exp(-i / (rate * .35)) * Math.sin(2 * Math.PI * irHz * i / rate);
+  }
+  const source = context.createBufferSource();
+  source.buffer = dry;
+  const convolver = context.createConvolver();
+  convolver.normalize = true;
+  convolver.buffer = impulse;
+  source.connect(convolver).connect(context.destination);
+  source.start();
+  const wet = (await context.startRendering()).getChannelData(0);
+  const gains = mixGains(.5);
+  const mixed = new Float32Array(wet.length);
+  let limitedFrames = 0;
+  let worstReduction = 0;
+  const limiter = new StereoSafetyLimiter(rate);
+  for (let i = 0; i < wet.length; i++) {
+    const value = (drySamples[i] || 0) * gains.dry + wet[i] * gains.wet;
+    mixed[i] = value;
+    limiter.process(value, value);
+    if (limiter.gain < .999) limitedFrames++;
+    worstReduction = Math.max(worstReduction, 1 - limiter.gain);
+  }
+  return {
+    oscillatorHz, irHz, irAmplitude,
+    dry: metrics(drySamples), wet: metrics(wet), mixed: metrics(mixed),
+    limiterFramesPercent: +(100 * limitedFrames / wet.length).toFixed(2),
+    worstReductionPercent: +(100 * worstReduction).toFixed(2)
+  };
+}
+
+document.querySelector('#run').onclick = async () => {
+  const button = document.querySelector('#run');
+  button.disabled = true;
+  try {
+    const rows = [];
+    for (const irHz of [100, 3000]) {
+      for (const oscillatorHz of [100, 3000]) {
+        for (const irAmplitude of [.1, .8]) rows.push(await measure(oscillatorHz, irHz, irAmplitude));
+      }
+    }
+    document.querySelector('#result').textContent = JSON.stringify(rows, null, 2);
+  } catch (error) {
+    document.querySelector('#result').textContent = error.stack || String(error);
+  } finally {
+    button.disabled = false;
+  }
+};
+
+async function measureFile(impulse, frequency, preset) {
+  const frameCount = rate;
+  const curves = Object.fromEntries(Object.entries(curveDefaults).map(([key, y]) => [key, [{ x: 0, y }, { x: 1, y }]]));
+  curves.basePitch = [{ x: 0, y: normFromBaseFrequency(frequency) }, { x: 1, y: normFromBaseFrequency(frequency) }];
+  const settings = { waveform: preset.waveform, count: preset.count, stack: preset.stack, modulationMode: 'off', durationSeconds: 1, curves };
+  const phases = new Float64Array(64);
+  const modPhases = new Float64Array(64);
+  const smoothing = createSmoothingState();
+  const dry = [new Float32Array(frameCount), new Float32Array(frameCount)];
+  for (let i = 0; i < frameCount; i++) {
+    const frame = renderFrame(settings, i / frameCount, rate, phases, modPhases, smoothing);
+    const fade = edgeFade(i, frameCount, rate);
+    dry[0][i] = frame.left * fade;
+    dry[1][i] = frame.right * fade;
+  }
+  const context = new OfflineAudioContext(2, frameCount + impulse.length - 1, rate);
+  const buffer = context.createBuffer(2, frameCount, rate);
+  dry.forEach((channel, index) => buffer.copyToChannel(channel, index));
+  const source = context.createBufferSource();
+  source.buffer = buffer;
+  const convolver = context.createConvolver();
+  convolver.normalize = true;
+  convolver.buffer = impulse;
+  source.connect(convolver).connect(context.destination);
+  source.start();
+  const rendered = await context.startRendering();
+  const gains = mixGains(preset.wet);
+  const wet = [rendered.getChannelData(0), rendered.getChannelData(1)];
+  const mixed = [new Float32Array(wet[0].length), new Float32Array(wet[0].length)];
+  const final = [new Float32Array(wet[0].length), new Float32Array(wet[0].length)];
+  const limiter = new StereoSafetyLimiter(rate);
+  let limitedFrames = 0;
+  let worstReduction = 0;
+  for (let i = 0; i < wet[0].length; i++) {
+    const left = (dry[0][i] || 0) * gains.dry + wet[0][i] * gains.wet;
+    const right = (dry[1][i] || 0) * gains.dry + wet[1][i] * gains.wet;
+    mixed[0][i] = left;
+    mixed[1][i] = right;
+    const output = limiter.process(left, right);
+    final[0][i] = output.left;
+    final[1][i] = output.right;
+    if (limiter.gain < .999) limitedFrames++;
+    worstReduction = Math.max(worstReduction, 1 - limiter.gain);
+  }
+  const both = channels => metrics(Float32Array.from(channels[0], (value, i) => Math.abs(value) > Math.abs(channels[1][i]) ? value : channels[1][i]), frameCount);
+  let maxRenderError = null;
+  if (frequency === 110) {
+    const renderedOutput = await renderOscillator({
+      settings: { ...settings, format: 'stereo', convolutionEnabled: true, convolutionWet: preset.wet },
+      impulse, samplesOnly: true
+    });
+    maxRenderError = 0;
+    for (let channel = 0; channel < 2; channel++) {
+      for (let i = 0; i < final[channel].length; i++) {
+        maxRenderError = Math.max(maxRenderError, Math.abs(final[channel][i] - renderedOutput.samples[channel][i]));
+      }
+    }
+  }
+  return {
+    baseHz: frequency,
+    dry: both(dry), wet: both(wet), mixed: both(mixed), final: both(final),
+    limiterFramesPercent: +(100 * limitedFrames / wet[0].length).toFixed(2),
+    worstReductionPercent: +(100 * worstReduction).toFixed(2),
+    maxRenderError
+  };
+}
+
+async function runFileMeasurement(preset, button, irPercent = 0, frequencies = [50, 110, 2000, 3000]) {
+  const file = document.querySelector('#audio').files[0];
+  const result = document.querySelector('#result');
+  if (!file) { result.textContent = 'Choose a local audio file first.'; return; }
+  button.disabled = true;
+  result.textContent = 'Measuring…';
+  try {
+    const decoder = new OfflineAudioContext(2, 1, rate);
+    const decoded = await decoder.decodeAudioData(await file.arrayBuffer());
+    const impulse = prepareImpulse(decoder, decoded, irPercent);
+    const rows = [];
+    for (const frequency of frequencies) rows.push(await measureFile(impulse, frequency, preset));
+    result.textContent = JSON.stringify({
+      file: file.name, bytes: file.size, decodedChannels: decoded.numberOfChannels,
+      decodedSeconds: +(decoded.duration).toFixed(3), irSeconds: +(impulse.duration).toFixed(3),
+      settings: { ...preset, durationSeconds: 1, modulation: 'off', irPercent, sampleRate: rate }, rows
+    }, null, 2);
+  } catch (error) {
+    result.textContent = error.stack || String(error);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+document.querySelector('#runFile').onclick = event => runFileMeasurement(
+  { waveform: 'sine', stack: 'unison', count: 4, wet: .5 }, event.currentTarget
+);
+document.querySelector('#runDenseHalf').onclick = event => runFileMeasurement(
+  { waveform: 'saw', stack: 'harmonic', count: 16, wet: .5 }, event.currentTarget
+);
+document.querySelector('#runDense').onclick = event => runFileMeasurement(
+  { waveform: 'saw', stack: 'harmonic', count: 16, wet: 1 }, event.currentTarget
+);
+document.querySelector('#runFullIr').onclick = event => runFileMeasurement(
+  { waveform: 'saw', stack: 'harmonic', count: 16, wet: 1 }, event.currentTarget, 100, [110]
+);
+</script>
+</html>

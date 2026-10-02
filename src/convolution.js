@@ -1,4 +1,4 @@
-import { clamp, softLimit } from "./oscillator-core.js?v=20260928-audio1";
+import { clamp } from "./oscillator-core.js?v=20261002-fixedpan1";
 
 export const MIN_IR_SECONDS = 3;
 export const MAX_IR_FILE_BYTES = 16 * 1024 * 1024;
@@ -35,23 +35,13 @@ export function mixGains(wet) {
   return { dry: Math.cos(angle), wet: Math.sin(angle) };
 }
 
-export function createSafetyShaper(context) {
-  const node = context.createWaveShaper();
-  const curve = new Float32Array(4097);
-  for (let i = 0; i < curve.length; i += 1) {
-    curve[i] = softLimit(((i / (curve.length - 1)) * 8) - 4);
-  }
-  node.curve = curve;
-  node.oversample = "none";
-  return node;
-}
-
 export async function renderConvolved(channels, sampleRate, impulse, wet, signal) {
   if (!impulse || wet <= 0) return channels;
   if (signal?.aborted) throw new DOMException("Render cancelled", "AbortError");
   const frameCount = channels[0].length + impulse.length - 1;
   const context = new OfflineAudioContext(channels.length, frameCount, sampleRate);
-  const dryBuffer = context.createBuffer(channels.length, channels[0].length, sampleRate);
+  // Keep the stereo source active through the IR tail so the Convolver cannot downmix mid-render.
+  const dryBuffer = context.createBuffer(channels.length, frameCount, sampleRate);
   channels.forEach((channel, index) => dryBuffer.copyToChannel(channel, index));
   const source = context.createBufferSource();
   source.buffer = dryBuffer;
@@ -63,10 +53,8 @@ export async function renderConvolved(channels, sampleRate, impulse, wet, signal
   const gains = mixGains(wet);
   dryGain.gain.value = gains.dry;
   wetGain.gain.value = gains.wet;
-  const safety = createSafetyShaper(context);
-  source.connect(dryGain).connect(safety);
-  source.connect(convolver).connect(wetGain).connect(safety);
-  safety.connect(context.destination);
+  source.connect(dryGain).connect(context.destination);
+  source.connect(convolver).connect(wetGain).connect(context.destination);
   source.start();
   const rendered = await context.startRendering();
   if (signal?.aborted) throw new DOMException("Render cancelled", "AbortError");

@@ -18,7 +18,7 @@ New feature, parameter, DSP, interaction, or design changes should update their 
 
 Oscillator Curve Lab draws how a small oscillator stack changes over time. The first path is intentionally narrow: source waveform, base frequency, stack structure, deviation, spectral slope, and current oscillator value visualization.
 
-The sound selector now has Oscillator (default), Resynthesis, and Convolution modes. Resynthesis analyzes a local file into up to 32/64 significant sine partials; it does not play the imported recording. Convolution keeps the earlier oscillator-plus-IR behavior. See the dedicated specification for analysis limits and unverified sonic questions.
+The sound selector has Oscillator (default), Resynthesis, and Convolution modes. One Open Audio import serves both file-based modes: Resynthesis analyzes it into up to 32/64 significant sine partials, while Convolution uses it as an IR with the oscillator. Neither mode directly plays the imported recording. Resynthesis uses the fixed, user-approved C stereo placement. See the dedicated specification for analysis limits and unverified sonic questions.
 
 ## v1 scope
 

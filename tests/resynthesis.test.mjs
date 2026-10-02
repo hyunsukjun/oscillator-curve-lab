@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { analyzeSpectrum } from '../src/resynthesis-analysis.js';
-import { curveDefaults, normFromBaseFrequency, normFromSlopeDb, renderFrame, resynthesisVoices } from '../src/oscillator-core.js';
+import { curveDefaults, normFromBaseFrequency, normFromSlopeDb, renderFrame, resynthesisNyquistGain, resynthesisPan, resynthesisVoices } from '../src/oscillator-core.js';
 import { renderOscillator } from '../src/offline-render.js';
 
 function flat(y) { return [{ x: 0, y }, { x: 1, y }]; }
@@ -38,6 +38,32 @@ test('rich spectrum fills the 32 and 64 partial selections without inventing bin
   assert.equal(analyzeSpectrum(rich, rate, 64).partialCount, 64);
 });
 
+test('resynthesis uses the approved centered-root C placement', () => {
+  for (const [index, expected] of [0, -0.9, 0.8, -0.7, 1].entries()) {
+    assert.ok(Math.abs(resynthesisPan(index, 5) - expected) < 1e-12);
+  }
+  assert.equal(resynthesisPan(0, 1), 0);
+});
+
+test('high resynthesis partials fade before the cutoff and keep phase while muted', () => {
+  assert.equal(resynthesisNyquistGain(20160, rate), 1);
+  assert.ok(Math.abs(resynthesisNyquistGain(21600, rate) - 0.5) < 1e-12);
+  assert.ok(resynthesisNyquistGain(23039, rate) > 0);
+  assert.equal(resynthesisNyquistGain(23040, rate), 0);
+  const curves = Object.fromEntries(Object.entries(curveDefaults).map(([key, value]) => [key, flat(value)]));
+  curves.basePitch = flat(normFromBaseFrequency(4000));
+  const settings = {
+    soundMode: 'resynthesis',
+    analysisResult: { fundamentalEstimate: 100, partials: [{ index: 1, frequency: 600, relativeAmplitude: 1 }] },
+    curves
+  };
+  const phases = new Float64Array(64);
+  phases[0] = 0.1;
+  const muted = renderFrame(settings, 0, rate, phases, new Float64Array(64));
+  assert.equal(muted.voices, 0);
+  assert.ok(Math.abs(phases[0] - 0.6) < 1e-12);
+});
+
 test('default resynthesis keeps analysis ratios; curves transform output without altering analysis', async () => {
   const result = analyzeSpectrum(samples, rate, 32);
   const original = structuredClone(result.partials);
@@ -59,6 +85,12 @@ test('default resynthesis keeps analysis ratios; curves transform output without
   assert.ok(resynthesisVoices(settings, 0, rate)[0].frequency > voices[0].frequency);
   assert.deepEqual(result.partials, original);
   const rendered = await renderOscillator({ settings });
-  assert.equal(rendered.blob.size, 44 + rate * 2 * 3);
+  assert.equal(rendered.blob.size, 44 + (rate + 240) * 2 * 3);
   assert.ok(rendered.peak > 0 && rendered.peak < 1);
+  const fixed = (await renderOscillator({ settings, samplesOnly: true })).samples;
+  settings.resynthesisPan = 'sweep';
+  const legacySetting = (await renderOscillator({ settings, samplesOnly: true })).samples;
+  for (let channel = 0; channel < 2; channel += 1) {
+    assert.ok(fixed[channel].every((sample, index) => sample === legacySetting[channel][index]));
+  }
 });
