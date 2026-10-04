@@ -21,8 +21,8 @@ The canvas remains the primary work surface. Do not replace the module layout wi
 | Surface / raised surface | `#0d1b29` / `#122438` | `--cl-surface`, `--cl-surface-raised` |
 | Border / strong border | `#203a52` / `#345672` | `--cl-border`, `--cl-border-strong` |
 | Primary / secondary text | `#e8f0f6` / `#aabccc` | `--cl-text`, `--cl-text-secondary` |
-| Oscillator identity | Green `#53c78c` | `--cl-accent`; mark, title, restrained focus/identity accents |
-| Focus | `#8ce6b3`, 2 px outline with 2 px offset | `--cl-focus`, `:focus-visible` |
+| Oscillator identity | Teal `#28CDB0` | `--cl-accent`; mark, title, restrained focus/identity accents |
+| Focus | `#98eadc`, 2 px outline with 2 px offset | `--cl-focus`, `:focus-visible` |
 | Small/medium/large radius | 4/6/8 px | `--cl-radius-sm/md/lg` |
 | Spacing scale | 4/8/12/16/24 px | `--cl-space-1/2/3/4/6` |
 | Common control / toolbar height | 38/54 px | `--cl-control-height`, `--cl-toolbar-height` |
@@ -38,3 +38,7 @@ Canvas uses a dark `#0c1f31` field, more visible major than minor grid, legible 
 Buttons expose hover, active, focus-visible, and disabled states. Pen/Eraser remain a paired icon toggle with named hover help. Modulation and convolution controls appear only when meaningful. The page has a subtle ambient background; `prefers-reduced-motion` removes its motion. Use system fonts and no external visual package by default.
 
 For narrow screens the toolbar/status wrap and the fixed-format canvas scrolls horizontally instead of changing normalized curve data. In a Standalone UI, map these meanings to native controls and drawing primitives; copying CSS pixels verbatim is not required. Any token change that alters hierarchy or parameter identity needs a decision record and a regression check.
+
+## Hub v0.10 identity pilot — 2026-10-05
+
+Source of truth: CURVE LAB HUB for macOS v0.10. Header symbol and micro favicon are exact source SVGs. Shared six-Lab palette and source hashes live in `assets/identity/`. Oscillator uses #28CDB0, hover #60DBC5, focus #98EADC. Parameter, meter, FFT and canvas colors retain their musical meanings. See `docs/IDENTITY_PILOT.md`.

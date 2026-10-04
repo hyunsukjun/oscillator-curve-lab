@@ -133,3 +133,7 @@ This is a concise record of consequential choices, not a transcript. Dates below
 ## Open decision: IR-dependent tonal variance
 
 User observation: some source/parameter combinations sound attractive while others sound harsh; high versus low imported source material can reverse which base-frequency region feels useful. No automated EQ, spectral matching, revised Convolver normalization, or new parameter has been approved. Next investigation should use named audio files, identical output level, matched settings, rendered audio and listening notes, distinguishing clipping, aliasing, convolution coloration and intended timbre. Record any chosen adjustment's old/new values and listening setup in `PARAMETER_SPEC.md` and `DSP_BEHAVIOR.md` before calling it approved.
+
+## D-017: Hub v0.10 identity pilot
+
+2026-10-05: Replace temporary green identity and generic mark with Hub Oscillator #28CDB0 and original oscillator symbols. Preserve synthesis, interactions and semantic parameter colors. Local review completed; user authorized commit and publication on 2026-10-05. See `IDENTITY_PILOT.md`.

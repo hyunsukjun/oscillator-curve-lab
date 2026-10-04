@@ -1,0 +1,18 @@
+{
+  "source": "CURVE LAB HUB for macOS / DesignIdentity / 2026-10-04-v0.10",
+  "status": "Oscillator web identity; local review completed, publication authorized 2026-10-05",
+  "colorSpace": "sRGB",
+  "colors": {
+    "audio": "#459BFF",
+    "timbre": "#F4CB38",
+    "space": "#A982FF",
+    "granular": "#EF4FA4",
+    "spectral": "#FF7047",
+    "oscillator": "#28CDB0"
+  },
+  "assets": {
+    "oscillator-symbol.svg": "9c3af84d08acea0d4e79c4b1becc099804e2bb4eb88d5d6fc831105af2ddc378",
+    "oscillator-app.svg": "6147149d75b320bc2cc02d17c5ed134bc26a761f6ee73e53ab75344a7282424f",
+    "oscillator-micro.svg": "a580b68482d9505daa943e0f4b8e1fb080d2ab2785f18c340cb212627de7a103"
+  }
+}

@@ -106,3 +106,7 @@ Snapshot: 2026-09-29, current web implementation. `IMPLEMENTED` means code exist
 ## Not implemented / held
 
 Per-oscillator editing, 32/64 manually stacked OSCILLATOR-mode voices, waveshape drawing, a user-editable multiplier/Ratio pattern, multiple FM operators, complex modulation matrix, resonance/filter controls, time-varying partial tracking, and a high-resolution precision FFT analyzer are **not current features**. Resynthesis separately supports up to 32/64 analyzed peaks. A proposed preset/state format is not implemented. Keep proposals distinct from the current registry until a bounded implementation and tests exist.
+
+## Hub identity pilot
+
+IMPLEMENTED (2026-10-05): Hub v0.10 header symbol, micro favicon and Oscillator #28CDB0 identity. Publication authorized after local review on 2026-10-05. See `IDENTITY_PILOT.md`.

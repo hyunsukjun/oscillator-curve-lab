@@ -48,3 +48,7 @@ Use `KNOWLEDGE_PRESERVATION.md` as the capture ledger for the reference corpus, 
 - Windows modifier behavior, touch gestures, Reset cancellation in a real browser, and accessibility of a future native workspace need dedicated checks.
 
 Migration order: freeze behavior and test vectors for the core instrument first; design state/preset compatibility next; then evaluate native engine and UI frameworks against those requirements. Do not select a framework by assumption.
+
+## Identity assets
+
+Hub v0.10 standard/micro/app SVGs and six-Lab sRGB palette are preserved in `assets/identity/`. Web uses standard in header, micro in favicon; app tile is a future native reference, not an installed app icon. DSP and native architecture remain independent.

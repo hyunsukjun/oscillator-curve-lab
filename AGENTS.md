@@ -14,3 +14,7 @@ Scope: this directory only. Audio Curve Lab is a design reference; other Curve L
 8. Do not commit, push, publish, or deploy without an explicit request. Do not edit sibling Curve Lab projects.
 
 Document order: `DEVELOPMENT_GUIDELINES.md` for engineering practice, `CURVE_LAB_DESIGN_SYSTEM.md` for visual semantics, and `docs/` for this module's portable product specification. Existing reports in `docs/` are historical test evidence, not blanket approval of later revisions.
+
+## Brand reference
+
+Use Hub v0.10 Oscillator #28CDB0 and original SVG assets; see `docs/IDENTITY_PILOT.md`. Keep parameter and meter colors independent.
