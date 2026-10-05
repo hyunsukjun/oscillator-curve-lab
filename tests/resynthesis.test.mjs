@@ -85,7 +85,7 @@ test('default resynthesis keeps analysis ratios; curves transform output without
   assert.ok(resynthesisVoices(settings, 0, rate)[0].frequency > voices[0].frequency);
   assert.deepEqual(result.partials, original);
   const rendered = await renderOscillator({ settings });
-  assert.equal(rendered.blob.size, 44 + (rate + 240) * 2 * 3);
+  assert.equal(rendered.blob.size, 44 + rate * 2 * 3);
   assert.ok(rendered.peak > 0 && rendered.peak < 1);
   const fixed = (await renderOscillator({ settings, samplesOnly: true })).samples;
   settings.resynthesisPan = 'sweep';

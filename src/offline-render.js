@@ -1,6 +1,6 @@
 import { renderFrame, createSmoothingState, TARGET_SAMPLE_RATE, MAX_SOUND_DURATION_SECONDS, clamp, edgeFade, encodeWav24, outputChannelCount } from "./oscillator-core.js?v=20261005-duration-ui1";
 import { renderConvolved } from "./convolution.js?v=20261002-stereotail1";
-import { limitChannels } from "./safety-limiter.js?v=20261002-lookahead1";
+import { limitChannels, LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261002-lookahead1";
 
 export async function renderOscillator({ settings, impulse, signal, onProgress, samplesOnly = false }) {
   const sampleRate = TARGET_SAMPLE_RATE;
@@ -38,7 +38,12 @@ export async function renderOscillator({ settings, impulse, signal, onProgress, 
   }
 
   if (convolving) output = await renderConvolved(output, sampleRate, impulse, settings.convolutionWet, signal);
+  // Flush the unchanged limiter, then remove only its leading algorithmic delay.
+  // Preserve every source/tail sample; do not trim the end to force duration.
+  const latencyFrames = Math.round(sampleRate * LOOKAHEAD_SECONDS);
   output = limitChannels(output, sampleRate);
+  // Internal FFT/reference PCM retains the realtime timeline. Compensate files only.
+  if (!samplesOnly) output = output.map(channel => channel.subarray(latencyFrames));
   peak = 0;
   for (const channel of output) {
     for (const sample of channel) peak = Math.max(peak, Math.abs(sample));

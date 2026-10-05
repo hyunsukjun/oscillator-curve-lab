@@ -1,0 +1,16 @@
+<meta charset="utf-8"><h1>Oscillator compensated WAV and IR tail</h1><pre id="result">Running</pre><script type="module">
+
+import {renderOscillator as after} from '../src/offline-render.js?v=20261006-duration-comp2';
+import {curveDefaults} from '../src/oscillator-core.js';
+const curves=Object.fromEntries(Object.entries(curveDefaults).map(([k,y])=>[k,[{x:0,y},{x:1,y}]])),rows=[];
+for(const format of ['mono','stereo'])for(const wet of [0,.5,1]){
+const impulse=new AudioBuffer({numberOfChannels:2,length:4800,sampleRate:48000});impulse.getChannelData(0)[4799]=.5;impulse.getChannelData(1)[4799]=.25;
+const settings={waveform:'sine',count:4,stack:'harmonic',durationSeconds:1,format,curves,convolutionEnabled:true,convolutionWet:wet};
+const old=await after({settings,impulse,samplesOnly:true}),now=await after({settings,impulse,samplesOnly:true}),wav=await after({settings,impulse});const v=new DataView(await wav.blob.arrayBuffer());
+let error=0,tailPeak=0;const channels=v.getUint16(22,true),frameCount=v.getUint32(40,true)/(channels*3);
+for(let c=0;c<channels;c++)for(let i=0;i<frameCount;i++){const at=44+(i*channels+c)*3;let n=v.getUint8(at)|(v.getUint8(at+1)<<8)|(v.getUint8(at+2)<<16);if(n&0x800000)n-=0x1000000;const sample=n/(n<0?8388608:8388607);error=Math.max(error,Math.abs(sample-old.samples[c][i+240]));if(i>=48000)tailPeak=Math.max(tailPeak,Math.abs(sample));}
+const expected=48000+(wet>0?4799:0),frames=v.getUint32(40,true)/v.getUint16(32,true);
+rows.push({format,wet,frames,expected,pcmError:error,tailPeak,pass:frames===expected&&error<2e-7&&v.getUint32(24,true)===48000&&v.getUint16(34,true)===24&&(wet===0||tailPeak>0)});
+}
+document.querySelector('#result').textContent=JSON.stringify(rows,null,2);
+</script>

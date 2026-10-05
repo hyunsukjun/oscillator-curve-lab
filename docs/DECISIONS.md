@@ -152,3 +152,9 @@ User observation: some source/parameter combinations sound attractive while othe
 - DECISION: Remove the 1800 px minimum from the frequency/curve Canvas stack. Both Canvas display widths follow the available workspace; backing resolution and point hit testing continue to use their measured CSS dimensions.
 - REASON: The former minimum made a 1288 px laptop viewport show only about 1256 px of an 1800 px time axis. A user could not see the full curve or its end point without horizontal scrolling.
 - AFFECTS: Display geometry only. Normalized point x/y, interpolation, DSP timing, and WAV output remain unchanged. On very narrow screens, the same complete time axis is compressed and pointer precision deserves separate touch testing.
+
+## 2026-10-06 — WAV-only limiter latency compensation (local, unpublished)
+
+WAV files remove the 5 ms leading lookahead latency after flushing the unchanged safety limiter. Dry files now have exactly the generated frame count; wet files retain the full convolution length N + IR.length - 1 at matched 48 kHz. No end trimming, gain, ceiling, attack/release, oscillator or partial changes. Realtime and internal samplesOnly/FFT reference retain their existing delayed timeline; comparisons align WAV by 240 frames. This is file-time correction, not listening-led tuning.
+
+Verified: mono/stereo 1s and 60s output PCM equals the previous WAV after its 240-frame prefix; 17 limiter/convolution/resynthesis/file-duration tests pass; five Preview/WAV/FFT numerical comparisons pass after time alignment; six browser convolution cases (mono/stereo × wet 0/.5/1) preserve body/tail and match reference PCM within 24-bit quantization tolerance. Actual device listening and long/large IR limits remain unverified.

@@ -53,3 +53,9 @@ Migration order: freeze behavior and test vectors for the core instrument first;
 ## Identity assets
 
 Hub v0.10 standard/micro/app SVGs and six-Lab sRGB palette are preserved in `assets/identity/`. Web uses standard in header, micro in favicon; app tile is a future native reference, not an installed app icon. DSP and native architecture remain independent.
+
+## 2026-10-06 — WAV-only limiter latency compensation (local, unpublished)
+
+WAV files remove the 5 ms leading lookahead latency after flushing the unchanged safety limiter. Dry files now have exactly the generated frame count; wet files retain the full convolution length N + IR.length - 1 at matched 48 kHz. No end trimming, gain, ceiling, attack/release, oscillator or partial changes. Realtime and internal samplesOnly/FFT reference retain their existing delayed timeline; comparisons align WAV by 240 frames. This is file-time correction, not listening-led tuning.
+
+Verified: mono/stereo 1s and 60s output PCM equals the previous WAV after its 240-frame prefix; 17 limiter/convolution/resynthesis/file-duration tests pass; five Preview/WAV/FFT numerical comparisons pass after time alignment; six browser convolution cases (mono/stereo × wet 0/.5/1) preserve body/tail and match reference PCM within 24-bit quantization tolerance. Actual device listening and long/large IR limits remain unverified.

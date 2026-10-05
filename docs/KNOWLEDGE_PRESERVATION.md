@@ -119,3 +119,11 @@ No benchmark numbers or device underrun results have been recorded. The current 
 | Resynthesis 32/64 peaks, sparse and rich files | Decode/Worker duration, realtime glitches, 48 kHz WAV render time, peak memory, output spectrum and listening | Synthetic 64-peak selection checked; device and real-file measurements pending |
 
 Each measurement needs date, app revision, browser/OS, CPU/device, sample rate, channel count, material hash, complete settings, method/tool and raw result location. Keep numerical parity, perceptual listening, and performance as separate verdicts. A native implementation can choose different internals, but any audible or interaction difference should be an explicit product decision.
+
+## 2026-10-06 — WAV-only limiter latency compensation (local, unpublished)
+
+WAV files remove the 5 ms leading lookahead latency after flushing the unchanged safety limiter. Dry files now have exactly the generated frame count; wet files retain the full convolution length N + IR.length - 1 at matched 48 kHz. No end trimming, gain, ceiling, attack/release, oscillator or partial changes. Realtime and internal samplesOnly/FFT reference retain their existing delayed timeline; comparisons align WAV by 240 frames. This is file-time correction, not listening-led tuning.
+
+Verified: mono/stereo 1s and 60s output PCM equals the previous WAV after its 240-frame prefix; 17 limiter/convolution/resynthesis/file-duration tests pass; five Preview/WAV/FFT numerical comparisons pass after time alignment; six browser convolution cases (mono/stereo × wet 0/.5/1) preserve body/tail and match reference PCM within 24-bit quantization tolerance. Actual device listening and long/large IR limits remain unverified.
+
+Actual app check: default stereo 20-second oscillator Play/natural end and WAV download succeeded. Filesystem header: 48k/24-bit/2ch/960000 frames, exactly 20 seconds. Browser console had no warnings/errors.
