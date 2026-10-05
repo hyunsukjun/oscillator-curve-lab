@@ -145,3 +145,10 @@ User observation: some source/parameter combinations sound attractive while othe
 - REASON: Duration determines how quickly every curve gesture unfolds and belongs beside curve selection. A compact short range supports ordinary editing while a separate long range allows ten-minute output without sacrificing slider precision. The file-size estimate makes the long-output cost visible.
 - TRADEOFF: The previous 0.5 s step and 180 s ceiling are replaced. Stereo 48 kHz/24-bit PCM is about 172.8 MB at 600 s before IR tail; temporary JS arrays, offline convolution and processed FFT can use much more memory. A successful Node dry render is not proof of stable long wet rendering on every browser.
 - FOLLOW-UP 2026-10-05: After reviewing a visual mockup, the user chose an always-visible compact Duration row directly below the parameter toolbar. Remove the toggle button, but retain the same ranges, mapping, stop/reset behavior, and output estimate. On low or narrow screens, preserve the editor's minimum height and allow vertical scrolling.
+
+## D-019: Fit the complete curve time axis within the workspace
+
+- RECORDED: 2026-10-05. STATUS: Implemented locally; laptop and narrow-browser resize, point-addition, backing-size, and no-horizontal-overflow checks passed. Touch precision remains unverified.
+- DECISION: Remove the 1800 px minimum from the frequency/curve Canvas stack. Both Canvas display widths follow the available workspace; backing resolution and point hit testing continue to use their measured CSS dimensions.
+- REASON: The former minimum made a 1288 px laptop viewport show only about 1256 px of an 1800 px time axis. A user could not see the full curve or its end point without horizontal scrolling.
+- AFFECTS: Display geometry only. Normalized point x/y, interpolation, DSP timing, and WAV output remain unchanged. On very narrow screens, the same complete time axis is compressed and pointer precision deserves separate touch testing.

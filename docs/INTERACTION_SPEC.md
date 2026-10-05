@@ -27,6 +27,8 @@ The three sound-mode buttons are mutually exclusive. Oscillator is initially sel
 
 The web hit-test radius is 12 CSS px. That value is an implementation detail, not a native gesture specification. A Standalone implementation may choose a device-appropriate hit area while preserving point selection and empty-space behavior. Likewise, Canvas resize or scrolling must not change stored normalized curves.
 
+The frequency and curve Canvas use the available workspace width so the full output time range, including both endpoints, remains visible without horizontal scrolling on a laptop. Resize changes only display and backing-store dimensions; normalized points and their DSP timing stay fixed.
+
 Audio smoothing after curve mapping does not move points, change tooltip values, or redraw a different gesture. A steep Deviation or FM gesture remains steep on screen while its audio target settles over 8 or 5 ms respectively. Numeric Ratio changes settle over 10 ms in log-frequency space.
 
 ## Module controls

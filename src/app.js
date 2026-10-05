@@ -164,12 +164,6 @@ let canvasCssWidth = 1;
 let canvasCssHeight = 1;
 let frequencyCssWidth = 1;
 let frequencyCssHeight = 1;
-let canvasBaseWidth = 0;
-
-
-
-
-const canvasMinimumWidth = 1800;
 const canvasBaseHeight = 440;
 const frequencyBaseHeight = 110;
 const curveAxisWidth = 62;
@@ -262,12 +256,7 @@ function fitEditorControls(force = false) {
 }
 
 function resizeCanvas() {
-  const frameRect = canvas.parentElement.getBoundingClientRect();
-  const targetWidth = Math.max(frameRect.width, canvasBaseWidth, canvasMinimumWidth);
-  canvasBaseWidth = targetWidth;
-  frequencyCanvas.style.width = `${Math.round(canvasBaseWidth)}px`;
   frequencyCanvas.style.height = `${frequencyBaseHeight}px`;
-  canvas.style.width = `${Math.round(canvasBaseWidth)}px`;
   canvas.style.height = `${canvasBaseHeight}px`;
   const frequencyRect = frequencyCanvas.getBoundingClientRect();
   const rect = canvas.getBoundingClientRect();
