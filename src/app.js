@@ -1,6 +1,7 @@
-import {createFFTPreview} from "./fft-preview.js?v=20261002-lookahead1";
+import {createFFTPreview} from "./fft-preview.js?v=20261005-duration-ui1";
 import {
   TARGET_SAMPLE_RATE,
+  MAX_SOUND_DURATION_SECONDS,
   baseFrequencyFromNorm,
   normFromBaseFrequency,
   normFromSlopeDb,
@@ -16,9 +17,9 @@ import {
   slopeDbFromNorm,
   stackFrequencies,
   valueAt
-} from "./oscillator-core.js?v=20261002-fixedpan1";
+} from "./oscillator-core.js?v=20261005-duration-ui1";
 
-import { renderOscillator } from "./offline-render.js?v=20261002-lookahead1";
+import { renderOscillator } from "./offline-render.js?v=20261005-duration-ui1";
 import { LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261002-lookahead1";
 import { OutputMeterAnalyzer } from "./output-meter.js?v=20261001-playback1";
 import {
@@ -42,6 +43,10 @@ const clearCurveButton = document.getElementById("clearCurveButton");
 const resetButton = document.getElementById("resetButton");
 const sonogramToggle = document.getElementById("sonogramToggle");
 const durationInput = document.getElementById("durationInput");
+const durationPanel = document.getElementById("durationPanel");
+const durationRange = document.getElementById("durationRange");
+const durationValue = document.getElementById("durationValue");
+const durationEstimate = document.getElementById("durationEstimate");
 const formatSelect = document.getElementById("formatSelect");
 const waveformButtons = [...document.querySelectorAll(".waveformButton")];
 const countSelect = document.getElementById("countSelect");
@@ -208,7 +213,7 @@ function settings() {
     modulationMode: modulationSelect.value,
     modulationRatio: Math.max(0.25, Math.min(8, Number(modulationRatioInput.value) || 1)),
     multiplierText: "1:1.5:2:2.5",
-    durationSeconds: Math.max(1, Math.min(180, Number(durationInput.value) || 20)),
+    durationSeconds: Math.max(1, Math.min(MAX_SOUND_DURATION_SECONDS, Number(durationInput.value) || 20)),
     convolutionEnabled: soundMode === "convolution" && Boolean(impulseBuffer48k),
     convolutionWet: convolutionWetAmount,
     impulseRevision,
@@ -221,6 +226,39 @@ function settings() {
 function outputDuration() {
   const current = settings();
   return current.durationSeconds + current.tailSeconds + LOOKAHEAD_SECONDS;
+}
+
+function formatDurationLabel(seconds) {
+  return seconds < 60 ? `${seconds} sec` : `${Math.floor(seconds / 60)} min${seconds % 60 ? ` ${seconds % 60} sec` : ""}`;
+}
+
+function updateDurationDisplay() {
+  const current = settings();
+  const label = formatDurationLabel(current.durationSeconds);
+  durationValue.textContent = label;
+  durationInput.setAttribute("aria-valuetext", label);
+  const frames = Math.ceil(current.durationSeconds * TARGET_SAMPLE_RATE)
+    + (current.tailSeconds ? Math.round(current.tailSeconds * TARGET_SAMPLE_RATE) : 0)
+    + Math.round(LOOKAHEAD_SECONDS * TARGET_SAMPLE_RATE);
+  const channels = current.format === "mono" ? 1 : 2;
+  const megabytes = (44 + frames * channels * 3) / 1_000_000;
+  durationEstimate.textContent = `WAV ~${megabytes.toFixed(1)} MB${current.tailSeconds ? ` · includes ${current.tailSeconds.toFixed(1)} s IR tail` : ""}`;
+}
+
+function fitEditorControls(force = false) {
+  const editor = document.querySelector(".editor");
+  const compact = window.matchMedia("(max-height: 900px)").matches;
+  const growth = (element, baseline) => Math.max(0, element.getBoundingClientRect().height - baseline);
+  const extra = Math.ceil(
+    growth(oscillatorControls, compact ? 50 : 54)
+    + growth(document.querySelector(".impulseBand"), compact ? 42 : 44)
+    + growth(document.querySelector(".legend"), compact ? 48 : 54)
+    + (modulationInfo.hidden ? 0 : modulationInfo.getBoundingClientRect().height)
+    + durationPanel.getBoundingClientRect().height + (parseFloat(getComputedStyle(editor).rowGap) || 0)
+  );
+  if (!force && editor.style.getPropertyValue("--editor-extra-height") === `${extra}px`) return;
+  editor.style.setProperty("--editor-extra-height", `${extra}px`);
+  resizeCanvas();
 }
 
 function resizeCanvas() {
@@ -294,6 +332,7 @@ function sendSettings() {
   node?.port.postMessage({ type: "settings", settings: settings() });
   updateConvolutionRouting();
   scheduleSonogramRender();
+  updateDurationDisplay();
   draw();
   updateTransport();
 }
@@ -1284,11 +1323,28 @@ window.addEventListener("blur", () => updateEraseCursor());
 [
   countSelect,
   stackSelect,
-  durationInput,
   formatSelect
 ].forEach((control) => {
   control.addEventListener("input", sendSettings);
   control.addEventListener("change", sendSettings);
+});
+
+durationRange.addEventListener("change", () => {
+  const previous = Number(durationInput.value);
+  const long = durationRange.value === "long";
+  durationInput.min = long ? "60" : "1";
+  durationInput.max = long ? String(MAX_SOUND_DURATION_SECONDS) : "60";
+  durationInput.value = String(Math.max(Number(durationInput.min), Math.min(Number(durationInput.max), previous)));
+  document.getElementById("durationMin").textContent = long ? "1 min" : "1 sec";
+  document.getElementById("durationMax").textContent = long ? "10 min" : "60 sec";
+  if (Number(durationInput.value) !== previous) {
+    stop(true);
+    sendSettings();
+  } else updateDurationDisplay();
+});
+durationInput.addEventListener("input", () => {
+  stop(true);
+  sendSettings();
 });
 
 clearCurveButton.addEventListener("click", clearCurrentCurve);
@@ -1315,9 +1371,13 @@ window.addEventListener("keydown", (event) => {
   else play();
 });
 
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", () => fitEditorControls(true));
+if ("ResizeObserver" in window) {
+  const controlsObserver = new ResizeObserver(() => fitEditorControls());
+  [oscillatorControls, document.querySelector(".impulseBand"), document.querySelector(".legend"), modulationInfo, durationPanel].forEach((element) => controlsObserver.observe(element));
+}
 setSoundMode("oscillator");
-resizeCanvas();
+fitEditorControls(true);
 updateTransport();
 requestAnimationFrame(updateMeter);
 scheduleSonogramRender();

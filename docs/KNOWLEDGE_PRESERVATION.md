@@ -113,7 +113,7 @@ No benchmark numbers or device underrun results have been recorded. The current 
 | --- | --- | --- |
 | 1/4/16 voices, four waveforms, Off/FM/AM/Ring at 48 kHz | Real-time CPU/load proxy, glitches/underruns, actual context rate, output peak, rendered time | Pending |
 | High Base Freq and modulation ratio/amount extremes | Alias components or spectral evidence plus matched listening; compare 48 kHz and native fallback | Pending |
-| 1/20/180 s sound, short/full permitted IR | Render elapsed time, peak memory, output duration, UI responsiveness, abort behavior | Pending |
+| 1/20/60/600 s sound, short/full permitted IR | Render elapsed time, peak memory, output duration, UI responsiveness, abort behavior | 600 s dry mono 48 kHz/24-bit Node render produced a 600.005 s, 86,400,764-byte WAV Blob in about 11 s on 2026-10-05; local browser dry FFT at 600 s completed without console error. Short dry and 1 s sound plus 1 s IR-tail stereo browser WAV downloads were confirmed as 48 kHz/24-bit PCM. These do not establish browser peak memory, long wet render, or listening stability. Remaining cases pending. |
 | Convolution Off/On, Dry/Wet endpoints | Browser and future native normalization, loudness/peak change, tail handling | Pending |
 | FFT Off/On and stale/update cycles | Analysis elapsed time, memory, cancellation and stale-result behavior | Pending |
 | Resynthesis 32/64 peaks, sparse and rich files | Decode/Worker duration, realtime glitches, 48 kHz WAV render time, peak memory, output spectrum and listening | Synthetic 64-peak selection checked; device and real-file measurements pending |

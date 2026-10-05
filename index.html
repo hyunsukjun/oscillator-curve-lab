@@ -6,7 +6,7 @@
     <title>Oscillator Curve Lab</title>
     <link rel="icon" type="image/svg+xml" href="assets/identity/oscillator-micro.svg?v=hub-v0.10">
     <link rel="stylesheet" href="assets/identity/tokens.css?v=hub-v0.10">
-    <link rel="stylesheet" href="src/styles.css?v=20261005-compact-voices3">
+    <link rel="stylesheet" href="src/styles.css?v=20261005-duration-visible1">
   </head>
   <body>
     <main class="app">
@@ -22,11 +22,6 @@
         <div class="transport">
           <button id="openAudioButton" type="button">Open Audio</button>
           <input id="impulseInput" type="file" accept="audio/*,.wav,.aif,.aiff,.mp3,.m4a,.flac" hidden>
-          <label class="durationSelect">
-            <span>Sound Duration</span>
-            <input id="durationInput" type="number" min="1" max="180" step="0.5" value="20">
-            <span>sec</span>
-          </label>
           <label class="outputSelect">
             <select id="formatSelect" aria-label="Final output format">
               <option value="stereo">Stereo 2ch</option>
@@ -138,6 +133,19 @@
           </div>
         </div>
 
+        <section id="durationPanel" class="durationPanel" aria-label="Output Duration">
+          <label for="durationInput">Output Duration</label>
+          <select id="durationRange" aria-label="Duration range">
+            <option value="short">1–60 sec</option>
+            <option value="long">1–10 min</option>
+          </select>
+          <span id="durationMin">1 sec</span>
+          <input id="durationInput" type="range" min="1" max="60" step="1" value="20" aria-label="Output Duration">
+          <span id="durationMax">60 sec</span>
+          <output id="durationValue" for="durationInput">20 sec</output>
+          <span id="durationEstimate"></span>
+        </section>
+
         <div class="panel">
           <div class="readout"><span>Curve</span><strong id="modeReadout">Base Freq</strong></div>
           <div class="readout"><span>Points</span><strong id="pointsReadout">2</strong></div>
@@ -197,6 +205,6 @@
       </footer>
     </main>
 
-    <script src="src/app.js?v=20261005-compact-voices3" type="module"></script>
+    <script src="src/app.js?v=20261005-duration-visible1" type="module"></script>
   </body>
 </html>

@@ -1,10 +1,10 @@
-import { renderFrame, createSmoothingState, TARGET_SAMPLE_RATE, clamp, edgeFade, encodeWav24, outputChannelCount } from "./oscillator-core.js?v=20261002-fixedpan1";
+import { renderFrame, createSmoothingState, TARGET_SAMPLE_RATE, MAX_SOUND_DURATION_SECONDS, clamp, edgeFade, encodeWav24, outputChannelCount } from "./oscillator-core.js?v=20261005-duration-ui1";
 import { renderConvolved } from "./convolution.js?v=20261002-stereotail1";
 import { limitChannels } from "./safety-limiter.js?v=20261002-lookahead1";
 
 export async function renderOscillator({ settings, impulse, signal, onProgress, samplesOnly = false }) {
   const sampleRate = TARGET_SAMPLE_RATE;
-  const duration = clamp(settings.durationSeconds || 20, 1, 180);
+  const duration = clamp(settings.durationSeconds || 20, 1, MAX_SOUND_DURATION_SECONDS);
   const frameCount = Math.ceil(duration * sampleRate);
   const channelCount = outputChannelCount(settings.format);
   let output = Array.from({ length: channelCount }, () => new Float32Array(frameCount));

@@ -6,6 +6,7 @@ The future Standalone product should reproduce **behavior and sound**, not neces
 
 - Stable current parameter IDs: `basePitch`, `deviation`, `slope`, `fmIndex`, `amDepth`, `ringMix`, plus the named settings in `PARAMETER_SPEC.md`. UI labels may change, but changing meaning/range/normalization requires a versioned migration.
 - Curve points are normalized `{x,y}`, independent of viewport size; `x` refers to sound duration and y follows each parameter's documented mapping. Smoothstep interpolation and protected endpoints are product behavior.
+- Output Duration uses integer seconds from 1 to 600 (short 1-60 s, long 60-600 s), default 20 s. Changing it stops and resets transport without rewriting normalized curves; wet IR tail and limiter flush remain outside sound duration. These semantics are portable, while the web slider, Blob size and browser memory limits are not. A native renderer should separately budget final file bytes and peak working memory.
 - A future state format is **proposed, not implemented**. Candidate fields: `schemaVersion`, `product`, `module`, `settings`, `curves`, and explicit treatment of IR references/availability. Do not assume local browser file bytes can simply be embedded in an automation preset.
 - Preserve UI semantics: separate brand versus parameter colors, workbench hierarchy, current oscillator values versus FFT output observation, Pen/Eraser intent, focus/disabled feedback, and reduced-motion policy.
 

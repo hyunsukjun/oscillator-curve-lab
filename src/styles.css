@@ -204,33 +204,13 @@ input {
   color: var(--cl-text-secondary);
 }
 
-.outputSelect,
-.durationSelect {
+.outputSelect {
   height: var(--cl-control-height);
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--cl-border);
   border-radius: var(--cl-radius-md);
   background: var(--cl-surface-raised);
-}
-
-.durationSelect {
-  gap: var(--cl-space-2);
-  padding: 0 8px 0 12px;
-  color: var(--cl-text-secondary);
-  font-size: 12.5px;
-  font-weight: 620;
-  white-space: nowrap;
-}
-
-.durationSelect input {
-  width: 62px;
-  height: 30px;
-  border: 0;
-  background: var(--cl-surface-active);
-  padding: 0 7px;
-  font-size: 13px;
-  font-weight: 500;
 }
 
 .outputSelect select {
@@ -561,6 +541,25 @@ button:disabled {
   height: 34px;
 }
 
+.durationPanel {
+  display: grid;
+  grid-template-columns: auto auto auto minmax(100px, 1fr) auto auto auto;
+  align-items: center;
+  gap: var(--cl-space-3);
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--cl-border);
+  border-radius: var(--cl-radius-lg);
+  background: var(--cl-surface);
+  color: var(--cl-text-secondary);
+  font-size: 12px;
+}
+
+.durationPanel select { padding: 0 8px; }
+.durationPanel input[type="range"] { width: 100%; min-width: 0; height: 20px; border: 0; background: transparent; accent-color: var(--cl-accent); }
+.durationPanel output { color: var(--cl-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+#durationEstimate { color: var(--cl-text-muted); white-space: nowrap; }
+
 .curveMode {
   border-color: #29445b;
   background: #102236;
@@ -730,7 +729,7 @@ button:disabled {
 }
 
 #curveCanvas {
-  height: 440px;
+  height: clamp(240px, calc(440px - var(--editor-extra-height, 0px)), 440px) !important;
   cursor: crosshair;
 }
 
@@ -768,7 +767,7 @@ button:disabled {
   .panel { padding: 7px var(--cl-space-2); }
   .curveStack { gap: var(--cl-space-2); }
   #frequencyCanvas { height: clamp(80px, calc((100dvh - 620px) / 2), 120px) !important; }
-  #curveCanvas { height: clamp(190px, calc(100dvh - 590px), 340px) !important; }
+  #curveCanvas { height: clamp(170px, calc(100dvh - 550px - var(--editor-extra-height, 0px)), 340px) !important; }
 }
 
 .bottomTransport { display: flex; align-items: center; gap: var(--cl-space-2); }
@@ -885,6 +884,14 @@ button:disabled {
 }
 
 @media (max-width: 860px) {
+  .durationPanel { grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--cl-space-2); }
+  .durationPanel > label { grid-column: 1 / 3; }
+  #durationRange { grid-column: 3; }
+  #durationMin { grid-column: 1; }
+  #durationInput { grid-column: 2; }
+  #durationMax { grid-column: 3; }
+  #durationValue { grid-column: 2; }
+  #durationEstimate { grid-column: 1 / -1; white-space: normal; }
   .topbar {
     align-items: start;
     grid-template-columns: minmax(0, 1fr);

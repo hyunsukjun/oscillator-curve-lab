@@ -137,3 +137,11 @@ User observation: some source/parameter combinations sound attractive while othe
 ## D-017: Hub v0.10 identity pilot
 
 2026-10-05: Replace temporary green identity and generic mark with Hub Oscillator #28CDB0 and original oscillator symbols. Preserve synthesis, interactions and semantic parameter colors. Local review completed; user authorized commit and publication on 2026-10-05. See `IDENTITY_PILOT.md`.
+
+## D-018: Expose Output Duration as a curve-workbench control
+
+- RECORDED: 2026-10-05. STATUS: Implemented locally; long browser/device stress remains unverified.
+- DECISION: Replace the top numeric Sound Duration field with a toolbar Duration button and collapsible 1-60 s / 60-600 s slider. Use integer seconds; retain normalized curve points and stop/reset playback on value changes. Preserve the existing convolution tail and 5 ms limiter flush rather than redefining duration as final file length.
+- REASON: Duration determines how quickly every curve gesture unfolds and belongs beside curve selection. A compact short range supports ordinary editing while a separate long range allows ten-minute output without sacrificing slider precision. The file-size estimate makes the long-output cost visible.
+- TRADEOFF: The previous 0.5 s step and 180 s ceiling are replaced. Stereo 48 kHz/24-bit PCM is about 172.8 MB at 600 s before IR tail; temporary JS arrays, offline convolution and processed FFT can use much more memory. A successful Node dry render is not proof of stable long wet rendering on every browser.
+- FOLLOW-UP 2026-10-05: After reviewing a visual mockup, the user chose an always-visible compact Duration row directly below the parameter toolbar. Remove the toggle button, but retain the same ranges, mapping, stop/reset behavior, and output estimate. On low or narrow screens, preserve the editor's minimum height and allow vertical scrolling.

@@ -29,7 +29,7 @@ Snapshot: 2026-09-29, current web implementation. `IMPLEMENTED` means code exist
 
 - CATEGORY: COMMON. STATUS: VERIFIED for generated 48 kHz/24-bit PCM format and tested paths.
 - PURPOSE/USER BEHAVIOR: Download rendered mono or stereo audio without uploading a source file.
-- INPUT/OUTPUT: Current settings and curves, optional local IR; 48 kHz, signed 24-bit PCM WAV. Sound duration is 1-180 s; an active wet IR adds its tail, then the final limiter adds 5 ms of leading delay and final flush.
+- INPUT/OUTPUT: Current settings and curves, optional local IR; 48 kHz, signed 24-bit PCM WAV. Sound duration is 1-600 s; an active wet IR adds its tail, then the final limiter adds 5 ms of leading delay and final flush.
 - PROCESSING: Shared core frame renderer, selected parameter slew, edge fade, optional offline convolution, linked final safety limiter, 24-bit encoder.
 - EDGE CASES: An edit marks prior download stale. The renderer accepts an abort signal internally, but the current UI has no user-facing render-cancel button. Browser file-download behavior depends on platform.
 - CURRENT WEB IMPLEMENTATION: `src/offline-render.js`, `src/oscillator-core.js`, `src/convolution.js`, `src/app.js`.
@@ -45,6 +45,14 @@ Snapshot: 2026-09-29, current web implementation. `IMPLEMENTED` means code exist
 - CURRENT WEB IMPLEMENTATION: `src/fft-preview.js`, `src/fft-worker.js`, `src/spectrogram-core.js`, `src/fft.js`.
 - PLATFORM-INDEPENDENT REQUIREMENTS: Label it as an observation with resolution limits; do not imply it is a precision analyzer.
 - TESTS/HISTORY: `tests/output-preview.mjs` and `docs/FFT-REFINEMENT-REPORT.md`. Browser FFT update and error-free completion were observed on 2026-09-29.
+
+### OCL-C05: Output Duration control
+
+- CATEGORY: COMMON interaction. STATUS: IMPLEMENTED; 600 s dry mono WAV numerically checked, 600 s dry FFT completed in the local browser, and short dry/wet browser exports downloaded. Long wet render and device stress remain open.
+- PURPOSE/USER BEHAVIOR: The Output Duration slider is always visible below the parameter toolbar; no extra toggle is needed and using it does not change the selected curve or editing tool. Short range is 1-60 s; long range is 60-600 s, both in 1 s steps. Switching ranges clamps an out-of-range value.
+- INPUT/OUTPUT: Changing duration stops playback, returns position to zero, and stretches the same normalized curve over the new sound time. The panel shows an estimated 48 kHz/24-bit WAV file size for the selected channel count, including current wet IR tail and limiter flush; this is not an estimate of render memory.
+- EDGE CASES: Controls lock during rendering. The output may exceed selected sound duration because of wet IR tail and the existing 5 ms limiter flush. A 10 min stereo dry file alone is about 172.8 MB; renderer buffers and FFT wet analysis require additional memory. Browser/device stability at this limit is not approved.
+- CURRENT WEB IMPLEMENTATION: `index.html`, `src/app.js`, `src/styles.css`, `src/offline-render.js`, `src/fft-worker.js`.
 
 ## Oscillator-specific behavior
 

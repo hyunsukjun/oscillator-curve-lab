@@ -31,6 +31,8 @@ Audio smoothing after curve mapping does not move points, change tooltip values,
 
 ## Module controls
 
+- `Duration`: An always-visible row below the parameter toolbar shows the range, slider, current seconds, and estimated WAV size; it does not change the active curve or tool. The short 1-60 s and long 60-600 s sliders use 1 s steps. Changing range clamps only when needed; changing the value stops playback and resets the playhead. Points retain normalized time/value and interpolation, so the whole gesture takes proportionally longer or shorter. Controls are disabled while rendering. The displayed WAV size includes output channels, current wet tail, and limiter flush, but not temporary render memory.
+
 - `Waveform`: Sine/Triangle/Saw/Square are mutually exclusive source choices. The default is Sine.
 - `Stack`: Unison, Harmonic, Odd Harmonics, or Multiplier. Multiplier currently uses an internal fixed pattern, not direct ratio entry. `Mod Freq x` is the modulator-to-carrier ratio and is shown only when FM/AM/Ring is selected.
 - `Convolution`: the mode button remains selectable without an IR; until a valid local file is decoded it plays the dry oscillator and does not show Dry/Wet or IR Length. Opening audio loads an IR while preserving oscillator synthesis. Choosing Oscillator bypasses the effect. A new invalid file must not erase an earlier usable IR.

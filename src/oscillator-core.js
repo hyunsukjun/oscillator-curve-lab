@@ -1,4 +1,5 @@
 export const TARGET_SAMPLE_RATE = 48000;
+export const MAX_SOUND_DURATION_SECONDS = 600;
 export const MIN_BASE_FREQUENCY = 20;
 export const MAX_BASE_FREQUENCY = 4000;
 

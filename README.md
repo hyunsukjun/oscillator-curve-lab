@@ -18,6 +18,8 @@ New feature, parameter, DSP, interaction, or design changes should update their 
 
 Oscillator Curve Lab draws how a small oscillator stack changes over time. The first path is intentionally narrow: source waveform, base frequency, stack structure, deviation, spectral slope, and current oscillator value visualization.
 
+Set output time from the always-visible Output Duration row below the curve toolbar. It offers 1-60 seconds and 1-10 minutes in one-second steps, with an estimated WAV file size. Duration stretches the same normalized curves; Convolution may add an IR tail beyond the selected time. Ten-minute renders can require substantially more working memory than the shown WAV size.
+
 The sound selector has Oscillator (default), Resynthesis, and Convolution modes. One Open Audio import serves both file-based modes: Resynthesis analyzes it into up to 32/64 significant sine partials, while Convolution uses it as an IR with the oscillator. Neither mode directly plays the imported recording. Resynthesis uses the fixed, user-approved C stereo placement. See the dedicated specification for analysis limits and unverified sonic questions.
 
 ## v1 scope
