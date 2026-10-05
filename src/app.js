@@ -165,8 +165,8 @@ let canvasBaseWidth = 0;
 
 
 const canvasMinimumWidth = 1800;
-const canvasBaseHeight = 560;
-const frequencyBaseHeight = 220;
+const canvasBaseHeight = 440;
+const frequencyBaseHeight = 110;
 const curveAxisWidth = 62;
 const frequencyAxisPadding = 14;
 
@@ -686,19 +686,20 @@ function drawFrequency() {
     : stackFrequencies(currentSettings, t, audioContext?.sampleRate || TARGET_SAMPLE_RATE);
   const minHz = 20;
   const maxHz = 20000;
-  const bottom = frequencyCssHeight - 34;
-  const top = 24;
+  const bottom = frequencyCssHeight - 28;
+  const top = 26;
   frequencyCtx.font = "12px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
   frequencyCtx.fillStyle = "#e8f0f6";
-  frequencyCtx.fillText(soundMode === "resynthesis" ? "Current Analyzed Partials" : "Current Oscillator Values", 18, 20);
+  const heading = soundMode === "resynthesis" ? "Current Analyzed Partials" : "Current Oscillator Values";
+  frequencyCtx.fillText(heading, 18, 20);
   frequencyCtx.fillStyle = "rgba(170, 188, 204, 0.78)";
-  frequencyCtx.fillText(`${voices.length}/${soundMode === "resynthesis" ? analysisResult?.partialCount || 0 : countSelect.value} voices below Nyquist`, 18, frequencyCssHeight - 12);
+  frequencyCtx.fillText(`${voices.length}/${soundMode === "resynthesis" ? analysisResult?.partialCount || 0 : countSelect.value} voices below Nyquist`, 30 + frequencyCtx.measureText(heading).width, 20);
 
   voices.forEach((voice) => {
     const y = bottom - ((Math.log10(voice.frequency / minHz) / Math.log10(maxHz / minHz)) * (bottom - top));
     const total = soundMode === "resynthesis" ? analysisResult.partialCount : Number(countSelect.value);
     const x = 90 + ((voice.index + 0.5) * ((frequencyCssWidth - 150) / Math.max(1, total)));
-    const radius = 5 + Math.min(18, voice.amplitude * 40);
+    const radius = (5 + Math.min(18, voice.amplitude * 40)) * 0.5;
     frequencyCtx.beginPath();
     frequencyCtx.fillStyle = curveColors.deviation;
     frequencyCtx.globalAlpha = 0.86;
