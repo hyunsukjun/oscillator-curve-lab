@@ -56,7 +56,51 @@ export async function renderConvolved(channels, sampleRate, impulse, wet, signal
   source.connect(dryGain).connect(context.destination);
   source.connect(convolver).connect(wetGain).connect(context.destination);
   source.start();
-  const rendered = await context.startRendering();
-  if (signal?.aborted) throw new DOMException("Render cancelled", "AbortError");
-  return Array.from({ length: channels.length }, (_, index) => rendered.getChannelData(index).slice());
+  // Native rendering has no close/terminate operation. Check cancellation at
+  // suspended boundaries, clear the graph, then drain to completion before
+  // rejecting, so a cancelled render never survives its returned promise.
+  const disconnect = () => {
+    source.disconnect();
+    convolver.disconnect();
+    dryGain.disconnect();
+    wetGain.disconnect();
+  };
+  const duration = frameCount / sampleRate;
+  let checkpoint = signal && duration > 2 ? context.suspend(2) : null;
+  const rendering = context.startRendering();
+  // Attach a rejection handler while awaiting checkpoints as well.
+  const completed = rendering.then(value => ({ value }), error => ({ error }));
+  try {
+    let time = 2;
+    while (checkpoint) {
+      const outcome = await Promise.race([
+        checkpoint.then(() => ({ suspended: true })), completed
+      ]);
+      if (!outcome.suspended) break;
+      if (signal.aborted) {
+        disconnect();
+        source.buffer = null;
+        convolver.buffer = null;
+        await context.resume();
+        break;
+      }
+      time += 2;
+      checkpoint = time < duration ? context.suspend(time) : null;
+      await context.resume();
+    }
+    const outcome = await completed;
+    if (outcome.error) throw outcome.error;
+    if (signal?.aborted) throw new DOMException("Render cancelled", "AbortError");
+    return Array.from({ length: channels.length }, (_, index) => outcome.value.getChannelData(index).slice());
+  } catch (error) {
+    // A scheduling/resume error must not strand a suspended native render.
+    disconnect();
+    source.buffer = null;
+    convolver.buffer = null;
+    if (context.state === "suspended") await context.resume();
+    await completed;
+    throw error;
+  } finally {
+    disconnect();
+  }
 }

@@ -203,6 +203,14 @@ export function outputChannelCount(format) {
 }
 
 export function encodeWav24(channels, sampleRate) {
+  const steps = encodeWav24Steps(channels, sampleRate);
+  let step;
+  do { step = steps.next(); } while (!step.done);
+  return step.value;
+}
+
+// Shared numerical path for synchronous reference and cooperative export.
+export function* encodeWav24Steps(channels, sampleRate) {
   const channelCount = channels.length;
   const frameCount = channels[0].length;
   const bytesPerSample = 3;
@@ -234,6 +242,7 @@ export function encodeWav24(channels, sampleRate) {
       view.setUint8(offset + 2, (int >> 16) & 0xff);
       offset += bytesPerSample;
     }
+    if ((frame + 1) % 16384 === 0) yield;
   }
   return new Blob([buffer], { type: "audio/wav" });
 }

@@ -19,7 +19,7 @@ import {
   valueAt
 } from "./oscillator-core.js?v=20261005-duration-ui1";
 
-import { renderOscillator } from "./offline-render.js?v=20261006-duration-comp2";
+import { renderOscillator } from "./offline-render.js?v=20261006-cooperative1";
 import { LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261002-lookahead1";
 import { OutputMeterAnalyzer } from "./output-meter.js?v=20261001-playback1";
 import {

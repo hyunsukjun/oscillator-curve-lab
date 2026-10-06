@@ -1,8 +1,31 @@
-import { renderFrame, createSmoothingState, TARGET_SAMPLE_RATE, MAX_SOUND_DURATION_SECONDS, clamp, edgeFade, encodeWav24, outputChannelCount } from "./oscillator-core.js?v=20261005-duration-ui1";
-import { renderConvolved } from "./convolution.js?v=20261002-stereotail1";
-import { limitChannels, LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261002-lookahead1";
+import { renderFrame, createSmoothingState, TARGET_SAMPLE_RATE, MAX_SOUND_DURATION_SECONDS, clamp, edgeFade, encodeWav24Steps, outputChannelCount } from "./oscillator-core.js?v=20261006-cooperative1";
+import { renderConvolved } from "./convolution.js?v=20261006-cancel-drain1";
+import { limitChannelsSteps, LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261006-cooperative1";
 
 export async function renderOscillator({ settings, impulse, signal, onProgress, samplesOnly = false }) {
+  settings = structuredClone(settings);
+  const checkAbort = () => {
+    if (signal?.aborted) throw new DOMException("Render cancelled", "AbortError");
+  };
+  const yieldUI = async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
+    checkAbort();
+  };
+  const consume = async steps => {
+    let step;
+    let lastYield = performance.now();
+    do {
+      checkAbort();
+      step = steps.next();
+      if (!step.done && performance.now() - lastYield >= 12) {
+        await yieldUI();
+        lastYield = performance.now();
+      }
+    } while (!step.done);
+    checkAbort();
+    return step.value;
+  };
+  checkAbort();
   const sampleRate = TARGET_SAMPLE_RATE;
   const duration = clamp(settings.durationSeconds || 20, 1, MAX_SOUND_DURATION_SECONDS);
   const frameCount = Math.ceil(duration * sampleRate);
@@ -27,13 +50,13 @@ export async function renderOscillator({ settings, impulse, signal, onProgress, 
     output[0][frame] = left;
     if (channelCount > 1) output[1][frame] = right;
 
-    const progress = (frame / frameCount) * (convolving ? 0.85 : 1);
+    const progress = (frame / frameCount) * (convolving ? 0.75 : 0.85);
     const now = performance.now();
-    if (progress - lastProgress > 0.01 || now - lastYield > 60) {
+    if (progress - lastProgress > 0.01 || now - lastYield > 12) {
       lastProgress = progress;
       lastYield = now;
       onProgress?.(progress);
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await yieldUI();
     }
   }
 
@@ -41,16 +64,25 @@ export async function renderOscillator({ settings, impulse, signal, onProgress, 
   // Flush the unchanged limiter, then remove only its leading algorithmic delay.
   // Preserve every source/tail sample; do not trim the end to force duration.
   const latencyFrames = Math.round(sampleRate * LOOKAHEAD_SECONDS);
-  output = limitChannels(output, sampleRate);
+  output = await consume(limitChannelsSteps(output, sampleRate));
   // Internal FFT/reference PCM retains the realtime timeline. Compensate files only.
   if (!samplesOnly) output = output.map(channel => channel.subarray(latencyFrames));
   peak = 0;
   for (const channel of output) {
-    for (const sample of channel) peak = Math.max(peak, Math.abs(sample));
+    for (let start = 0; start < channel.length; start += 65536) {
+      const end = Math.min(channel.length, start + 65536);
+      for (let i = start; i < end; i++) peak = Math.max(peak, Math.abs(channel[i]));
+      if (performance.now() - lastYield > 12) {
+        await yieldUI();
+        lastYield = performance.now();
+      }
+    }
   }
+  const blob = samplesOnly ? null : await consume(encodeWav24Steps(output, sampleRate));
+  checkAbort();
   onProgress?.(1);
   return {
-    blob: samplesOnly ? null : encodeWav24(output, sampleRate),
+    blob,
     samples: samplesOnly ? output : null,
     duration: output[0].length / sampleRate,
     channelCount,

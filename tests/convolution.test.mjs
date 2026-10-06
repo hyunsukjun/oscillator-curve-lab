@@ -54,7 +54,7 @@ test("Convolution Off leaves oscillator WAV byte-identical", async () => {
 test("Offline convolution keeps both source channels alive through the IR tail", async () => {
   const original = globalThis.OfflineAudioContext;
   let sourceBuffer;
-  const makeNode = () => ({ connect(destination) { return destination; }, gain: { value: 0 }, start() {} });
+  const makeNode = () => ({ connect(destination) { return destination; }, gain: { value: 0 }, start() {}, disconnect() {} });
   globalThis.OfflineAudioContext = class {
     constructor(channelCount, frameCount, sampleRate) {
       this.destination = makeNode();

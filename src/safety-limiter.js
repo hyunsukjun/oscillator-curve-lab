@@ -67,6 +67,13 @@ export class LookaheadSafetyLimiter {
 }
 
 export function limitChannels(channels, sampleRate) {
+  const steps = limitChannelsSteps(channels, sampleRate);
+  let step;
+  do { step = steps.next(); } while (!step.done);
+  return step.value;
+}
+
+export function* limitChannelsSteps(channels, sampleRate) {
   const limiter = new LookaheadSafetyLimiter(sampleRate);
   const left = channels[0];
   const right = channels[1] || left;
@@ -76,6 +83,7 @@ export function limitChannels(channels, sampleRate) {
     const limited = limiter.process(frame < originalLength ? left[frame] : 0, frame < originalLength ? right[frame] : 0);
     output[0][frame] = limited.left;
     if (channels.length > 1) output[1][frame] = limited.right;
+    if ((frame + 1) % 16384 === 0) yield;
   }
   return output;
 }
