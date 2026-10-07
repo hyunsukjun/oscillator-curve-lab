@@ -1351,13 +1351,25 @@ meterClipButton.addEventListener("click", () => {
 });
 downloadButton.addEventListener("click", downloadWav);
 
+function isTransportInput(target) {
+  return target instanceof HTMLInputElement || target instanceof HTMLSelectElement ||
+    target instanceof HTMLTextAreaElement || target?.isContentEditable;
+}
+
 window.addEventListener("keydown", (event) => {
-  if (event.code !== "Space") return;
-  const tag = document.activeElement?.tagName;
-  if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+  if (event.code !== "Space" || isTransportInput(event.target)) return;
   event.preventDefault();
+  event.stopPropagation();
+  if (event.repeat || playButton.disabled || renderAbortController) return;
+  if (document.activeElement instanceof HTMLButtonElement) document.activeElement.blur();
   if (isPlaying) stop(true);
   else play();
+});
+
+window.addEventListener("keyup", (event) => {
+  if (event.code !== "Space" || isTransportInput(event.target)) return;
+  event.preventDefault();
+  event.stopPropagation();
 });
 
 window.addEventListener("resize", () => fitEditorControls(true));

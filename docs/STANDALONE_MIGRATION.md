@@ -62,3 +62,7 @@ Verified: mono/stereo 1s and 60s output PCM equals the previous WAV after its 24
 
 ## 2026-10-06 scheduling boundary
 Cooperative yields and OfflineAudioContext suspension/drain are Web implementation details. Preserve DSP order, WAV48k/24-bit, full IR tail and WAV-only latency compensation in a native port. Native cancellation must release processing resources before reporting completion; do not port the two-second browser checkpoint as a sonic parameter.
+
+## Keyboard transport contract (2026-10-07)
+
+COMMON CANDIDATE: one physical shortcut press triggers at most one transport action. Editing focus and unavailable/busy transport take precedence. A native implementation must reproduce this routing contract using its own event/focus APIs; browser keyup prevention and DOM button blur are platform details, not DSP.

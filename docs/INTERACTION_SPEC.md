@@ -8,7 +8,7 @@ The three sound-mode buttons are mutually exclusive. Oscillator is initially sel
 
 1. Select waveform, oscillator count, stack, and optional modulation. The selected waveform and stack affect every active voice. Select a curve mode to edit one trajectory while the other trajectories remain visible.
 2. Draw or adjust points in the large curve workspace. Horizontal position is normalized sound time; vertical position is the selected parameter's mapping. A point tooltip reports time and a parameter-appropriate value. Base Freq additionally displays nearest equal-tempered note and cents relative to A4=440 Hz; this is a reference pitch, not measured output pitch.
-3. Play hears current settings from the start; Stop silences immediately and returns the playhead to zero. Spacebar toggles transport when focus is not in an input/select/textarea. The status strip and current-oscillator panel show present values. The optional FFT output panel is observation only.
+3. Play hears current settings from the start; Stop silences immediately and returns the playhead to zero. Spacebar toggles transport once per physical press when focus is not in an input/select/textarea or editable text. Held-key repeats do not toggle again. The shortcut respects disabled Play and active export, releases button focus after an accepted press, and consumes keyup outside editing controls to avoid a second button activation. The status strip and current-oscillator panel show present values. The optional FFT output panel is observation only.
 4. Render downloads the current 48 kHz/24-bit WAV. Changing a setting or curve invalidates the previous export status and makes any displayed FFT result stale.
 
 ## Curve gestures and invariants

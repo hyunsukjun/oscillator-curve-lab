@@ -124,3 +124,7 @@ IMPLEMENTED (2026-10-05): Hub v0.10 header symbol, micro favicon and Oscillator 
 WAV files remove the 5 ms leading lookahead latency after flushing the unchanged safety limiter. Dry files now have exactly the generated frame count; wet files retain the full convolution length N + IR.length - 1 at matched 48 kHz. No end trimming, gain, ceiling, attack/release, oscillator or partial changes. Realtime and internal samplesOnly/FFT reference retain their existing delayed timeline; comparisons align WAV by 240 frames. This is file-time correction, not listening-led tuning.
 
 Verified: mono/stereo 1s and 60s output PCM equals the previous WAV after its 240-frame prefix; 17 limiter/convolution/resynthesis/file-duration tests pass; five Preview/WAV/FFT numerical comparisons pass after time alignment; six browser convolution cases (mono/stereo × wet 0/.5/1) preserve body/tail and match reference PCM within 24-bit quantization tolerance. Actual device listening and long/large IR limits remain unverified.
+
+## Transport keyboard guard (2026-10-07)
+
+Spacebar invokes one Play/Stop action per press; repeated keydown is consumed without retriggering. Disabled Play and active WAV rendering block the shortcut. Inputs, selects, textareas and editable text retain native keyboard behavior. Synthesis, seek, Stop-to-zero and WAV data are unchanged. Verified by `tests/transport-keyboard.test.mjs` and a browser Play/Stop/Resynthesis-disabled smoke check.
