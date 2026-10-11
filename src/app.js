@@ -542,9 +542,12 @@ async function play() {
   if (isPlaying) return;
   if (soundMode === "resynthesis" && !analysisResult) return;
   fftPreview.cancel("Analysis cancelled for playback · Update to refresh");
+  const requestToken = playbackToken;
   try {
     await ensureAudio();
+    if (isPlaying || requestToken !== playbackToken) return;
     if (soundMode === "convolution" && impulseBuffer48k && !convolver) impulseSourceNative = await installConvolver(impulseBuffer48k);
+    if (isPlaying || requestToken !== playbackToken) return;
     const now = audioContext.currentTime;
     outputGain.gain.cancelScheduledValues(now);
     outputGain.gain.setValueAtTime(0, now);

@@ -45,3 +45,10 @@ Audio smoothing after curve mapping does not move points, change tooltip values,
 The current-value panel shows voice frequency structure at the playhead and identifies omitted high voices by count. The editable Base Freq axis is 20-4000 Hz; the FFT's independent observation axis is 20 Hz-20 kHz. These scales must not be visually conflated. Keep focus-visible, hover, disabled, and reduced-motion behavior from `CURVE_LAB_DESIGN_SYSTEM.md`.
 
 Open tests: Reset All cancellation in a real browser; PC Ctrl-click on Windows hardware; touch/pen semantics; browser zoom plus canvas scroll hit testing; long-duration playhead timing on devices with native-rate fallback. No Undo/Redo or persisted preset interaction currently exists.
+
+
+## 2026-10-11 — Pending Play cancellation
+
+Play now checks its captured playback token after both engine preparation and asynchronous Convolution installation. Stop during either wait prevents an obsolete request from opening output gain or starting playback. Multiple pending Play calls start only once; a subsequent explicit Play still works. DSP, IR preparation, safety limiter, curves, and export format are unchanged.
+
+Actual-handler delayed-initialization regression failed before the fix and passes engine-wait cancellation, convolution-wait cancellation, duplicate Play and explicit retry after correction. Existing keyboard, render lifecycle, convolution and syntax checks pass. This is request cancellation evidence, not measured cold-start latency or listening approval. Mode switching/file-import cancellation during initialization remains a separate review item. Convolver installation itself is not aborted; this change prevents obsolete playback after its completion.

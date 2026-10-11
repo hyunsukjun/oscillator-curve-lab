@@ -128,3 +128,10 @@ Verified: mono/stereo 1s and 60s output PCM equals the previous WAV after its 24
 ## Transport keyboard guard (2026-10-07)
 
 Spacebar invokes one Play/Stop action per press; repeated keydown is consumed without retriggering. Disabled Play and active WAV rendering block the shortcut. Inputs, selects, textareas and editable text retain native keyboard behavior. Synthesis, seek, Stop-to-zero and WAV data are unchanged. Verified by `tests/transport-keyboard.test.mjs` and a browser Play/Stop/Resynthesis-disabled smoke check.
+
+
+## 2026-10-11 — Pending Play cancellation
+
+Play now checks its captured playback token after both engine preparation and asynchronous Convolution installation. Stop during either wait prevents an obsolete request from opening output gain or starting playback. Multiple pending Play calls start only once; a subsequent explicit Play still works. DSP, IR preparation, safety limiter, curves, and export format are unchanged.
+
+Actual-handler delayed-initialization regression failed before the fix and passes engine-wait cancellation, convolution-wait cancellation, duplicate Play and explicit retry after correction. Existing keyboard, render lifecycle, convolution and syntax checks pass. This is request cancellation evidence, not measured cold-start latency or listening approval. Mode switching/file-import cancellation during initialization remains a separate review item. Convolver installation itself is not aborted; this change prevents obsolete playback after its completion.

@@ -66,3 +66,10 @@ Cooperative yields and OfflineAudioContext suspension/drain are Web implementati
 ## Keyboard transport contract (2026-10-07)
 
 COMMON CANDIDATE: one physical shortcut press triggers at most one transport action. Editing focus and unavailable/busy transport take precedence. A native implementation must reproduce this routing contract using its own event/focus APIs; browser keyup prevention and DOM button blur are platform details, not DSP.
+
+
+## 2026-10-11 — Pending Play cancellation
+
+Play now checks its captured playback token after both engine preparation and asynchronous Convolution installation. Stop during either wait prevents an obsolete request from opening output gain or starting playback. Multiple pending Play calls start only once; a subsequent explicit Play still works. DSP, IR preparation, safety limiter, curves, and export format are unchanged.
+
+Actual-handler delayed-initialization regression failed before the fix and passes engine-wait cancellation, convolution-wait cancellation, duplicate Play and explicit retry after correction. Existing keyboard, render lifecycle, convolution and syntax checks pass. This is request cancellation evidence, not measured cold-start latency or listening approval. Mode switching/file-import cancellation during initialization remains a separate review item. Convolver installation itself is not aborted; this change prevents obsolete playback after its completion.
