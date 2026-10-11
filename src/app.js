@@ -1,3 +1,4 @@
+import { readAudioFile } from "./audio-import.js?v=20261011-aiff1";
 import {createFFTPreview} from "./fft-preview.js?v=20261005-duration-ui1";
 import {
   TARGET_SAMPLE_RATE,
@@ -1169,7 +1170,7 @@ impulseInput.addEventListener("change", async () => {
   impulseStatus.textContent = "Decoding audio…";
   analysisStatus.textContent = "Decoding audio…";
   try {
-    const bytes = await file.arrayBuffer();
+    const bytes = await readAudioFile(file, Math.max(TARGET_SAMPLE_RATE, audioContext?.sampleRate || TARGET_SAMPLE_RATE));
     const decoder = new OfflineAudioContext(2, 1, TARGET_SAMPLE_RATE);
     const decoded = await decoder.decodeAudioData(bytes.slice(0));
     const prepared = prepareImpulse(decoder, decoded, Number(impulseLengthInput.value));

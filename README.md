@@ -72,3 +72,10 @@ Run the focused modulation and convolution checks with `node --test tests/modula
 Enable FFT Preview to inspect the actual synthesized output in a separate frequency/time panel. Brightness uses a fixed −90…0 dBFS scale. After changing sound settings or curves, stop playback and choose Update preview. This is an overview; brief events may fall between columns.
 
 See [FFT refinement and verification](docs/FFT-REFINEMENT-REPORT.md). Run `node tests/output-preview.mjs` for WAV/Worklet/FFT parity, or open `tests/browser-output-preview.html` through the local server for native browser Worklet checks.
+
+
+### Portable AIFF input
+
+AIFF (.aif/.aiff), mono/stereo 16/24-bit PCM, is converted locally on import.
+AIFF-C is not supported by this importer; use PCM WAV instead. Original files
+are unchanged. See [support scope and limits](docs/AIFF_IMPORT.md).

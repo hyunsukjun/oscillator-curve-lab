@@ -53,3 +53,11 @@ The optional spectrogram is 20 Hz-20 kHz logarithmic, fixed -90..0 dBFS, 2048-sa
 ## Evidence and gaps
 
 On 2026-10-01, 18 unit tests passed, including count compensation, slew, linked-limiter bounds, and voice-index pan progression. `tests/output-preview.mjs` compared five dry cases (Off/FM/AM/Ring and limiter-active FM stress) across simulated Worklet, WAV, and FFT within quantization/FFT tolerance. Local browser checks covered dry and imported-IR playback, Stop, meter response, FFT completion, and dry/wet WAV render with no console errors. The alternating-pan candidate also passed numerical/browser checks but was rejected after user listening; those checks do not establish musical approval. Device underruns, long IR stress, high-frequency aliasing across modes, and native-rate fallback parity remain open. `docs/FFT-REFINEMENT-REPORT.md` remains historical evidence for an earlier revision.
+
+
+## AIFF input compatibility (2026-10-11)
+
+See [AIFF import contract](AIFF_IMPORT.md): local PCM AIFF 16/24-bit mono/stereo
+normalization into PCM WAV before the established decoder. Existing DSP,
+resampling and Lab-specific channel policies are preserved. Browser and memory
+verification limits are recorded there.
