@@ -1048,6 +1048,7 @@ function updateImpulseStatus() {
 function setSoundMode(nextMode) {
   if (nextMode === soundMode && nextMode !== "oscillator") return;
   if (isPlaying) stop(true);
+  else nextPlaybackToken();
   playheadSeconds = 0;
   if (nextMode !== "convolution") disconnectConvolver();
   soundMode = nextMode;
@@ -1082,6 +1083,7 @@ function setSoundMode(nextMode) {
 async function runResynthesisAnalysis() {
   if (!analysisSamples) return;
   if (isPlaying) stop(true);
+  else nextPlaybackToken();
   analysisWorker?.terminate();
   const generation = ++analysisGeneration;
   analysisResult = null;
@@ -1161,6 +1163,7 @@ impulseInput.addEventListener("change", async () => {
   }
   const modeAtOpen = soundMode;
   if (isPlaying) stop(true);
+  else nextPlaybackToken();
   openAudioButton.disabled = true;
   impulseLengthInput.disabled = true;
   impulseStatus.textContent = "Decoding audio…";
