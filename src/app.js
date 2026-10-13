@@ -1,3 +1,4 @@
+import {mountTransport} from "./common-transport.js?v=20261013-1";
 import { readAudioFile } from "./audio-import.js?v=20261011-aiff1";
 import {createFFTPreview} from "./fft-preview.js?v=20261005-duration-ui1";
 import {
@@ -518,6 +519,7 @@ function updateMeter() {
     row.querySelector(".meterRms").style.clipPath = `inset(0 ${100 - meterPercent(state.rms)}% 0 0)`;
     row.querySelector(".meterPeak").style.clipPath = `inset(0 ${100 - meterPercent(state.peak)}% 0 0)`;
     row.querySelector(".meterHold").style.left = `${meterPercent(state.hold)}%`;
+    row.querySelector(".meterHold").style.opacity = state.hold > 0.001 ? "1" : "0";
     row.querySelector(".meterValue").textContent = state.peak > 0.0001
       ? `${Math.max(-60, 20 * Math.log10(state.peak)).toFixed(0)}` : "-∞";
     if (reading.clipped) meterClipLatched = true;
@@ -533,7 +535,7 @@ function seekFromScrubber() {
   const requested = Number(playbackScrubber.value) * duration;
   playheadSeconds = Math.min(soundDuration, requested);
   if (requested !== playheadSeconds) playbackScrubber.value = String(playheadSeconds / duration);
-  node?.port.postMessage({ type: "seek", seconds: playheadSeconds, token: playbackToken });
+  node?.port.postMessage({ type: "seek", seconds: playheadSeconds, token: nextPlaybackToken() });
   safetyLimiterNode?.port.postMessage({ type: "reset" });
   updateTransport();
   draw();
@@ -1346,11 +1348,7 @@ durationInput.addEventListener("input", () => {
 clearCurveButton.addEventListener("click", clearCurrentCurve);
 resetButton.addEventListener("click", resetAll);
 playButton.addEventListener("click", play);
-stopButton.addEventListener("click", () => stop(true));
-playbackScrubber.addEventListener("pointerdown", () => { isScrubbing = true; });
-playbackScrubber.addEventListener("input", seekFromScrubber);
-playbackScrubber.addEventListener("change", () => { seekFromScrubber(); isScrubbing = false; updateTransport(); });
-playbackScrubber.addEventListener("pointercancel", () => { isScrubbing = false; updateTransport(); });
+stopButton.addEventListener("click", () => stop(false));
 meterClipButton.addEventListener("click", () => {
   meterClipLatched = false;
   meterClipButton.classList.remove("clipped");
@@ -1369,7 +1367,7 @@ window.addEventListener("keydown", (event) => {
   event.stopPropagation();
   if (event.repeat || playButton.disabled || renderAbortController) return;
   if (document.activeElement instanceof HTMLButtonElement) document.activeElement.blur();
-  if (isPlaying) stop(true);
+  if (isPlaying) stop(false);
   else play();
 });
 
@@ -1389,3 +1387,5 @@ fitEditorControls(true);
 updateTransport();
 requestAnimationFrame(updateMeter);
 scheduleSonogramRender();
+
+mountTransport({onScrub:value=>{isScrubbing=value;},state:()=>({duration:outputDuration(),seconds:playheadSeconds,playing:isPlaying,disabled:playButton.disabled||!!renderAbortController}),seek:p=>{playbackScrubber.value=String(p);seekFromScrubber();}});

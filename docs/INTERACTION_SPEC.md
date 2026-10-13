@@ -59,3 +59,23 @@ Actual-handler delayed-initialization regression failed before the fix and passe
 Mode changes, analysis restarts with source samples, and accepted file reads now invalidate a pending Play even when isPlaying is still false. Previously these actions only stopped active playback and could allow engine preparation to complete into the new context. File chooser cancellation and over-limit files rejected before decoding preserve the current state. Failed accepted imports retain the existing usable IR but cancel the earlier Play request. Sound processing and analysis algorithms are unchanged.
 
 Actual-handler regression tests/pending-play-context.mjs: old mode-switch case failed; corrected mode switch, analysis restart and corrupt-file cancellation pass, as do chooser cancellation and size rejection preservation. Existing pending setup tests pass. Controlled waits isolate the race; this is not an audible latency measurement. Standalone should invalidate asynchronous playback requests when the source or sound mode changes.
+
+
+## Common bottom transport — 2026-10-13
+COMMON CANDIDATE, implemented locally. Audio reference adopted: Return to start,
+Play, Pause, output-position slider, time, continuous green/yellow/red stereo meter,
+CLIP. Neutral 16px icons are centered inside 38x32px buttons; 34px slider hit area.
+Return to start seeks to zero while preserving playing/paused state. Pause retains
+position; Play resumes; Space toggles Play/Pause outside editable controls.
+Internal reset stops for import/export/settings remain distinct and unchanged.
+No DSP algorithm or output format changes. Resume uses this Lab's existing engine
+initialization; continuous-sample-identical resumption is not promised.
+The existing waveform guides remain in their existing locations.
+OUT and numeric meter values are visually removed (values remain accessible).
+Meter color fields are clipped at the level, not stretched; retain analysis,
+ballistics, peak hold and CLIP semantics. Shared CSS/module are vendored locally,
+with per-Lab adapters and no external runtime dependency.
+Oscillator retains its existing source-duration seek cap for convolution tails.
+Verification covers syntax, keyboard contracts and browser layout; file-based
+Labs also exercised silent-WAV pause/resume. Audible listening, Safari/Windows,
+long-file performance and Oscillator mode-specific listening remain separate QA.

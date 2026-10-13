@@ -33,14 +33,14 @@ function harness() {
   }
   return { context, calls, send };
 }
-test('one held Space gesture toggles once; release does not retrigger; next press stops from zero', () => {
+test('one held Space gesture toggles once; release does not retrigger; next press pauses in place', () => {
   const h = harness();
   assert(h.send().prevented);
   for (let i = 0; i < 20; i++) assert(h.send('keydown', {repeat: true}).prevented);
   assert(h.send('keyup').prevented);
   assert.deepEqual(h.calls, ['play']);
   assert(h.context.document.activeElement.blurred);
-  h.send(); assert.deepEqual(h.calls, ['play', ['stop', true]]);
+  h.send(); assert.deepEqual(h.calls, ['play', ['stop', false]]);
 });
 test('disabled transport and active render block Space even if UI enablement changes', () => {
   for (const playing of [false, true]) {

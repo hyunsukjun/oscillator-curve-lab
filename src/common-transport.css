@@ -1,0 +1,39 @@
+
+/* Curve Lab common bottom transport. Independent from engine and waveform UI. */
+.playbackBar{display:grid;grid-template-columns:auto minmax(100px,1fr) auto minmax(200px,25%);align-items:center;gap:12px;min-height:54px;padding:6px 10px}
+.bottomTransport{display:flex;align-items:center;gap:0;padding:3px;border:1px solid #304252;border-radius:6px;background:#101d29}
+.bottomTransport button,#rewindButton{position:relative;display:block;width:38px;min-width:38px;height:32px;padding:0;border:0;border-radius:3px;background:transparent;color:#d2dce5;font-size:0;box-shadow:none}
+.bottomTransport button::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;background:currentColor}
+#playButton::before{clip-path:polygon(20% 5%,95% 50%,20% 95%)}
+#stopButton::before{clip-path:polygon(15% 8%,38% 8%,38% 92%,15% 92%,15% 8%,62% 8%,85% 8%,85% 92%,62% 92%,62% 8%)}
+#rewindButton::before{clip-path:polygon(10% 10%,23% 10%,23% 90%,10% 90%,10% 10%,85% 10%,85% 90%,30% 50%,85% 10%)}
+#rewindButton{margin-right:7px;border-right:1px solid #344655;border-radius:3px 0 0 3px}
+#playButton[aria-pressed="true"]{background:#35404b;color:#d2dce5}
+.bottomTransport button:hover{background:#26394c;color:#d2dce5}
+.bottomTransport button:disabled{opacity:.35}
+.bottomTransport button:focus-visible{outline:2px solid #d2dce5;outline-offset:2px}
+#timeStatus{min-width:0;font-size:13px;white-space:nowrap}
+#playbackScrubber{appearance:none;-webkit-appearance:none;display:block;width:100%;min-width:0;height:34px;padding:0;margin:0;border:0;border-radius:0;cursor:ew-resize;
+background:linear-gradient(to right,var(--cl-accent,#459bff) 0% var(--progress,0%),#223a50 var(--progress,0%) 100%) center / 100% 6px no-repeat}
+#playbackScrubber::-webkit-slider-runnable-track{height:6px;background:transparent}
+#playbackScrubber::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:3px;height:14px;margin-top:-4px;border:0;border-radius:0;background:#fff}
+#playbackScrubber::-moz-range-track{height:6px;background:transparent}
+#playbackScrubber::-moz-range-thumb{width:3px;height:14px;border:0;border-radius:0;background:#fff}
+#playbackScrubber:disabled{opacity:.35}
+.playbackBar .outputMeter{display:grid;grid-template-columns:minmax(0,1fr) auto;min-width:0;align-items:center}
+.playbackBar .meterTitle{display:none}
+.playbackBar .meterValue{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.playbackBar .meterRow{grid-template-columns:12px minmax(60px,1fr)}
+.playbackBar .meterChannelLabel{font-size:11px;color:#b5c6d6}
+.playbackBar .meterChannels{gap:6px}
+.playbackBar .meterTrack{height:8px;border:0;border-radius:2px;background:linear-gradient(to right,#102b20 0%,#173822 65%,#323b1c 80%,#453b19 90%,#462c1c 95%,#481f25 100%)}
+.playbackBar .meterRms,.playbackBar .meterPeak{transform:none;clip-path:inset(0 100% 0 0);background:linear-gradient(to right,#49ca87 0%,#6bd56e 65%,#b9db60 80%,#edce5b 90%,#f39b58 95%,#f26470 100%)}
+.playbackBar .meterPeak{top:0;bottom:0;opacity:1}
+.playbackBar .meterRms{opacity:.55}
+.playbackBar .meterHold{width:1px;background:#eff5f8;transform:translateX(-.5px)}
+@media(max-width:1100px){.playbackBar{grid-template-columns:auto minmax(100px,1fr) auto}.playbackBar .outputMeter{grid-column:1/-1;border-left:0;padding:2px 0 0}.app{padding-bottom:130px}}
+@media(max-width:600px){.playbackBar{grid-template-columns:auto 1fr;gap:6px}#playbackScrubber{grid-row:2;grid-column:1/-1}#timeStatus{grid-row:1;grid-column:2;font-size:11px}.app{padding-bottom:160px}}
+
+#playButton,#stopButton,#rewindButton{color:#d2dce5}
+#playButton:hover,#stopButton:hover,#rewindButton:hover{color:#d2dce5;background:#26394c}
+.playbackBar #timeStatus{width:auto;max-width:none;overflow:visible;text-overflow:clip;justify-self:stretch}

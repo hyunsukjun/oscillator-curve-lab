@@ -42,3 +42,23 @@ For narrow screens the toolbar/status wrap and the fixed-format canvas scrolls h
 ## Hub v0.10 identity pilot — 2026-10-05
 
 Source of truth: CURVE LAB HUB for macOS v0.10. Header symbol and micro favicon are exact source SVGs. Shared six-Lab palette and source hashes live in `assets/identity/`. Oscillator uses #28CDB0, hover #60DBC5, focus #98EADC. Parameter, meter, FFT and canvas colors retain their musical meanings. See `docs/IDENTITY_PILOT.md`.
+
+
+## Common bottom transport — 2026-10-13
+COMMON CANDIDATE, implemented locally. Audio reference adopted: Return to start,
+Play, Pause, output-position slider, time, continuous green/yellow/red stereo meter,
+CLIP. Neutral 16px icons are centered inside 38x32px buttons; 34px slider hit area.
+Return to start seeks to zero while preserving playing/paused state. Pause retains
+position; Play resumes; Space toggles Play/Pause outside editable controls.
+Internal reset stops for import/export/settings remain distinct and unchanged.
+No DSP algorithm or output format changes. Resume uses this Lab's existing engine
+initialization; continuous-sample-identical resumption is not promised.
+The existing waveform guides remain in their existing locations.
+OUT and numeric meter values are visually removed (values remain accessible).
+Meter color fields are clipped at the level, not stretched; retain analysis,
+ballistics, peak hold and CLIP semantics. Shared CSS/module are vendored locally,
+with per-Lab adapters and no external runtime dependency.
+Oscillator retains its existing source-duration seek cap for convolution tails.
+Verification covers syntax, keyboard contracts and browser layout; file-based
+Labs also exercised silent-WAV pause/resume. Audible listening, Safari/Windows,
+long-file performance and Oscillator mode-specific listening remain separate QA.

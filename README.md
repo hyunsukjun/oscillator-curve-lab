@@ -79,3 +79,9 @@ See [FFT refinement and verification](docs/FFT-REFINEMENT-REPORT.md). Run `node 
 AIFF (.aif/.aiff), mono/stereo 16/24-bit PCM, is converted locally on import.
 AIFF-C is not supported by this importer; use PCM WAV instead. Original files
 are unchanged. See [support scope and limits](docs/AIFF_IMPORT.md).
+
+
+### Current transport
+Bottom controls are Return to start / Play / Pause. Space toggles Play/Pause.
+Pause keeps the current position; Return to start seeks to zero. The thin slider
+navigates output time. Source guides, sound engines and export policies are unchanged.
