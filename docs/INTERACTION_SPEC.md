@@ -83,3 +83,8 @@ long-file performance and Oscillator mode-specific listening remain separate QA.
 
 ## 2026-10-14 UI scope update
 Output Duration now uses one 0–600s slider (zero disables playback/export); FFT Preview UI and runtime wiring are removed. Resynthesis FFT analysis remains. Canvas heights follow the actual viewport budget. Earlier FFT descriptions are historical. See [implementation, verification and review](UI_REVIEW_2026-10-14.md). No sound-algorithm tuning or deployment in this change.
+
+
+## 2026-10-14 — Synthesis hierarchy (local review)
+
+Synthesis path selection now precedes path-specific settings. Open Audio is in that source row. Basic Waveform, File Resynthesis and Oscillator + File IR retain the same mutually exclusive oscillator/resynthesis/convolution mode IDs and behavior. Frequency layout is the visible label for Stack; modulation is grouped separately. Synthesis detail is a native details disclosure, closed on each page load. Opening/closing adjusts canvas display geometry only; normalized points and sound are unchanged. WAV status stays next to Download WAV.

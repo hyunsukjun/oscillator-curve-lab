@@ -244,9 +244,13 @@ function fitEditorControls(force = false) {
   const footer = document.querySelector(".playbackBar");
   const gap = parseFloat(getComputedStyle(document.querySelector(".curveStack")).rowGap) || 8;
   // Measure actual wrapped controls and footer instead of subtracting fixed estimates.
-  const available = Math.max(152, footer.getBoundingClientRect().top - workspace.getBoundingClientRect().top - 36);
-  const frequency = Math.max(44, Math.min(100, available * 0.22));
-  const curve = Math.max(100, available - frequency - gap - 4);
+  const available = Math.max(100, footer.getBoundingClientRect().top - workspace.getBoundingClientRect().top - 36);
+  const details = document.getElementById("voiceDetails");
+  const frequency = 64;
+  const detailHeight = details.open
+    ? frequency + details.querySelector("summary").getBoundingClientRect().height + details.querySelector(".panel").getBoundingClientRect().height + 12
+    : details.querySelector("summary").getBoundingClientRect().height;
+  const curve = Math.max(80, available - detailHeight - gap - 4);
   document.documentElement.style.setProperty("--transport-reserve", `${footer.getBoundingClientRect().height + 20}px`);
   const value = `${curve}px`;
   if (!force && editor.style.getPropertyValue("--curve-height") === value) return;
@@ -698,6 +702,7 @@ function prepareContext(renderCtx, width, height) {
 }
 
 function drawFrequency() {
+  if (!document.getElementById("voiceDetails").open) return;
   prepareContext(frequencyCtx, frequencyCssWidth, frequencyCssHeight);
   frequencyCtx.fillStyle = "#0c1f31";
   frequencyCtx.fillRect(0, 0, frequencyCssWidth, frequencyCssHeight);
@@ -1351,9 +1356,11 @@ window.addEventListener("keyup", (event) => {
 });
 
 window.addEventListener("resize", () => fitEditorControls(true));
+document.getElementById("voiceDetails").addEventListener("toggle", () => fitEditorControls(true));
+
 if ("ResizeObserver" in window) {
   const controlsObserver = new ResizeObserver(() => fitEditorControls());
-  [oscillatorControls, document.querySelector(".impulseBand"), document.querySelector(".legend"), modulationInfo, durationPanel, document.querySelector(".topbar"), document.querySelector(".panel"), document.querySelector(".playbackBar")].forEach((element) => controlsObserver.observe(element));
+  [document.querySelector(".sourceBand"), oscillatorControls, document.querySelector(".impulseBand"), document.querySelector(".legend"), modulationInfo, durationPanel, document.querySelector(".topbar"), document.querySelector(".panel"), document.querySelector(".playbackBar")].forEach((element) => controlsObserver.observe(element));
 }
 setSoundMode("oscillator");
 fitEditorControls(true);

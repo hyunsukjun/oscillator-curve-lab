@@ -174,3 +174,8 @@ long-file performance and Oscillator mode-specific listening remain separate QA.
 
 ## 2026-10-14 UI scope update
 Output Duration now uses one 0–600s slider (zero disables playback/export); FFT Preview UI and runtime wiring are removed. Resynthesis FFT analysis remains. Canvas heights follow the actual viewport budget. Earlier FFT descriptions are historical. See [implementation, verification and review](UI_REVIEW_2026-10-14.md). No sound-algorithm tuning or deployment in this change.
+
+
+## 2026-10-14 — Synthesis hierarchy (local review)
+
+Current Oscillator Values / Current Analyzed Partials and secondary readouts are retained in a default-closed Synthesis detail disclosure. No synthesis capability removed or added.
