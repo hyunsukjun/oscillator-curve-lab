@@ -66,3 +66,7 @@ long-file performance and Oscillator mode-specific listening remain separate QA.
 
 ## 2026-10-14 viewport budget
 Canvas height follows measured controls and transport, including wrapped rows and mode changes. Single 0–10 min Duration row, no FFT Preview panel. See docs/UI_REVIEW_2026-10-14.md for verified viewport sizes.
+
+
+## 2026-10-14 — Common Clear Current / Reset All appearance
+Both actions follow Audio's neutral navy reference: background #122438, text #aabccc, 6px radius, 13px/620 type, 92px minimum width, 38px height (30px at >=900px viewport width). Clear border #3b5063; Reset border #203a52. Shared hover/pressed/focus/disabled styles live in src/curve-actions.css. Red action emphasis is removed; brand/parameter colors elsewhere stay independent. Existing IDs, handlers, reset scope, confirmation mechanism and keyboard behavior remain unchanged. This is a local visual update, separate from DSP verification.
