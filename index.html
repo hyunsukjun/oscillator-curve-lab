@@ -6,7 +6,7 @@
     <title>Oscillator Curve Lab</title>
     <link rel="icon" type="image/svg+xml" href="assets/identity/oscillator-micro.svg?v=hub-v0.10">
     <link rel="stylesheet" href="assets/identity/tokens.css?v=hub-v0.10">
-    <link rel="stylesheet" href="src/styles.css?v=20261005-fit-width1">
+    <link rel="stylesheet" href="src/styles.css?v=20261014-layout1">
     <link rel="stylesheet" href="src/common-transport.css?v=20261013-1">
   </head>
   <body>
@@ -125,10 +125,6 @@
             </div>
           </div>
           <div class="curveActions">
-            <label class="toggle compactToggle">
-              <input id="sonogramToggle" type="checkbox">
-              FFT Preview
-            </label>
             <button id="clearCurveButton" type="button">Clear Current</button>
             <button id="resetButton" type="button">Reset All</button>
           </div>
@@ -136,13 +132,9 @@
 
         <section id="durationPanel" class="durationPanel" aria-label="Output Duration">
           <label for="durationInput">Output Duration</label>
-          <select id="durationRange" aria-label="Duration range">
-            <option value="short">1–60 sec</option>
-            <option value="long">1–10 min</option>
-          </select>
-          <span id="durationMin">1 sec</span>
-          <input id="durationInput" type="range" min="1" max="60" step="1" value="20" aria-label="Output Duration">
-          <span id="durationMax">60 sec</span>
+          <span id="durationMin">0 sec</span>
+          <input id="durationInput" type="range" min="0" max="600" step="1" value="20" aria-label="Output Duration">
+          <span id="durationMax">10 min</span>
           <output id="durationValue" for="durationInput">20 sec</output>
           <span id="durationEstimate"></span>
         </section>
@@ -170,13 +162,6 @@
           </div>
         </div>
       </section>
-      <section id="fftPanel" class="fftPanel" hidden aria-label="Output spectrogram">
-        <div class="fftControls"><strong>OUTPUT · FFT Preview</strong><button id="fftUpdate" type="button">Update preview</button><span id="fftStatus" role="status">Update needed</span></div>
-        <p>Frequency (Hz, logarithmic) · Time (seconds) · Mean stereo power · Output before WAV quantisation</p>
-        <canvas id="fftCanvas" role="img" aria-label="Output spectrogram with fixed frequency axis"></canvas>
-        <div class="fftScale"><span>−90 dBFS</span><span class="fftGradient"></span><span>0 dBFS</span></div>
-        <p>Overview of current settings. Edits need an update. Stop playback to analyse. Short events may fall between columns.</p>
-      </section>
       <footer class="playbackBar" aria-label="Playback and output monitoring">
         <div class="bottomTransport" aria-label="Transport controls">
           <button id="rewindButton" type="button" aria-label="Return to start" title="Return to start" disabled></button>
@@ -203,6 +188,6 @@
       </footer>
     </main>
 
-    <script src="src/app.js?v=20261013-transport1" type="module"></script>
+    <script src="src/app.js?v=20261014-layout1" type="module"></script>
   </body>
 </html>

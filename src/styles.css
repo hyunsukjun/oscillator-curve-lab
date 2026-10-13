@@ -109,7 +109,7 @@ select {
   align-content: start;
   min-height: 100vh;
   min-height: 100dvh;
-  padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--transport-reserve, 74px) + env(safe-area-inset-bottom, 0px));
 }
 
 .topbar {
@@ -543,7 +543,7 @@ button:disabled {
 
 .durationPanel {
   display: grid;
-  grid-template-columns: auto auto auto minmax(100px, 1fr) auto auto auto;
+  grid-template-columns: auto auto minmax(100px, 1fr) auto auto auto;
   align-items: center;
   gap: var(--cl-space-3);
   min-width: 0;
@@ -887,7 +887,6 @@ button:disabled {
 @media (max-width: 860px) {
   .durationPanel { grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--cl-space-2); }
   .durationPanel > label { grid-column: 1 / 3; }
-  #durationRange { grid-column: 3; }
   #durationMin { grid-column: 1; }
   #durationInput { grid-column: 2; }
   #durationMax { grid-column: 3; }
@@ -970,53 +969,6 @@ button:disabled {
   .meterRow { grid-template-columns: 11px minmax(70px, 1fr); }
 }
 
-.fftPanel {
-  margin: 0 var(--cl-space-4) var(--cl-space-4);
-  padding: var(--cl-space-3);
-  border: 1px solid var(--cl-border);
-  border-radius: var(--cl-radius-lg);
-  background: rgba(13, 27, 41, 0.9);
-}
-
-.fftControls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--cl-space-3);
-  align-items: center;
-  color: var(--cl-text-secondary);
-  font-size: 12px;
-}
-
-.fftPanel p {
-  color: var(--cl-text-muted);
-  font-size: 11px;
-  margin: 9px 0;
-}
-
-#fftCanvas {
-  display: block;
-  width: 100%;
-  height: 260px;
-  border: 1px solid var(--cl-border-strong);
-  background: #0c1f31;
-}
-
-.fftScale {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  align-items: center;
-  color: var(--cl-text-secondary);
-  font-size: 10px;
-  margin-top: 8px;
-}
-
-.fftGradient {
-  width: 180px;
-  height: 8px;
-  background: linear-gradient(90deg, #0c131a, #1b4976, #487f9c, #92b576, #faeb1a);
-}
-
 @media (prefers-reduced-motion: reduce) {
   body::before,
   body::after {
@@ -1028,3 +980,7 @@ button:disabled {
     transition: none;
   }
 }
+
+/* Actual viewport budget follows wrapped controls and transport height. */
+#frequencyCanvas { height: var(--frequency-height, 64px) !important; }
+#curveCanvas { height: var(--curve-height, 180px) !important; }

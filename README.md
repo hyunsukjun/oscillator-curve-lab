@@ -85,3 +85,7 @@ are unchanged. See [support scope and limits](docs/AIFF_IMPORT.md).
 Bottom controls are Return to start / Play / Pause. Space toggles Play/Pause.
 Pause keeps the current position; Return to start seeks to zero. The thin slider
 navigates output time. Source guides, sound engines and export policies are unchanged.
+
+
+## Local UI revision — 2026-10-14
+Single 0–10 min Output Duration; zero disables Play/Download. FFT Preview removed from web UI; Resynthesis analysis remains. Responsive canvas budget keeps verified laptop viewports within one screen. [Review and validation](docs/UI_REVIEW_2026-10-14.md). Not committed/deployed yet.

@@ -62,3 +62,7 @@ Oscillator retains its existing source-duration seek cap for convolution tails.
 Verification covers syntax, keyboard contracts and browser layout; file-based
 Labs also exercised silent-WAV pause/resume. Audible listening, Safari/Windows,
 long-file performance and Oscillator mode-specific listening remain separate QA.
+
+
+## 2026-10-14 viewport budget
+Canvas height follows measured controls and transport, including wrapped rows and mode changes. Single 0–10 min Duration row, no FFT Preview panel. See docs/UI_REVIEW_2026-10-14.md for verified viewport sizes.

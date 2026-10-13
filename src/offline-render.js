@@ -27,7 +27,9 @@ export async function renderOscillator({ settings, impulse, signal, onProgress, 
   };
   checkAbort();
   const sampleRate = TARGET_SAMPLE_RATE;
-  const duration = clamp(settings.durationSeconds || 20, 1, MAX_SOUND_DURATION_SECONDS);
+  const requestedDuration = Number(settings.durationSeconds ?? 20);
+  if (!Number.isFinite(requestedDuration) || requestedDuration <= 0) throw new RangeError("Choose an Output Duration above 0 sec.");
+  const duration = clamp(requestedDuration, 1, MAX_SOUND_DURATION_SECONDS);
   const frameCount = Math.ceil(duration * sampleRate);
   const channelCount = outputChannelCount(settings.format);
   let output = Array.from({ length: channelCount }, () => new Float32Array(frameCount));

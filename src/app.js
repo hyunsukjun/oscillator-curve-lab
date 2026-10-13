@@ -1,6 +1,5 @@
 import {mountTransport} from "./common-transport.js?v=20261013-1";
 import { readAudioFile } from "./audio-import.js?v=20261011-aiff1";
-import {createFFTPreview} from "./fft-preview.js?v=20261005-duration-ui1";
 import {
   TARGET_SAMPLE_RATE,
   MAX_SOUND_DURATION_SECONDS,
@@ -21,7 +20,7 @@ import {
   valueAt
 } from "./oscillator-core.js?v=20261005-duration-ui1";
 
-import { renderOscillator } from "./offline-render.js?v=20261006-cooperative1";
+import { renderOscillator } from "./offline-render.js?v=20261014-duration1";
 import { LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261002-lookahead1";
 import { OutputMeterAnalyzer } from "./output-meter.js?v=20261001-playback1";
 import {
@@ -43,10 +42,8 @@ const stopButton = document.getElementById("stopButton");
 const downloadButton = document.getElementById("downloadButton");
 const clearCurveButton = document.getElementById("clearCurveButton");
 const resetButton = document.getElementById("resetButton");
-const sonogramToggle = document.getElementById("sonogramToggle");
 const durationInput = document.getElementById("durationInput");
 const durationPanel = document.getElementById("durationPanel");
-const durationRange = document.getElementById("durationRange");
 const durationValue = document.getElementById("durationValue");
 const durationEstimate = document.getElementById("durationEstimate");
 const formatSelect = document.getElementById("formatSelect");
@@ -209,7 +206,7 @@ function settings() {
     modulationMode: modulationSelect.value,
     modulationRatio: Math.max(0.25, Math.min(8, Number(modulationRatioInput.value) || 1)),
     multiplierText: "1:1.5:2:2.5",
-    durationSeconds: Math.max(1, Math.min(MAX_SOUND_DURATION_SECONDS, Number(durationInput.value) || 20)),
+    durationSeconds: Math.max(0, Math.min(MAX_SOUND_DURATION_SECONDS, Number(durationInput.value))),
     convolutionEnabled: soundMode === "convolution" && Boolean(impulseBuffer48k),
     convolutionWet: convolutionWetAmount,
     impulseRevision,
@@ -221,7 +218,7 @@ function settings() {
 
 function outputDuration() {
   const current = settings();
-  return current.durationSeconds + current.tailSeconds + LOOKAHEAD_SECONDS;
+  return current.durationSeconds > 0 ? current.durationSeconds + current.tailSeconds + LOOKAHEAD_SECONDS : 0;
 }
 
 function formatDurationLabel(seconds) {
@@ -238,22 +235,23 @@ function updateDurationDisplay() {
     + Math.round(LOOKAHEAD_SECONDS * TARGET_SAMPLE_RATE);
   const channels = current.format === "mono" ? 1 : 2;
   const megabytes = (44 + frames * channels * 3) / 1_000_000;
-  durationEstimate.textContent = `WAV ~${megabytes.toFixed(1)} MB${current.tailSeconds ? ` · includes ${current.tailSeconds.toFixed(1)} s IR tail` : ""}`;
+  durationEstimate.textContent = current.durationSeconds === 0 ? "Choose duration > 0" : `WAV ~${megabytes.toFixed(1)} MB${current.tailSeconds ? ` · includes ${current.tailSeconds.toFixed(1)} s IR tail` : ""}`;
 }
 
 function fitEditorControls(force = false) {
   const editor = document.querySelector(".editor");
-  const compact = window.matchMedia("(max-height: 900px)").matches;
-  const growth = (element, baseline) => Math.max(0, element.getBoundingClientRect().height - baseline);
-  const extra = Math.ceil(
-    growth(oscillatorControls, compact ? 50 : 54)
-    + growth(document.querySelector(".impulseBand"), compact ? 42 : 44)
-    + growth(document.querySelector(".legend"), compact ? 48 : 54)
-    + (modulationInfo.hidden ? 0 : modulationInfo.getBoundingClientRect().height)
-    + durationPanel.getBoundingClientRect().height + (parseFloat(getComputedStyle(editor).rowGap) || 0)
-  );
-  if (!force && editor.style.getPropertyValue("--editor-extra-height") === `${extra}px`) return;
-  editor.style.setProperty("--editor-extra-height", `${extra}px`);
+  const workspace = document.querySelector(".workspace");
+  const footer = document.querySelector(".playbackBar");
+  const gap = parseFloat(getComputedStyle(document.querySelector(".curveStack")).rowGap) || 8;
+  // Measure actual wrapped controls and footer instead of subtracting fixed estimates.
+  const available = Math.max(152, footer.getBoundingClientRect().top - workspace.getBoundingClientRect().top - 36);
+  const frequency = Math.max(44, Math.min(100, available * 0.22));
+  const curve = Math.max(100, available - frequency - gap - 4);
+  document.documentElement.style.setProperty("--transport-reserve", `${footer.getBoundingClientRect().height + 20}px`);
+  const value = `${curve}px`;
+  if (!force && editor.style.getPropertyValue("--curve-height") === value) return;
+  editor.style.setProperty("--curve-height", value);
+  editor.style.setProperty("--frequency-height", `${frequency}px`);
   resizeCanvas();
 }
 
@@ -322,7 +320,7 @@ function sendSettings() {
   markDownloadStale();
   node?.port.postMessage({ type: "settings", settings: settings() });
   updateConvolutionRouting();
-  scheduleSonogramRender();
+
   updateDurationDisplay();
   draw();
   updateTransport();
@@ -331,7 +329,7 @@ function sendSettings() {
 function sendCurves() {
   markDownloadStale();
   node?.port.postMessage({ type: "curves", curves });
-  scheduleSonogramRender();
+
   draw();
 }
 
@@ -347,9 +345,9 @@ function clearDownload() {
 }
 
 function setBusy(isBusy) {
-  playButton.disabled = isBusy || (soundMode === "resynthesis" && !analysisResult);
+  playButton.disabled = isBusy || settings().durationSeconds <= 0 || (soundMode === "resynthesis" && !analysisResult);
   stopButton.disabled = isBusy || !isPlaying;
-  downloadButton.disabled = isBusy;
+  downloadButton.disabled = isBusy || settings().durationSeconds <= 0;
   document.querySelectorAll("input, select, button").forEach((control) => {
     if ([playButton, stopButton, downloadButton].includes(control)) return;
     control.disabled = isBusy || (control === analyzeButton && !analysisSamples);
@@ -491,10 +489,11 @@ function updateTransport() {
   const current = settings();
   const duration = outputDuration();
   timeStatus.textContent = `${formatClock(playheadSeconds)} / ${formatClock(duration)}`;
-  if (!isScrubbing) playbackScrubber.value = String(Math.max(0, Math.min(1, playheadSeconds / duration)));
+  if (!isScrubbing) playbackScrubber.value = String(Math.max(0, Math.min(1, playheadSeconds / Math.max(0.001, duration))));
   playbackScrubber.setAttribute("aria-valuetext", `${formatClock(playheadSeconds)} of ${formatClock(duration)}`);
   playbackScrubber.disabled = soundMode === "resynthesis" && !analysisResult;
-  playButton.disabled = soundMode === "resynthesis" && !analysisResult;
+  downloadButton.disabled = !!renderAbortController || current.durationSeconds <= 0 || (soundMode === "resynthesis" && !analysisResult);
+  playButton.disabled = current.durationSeconds <= 0 || soundMode === "resynthesis" && !analysisResult;
   stopButton.disabled = !isPlaying;
 }
 
@@ -534,7 +533,7 @@ function seekFromScrubber() {
   const soundDuration = settings().durationSeconds;
   const requested = Number(playbackScrubber.value) * duration;
   playheadSeconds = Math.min(soundDuration, requested);
-  if (requested !== playheadSeconds) playbackScrubber.value = String(playheadSeconds / duration);
+  if (requested !== playheadSeconds) playbackScrubber.value = String(playheadSeconds / Math.max(0.001, duration));
   node?.port.postMessage({ type: "seek", seconds: playheadSeconds, token: nextPlaybackToken() });
   safetyLimiterNode?.port.postMessage({ type: "reset" });
   updateTransport();
@@ -542,9 +541,8 @@ function seekFromScrubber() {
 }
 
 async function play() {
-  if (isPlaying) return;
+  if (isPlaying || settings().durationSeconds <= 0) return;
   if (soundMode === "resynthesis" && !analysisResult) return;
-  fftPreview.cancel("Analysis cancelled for playback · Update to refresh");
   const requestToken = playbackToken;
   try {
     await ensureAudio();
@@ -587,8 +585,8 @@ function stop(reset = true) {
 }
 
 async function downloadWav() {
+  if (settings().durationSeconds <= 0) return;
   if (soundMode === "resynthesis" && !analysisResult) return;
-  fftPreview.cancel("Analysis cancelled for export · Update to refresh");
   if (renderAbortController) renderAbortController.abort();
   renderAbortController = new AbortController();
   setBusy(true);
@@ -759,18 +757,6 @@ function drawCurves() {
     .forEach((name) => drawCurve(name, name === activeCurve));
   drawPlayhead();
 }
-
-const fftPreview = createFFTPreview({
-  getSettings: settings,
-  isBusy: () => isPlaying || !!renderAbortController,
-  renderProcessed: async (signal, onProgress) => {
-    const result = await renderOscillator({
-      settings: settings(), impulse: impulseBuffer48k, signal, onProgress, samplesOnly: true
-    });
-    return result.samples;
-  }
-});
-function scheduleSonogramRender(){fftPreview.invalidate();}
 
 function drawGrid() {
   drawFrequencyAxis();
@@ -1327,19 +1313,6 @@ window.addEventListener("blur", () => updateEraseCursor());
   control.addEventListener("change", sendSettings);
 });
 
-durationRange.addEventListener("change", () => {
-  const previous = Number(durationInput.value);
-  const long = durationRange.value === "long";
-  durationInput.min = long ? "60" : "1";
-  durationInput.max = long ? String(MAX_SOUND_DURATION_SECONDS) : "60";
-  durationInput.value = String(Math.max(Number(durationInput.min), Math.min(Number(durationInput.max), previous)));
-  document.getElementById("durationMin").textContent = long ? "1 min" : "1 sec";
-  document.getElementById("durationMax").textContent = long ? "10 min" : "60 sec";
-  if (Number(durationInput.value) !== previous) {
-    stop(true);
-    sendSettings();
-  } else updateDurationDisplay();
-});
 durationInput.addEventListener("input", () => {
   stop(true);
   sendSettings();
@@ -1380,12 +1353,12 @@ window.addEventListener("keyup", (event) => {
 window.addEventListener("resize", () => fitEditorControls(true));
 if ("ResizeObserver" in window) {
   const controlsObserver = new ResizeObserver(() => fitEditorControls());
-  [oscillatorControls, document.querySelector(".impulseBand"), document.querySelector(".legend"), modulationInfo, durationPanel].forEach((element) => controlsObserver.observe(element));
+  [oscillatorControls, document.querySelector(".impulseBand"), document.querySelector(".legend"), modulationInfo, durationPanel, document.querySelector(".topbar"), document.querySelector(".panel"), document.querySelector(".playbackBar")].forEach((element) => controlsObserver.observe(element));
 }
 setSoundMode("oscillator");
 fitEditorControls(true);
 updateTransport();
 requestAnimationFrame(updateMeter);
-scheduleSonogramRender();
+
 
 mountTransport({onScrub:value=>{isScrubbing=value;},state:()=>({duration:outputDuration(),seconds:playheadSeconds,playing:isPlaying,disabled:playButton.disabled||!!renderAbortController}),seek:p=>{playbackScrubber.value=String(p);seekFromScrubber();}});
