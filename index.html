@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="src/styles.css?v=20261014-hierarchy1">
     <link rel="stylesheet" href="src/common-transport.css?v=20261013-1">
     <link rel="stylesheet" href="src/curve-actions.css?v=20261014-family1">
+    <link rel="stylesheet" href="src/file-help.css?v=20261014-family1">
   </head>
   <body>
     <main class="app">
@@ -29,7 +30,7 @@
             </select>
           </label>
           <div class="readout"><span>WAV</span><strong id="downloadReadout">ready</strong></div>
-          <button id="downloadButton" type="button">Download WAV</button>
+          <button id="downloadButton" type="button" title="1–600 sec synthesis, plus file IR tail when used · Mono / stereo · 48 kHz / 24-bit WAV.">Download WAV</button>
         </div>
       </header>
 
@@ -41,6 +42,19 @@
             <button id="resynthesisMode" type="button" aria-pressed="false">File Resynthesis</button>
             <button id="convolutionButton" type="button" aria-pressed="false">Oscillator + File IR</button>
           </div>
+          <details id="fileHelp" class="fileHelp">
+            <summary aria-label="Audio file and export information" title="Audio file and export information"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="4" r="1" fill="currentColor"/><path d="M6.5 7h1.5v5m-1.5 0h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+            <div class="fileHelpPanel">
+              <strong>Files &amp; export</strong>
+              <dl>
+                <dt>Input</dt><dd>WAV, MP3 recommended.</dd>
+                <dt>AIFF</dt><dd>Mono/stereo 16/24-bit PCM (8–192 kHz), converted locally on import. AIFF-C is not supported.</dd>
+                <dt>File size</dt><dd>Up to 16 MiB.</dd>
+                <dt>Output</dt><dd>1–600 sec synthesis, plus file IR tail when used · Mono / stereo · 48 kHz / 24-bit WAV.</dd>
+              </dl>
+              <p>Resynthesis analyses at most 30 sec of the file. Short excerpts recommended. Use one Lab at a time for heavy processing.</p>
+            </div>
+          </details>
           <button title="AIFF: mono/stereo 16/24-bit PCM is converted locally on import. AIFF-C is not supported." id="openAudioButton" type="button">Open Audio</button>
           <input id="impulseInput" type="file" accept="audio/*,.wav,.aif,.aiff,.aifc,.mp3,.m4a,.flac" hidden>
         </div>
@@ -200,6 +214,7 @@
       </footer>
     </main>
 
+    <script src="src/file-help.js?v=20261014-family1" type="module"></script>
     <script src="src/app.js?v=20261014-hierarchy1" type="module"></script>
   </body>
 </html>

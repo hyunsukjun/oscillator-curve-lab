@@ -75,3 +75,8 @@ Both actions follow Audio's neutral navy reference: background #122438, text #aa
 ## 2026-10-14 — Synthesis hierarchy (local review)
 
 Source selection precedes settings; waveform/count/frequency-layout are grouped apart from modulation. Secondary numerical/voice detail is collapsed by default. The curve gets remaining viewport space; details open/close triggers canvas resize without changing normalized points.
+
+
+## 2026-10-14 — Family file information
+
+Approved circular dotted-i disclosure immediately left of Open Audio. Default format guidance moves into this optional panel; privacy and actual error/status notices remain. Space operates disclosure without audio transport; Escape/outside click dismiss. Output guidance: 1–600 sec synthesis, plus file IR tail when used · Mono / stereo · 48 kHz / 24-bit WAV. Input limits reflect current implementation, not a device-memory guarantee. No DSP, admission, export, IDs or defaults changed.
