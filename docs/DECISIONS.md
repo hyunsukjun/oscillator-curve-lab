@@ -221,3 +221,8 @@ Output Duration now uses one 0–600s slider (zero disables playback/export); FF
 ## 2026-10-14 — Synthesis hierarchy (local review)
 
 UI hierarchy follows source path, synthesis configuration, then time-curve editing. This is a UI-only transition toward file-informed synthesis. Convolution remains an exclusive existing oscillator+IR route; Resynthesis+Convolution is not newly enabled. No parameter IDs, defaults, mappings, DSP, analysis or export changes.
+
+
+## 2026-10-14 — Family parameter help
+
+Static parameter descriptions are available on the relevant buttons using the Audio help design; current values, axes and activation feedback remain visible. See `docs/PARAMETER_HELP.md` (or `PARAMETER_HELP.md` in this directory). No DSP or curve mapping changes.

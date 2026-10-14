@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="src/common-transport.css?v=20261013-1">
     <link rel="stylesheet" href="src/curve-actions.css?v=20261014-family1">
     <link rel="stylesheet" href="src/file-help.css?v=20261014-family1">
+    <link rel="stylesheet" href="src/parameter-help.css?v=20261014-family1">
   </head>
   <body>
     <main class="app">
@@ -134,10 +135,10 @@
 
         <div class="legend">
           <div class="modeButtons">
-            <button id="basePitchMode" class="active curveMode" type="button">Base Freq</button>
-            <button id="deviationMode" class="curveMode" type="button">Deviation</button>
-            <button id="slopeMode" class="curveMode" type="button">Spectral Slope</button>
-            <button id="modulationCurveMode" class="curveMode modulationCurveMode" type="button" hidden>FM Strength</button>
+            <button id="basePitchMode" class="active curveMode" type="button" data-parameter-help aria-describedby="basePitchModeHelp">Base Freq</button>
+            <button id="deviationMode" class="curveMode" type="button" data-parameter-help aria-describedby="deviationModeHelp">Deviation</button>
+            <button id="slopeMode" class="curveMode" type="button" data-parameter-help aria-describedby="slopeModeHelp">Spectral Slope</button>
+            <button id="modulationCurveMode" class="curveMode modulationCurveMode" type="button" hidden data-parameter-help aria-describedby="modulationCurveModeHelp">FM Strength</button>
             <div class="toolToggle" role="group" aria-label="Curve editing tool">
               <button id="penTool" class="active" type="button" aria-label="Pen" aria-pressed="true" title="Pen: add or move points">
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L9 17l-4 1 1-4Z"/></svg>
@@ -216,5 +217,10 @@
 
     <script src="src/file-help.js?v=20261014-family1" type="module"></script>
     <script src="src/app.js?v=20261014-hierarchy1" type="module"></script>
-  </body>
+  <div id="basePitchModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Base Frequency · 20–4000 Hz</strong><span>Set the base for the oscillator stack, or transpose the analyzed partials in File Resynthesis.</span><span class="helpState"></span></div>
+<div id="deviationModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Deviation · Depends on source and layout</strong><span>Unison spreads voices up to ±50 cents. Other layouts and File Resynthesis bend partial relationships with an amount of 0–0.38. Zero keeps the original layout.</span><span class="helpState"></span></div>
+<div id="slopeModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Spectral Slope · −24 to +12 dB/oct</strong><span>Tilt voice or partial levels by frequency relative to the base. Negative values favor lower frequencies; positive values favor higher frequencies.</span><span class="helpState"></span></div>
+<div id="modulationCurveModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Modulation Strength · FM / AM / Ring</strong><span>FM uses an index of 0–4. AM Depth and Ring Blend use 0–100%. The curve follows the selected modulation mode.</span><span class="helpState"></span></div>
+<script type="module" src="src/parameter-help.js?v=20261014-family1"></script>
+</body>
 </html>
