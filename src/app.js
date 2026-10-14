@@ -351,7 +351,7 @@ function clearDownload() {
 function setBusy(isBusy) {
   playButton.disabled = isBusy || settings().durationSeconds <= 0 || (soundMode === "resynthesis" && !analysisResult);
   stopButton.disabled = isBusy || !isPlaying;
-  downloadButton.disabled = isBusy || settings().durationSeconds <= 0;
+  downloadButton.disabled = renderAbortController ? renderAbortController.signal.aborted : isBusy || settings().durationSeconds <= 0;
   document.querySelectorAll("input, select, button").forEach((control) => {
     if ([playButton, stopButton, downloadButton].includes(control)) return;
     control.disabled = isBusy || (control === analyzeButton && !analysisSamples);
@@ -496,7 +496,7 @@ function updateTransport() {
   if (!isScrubbing) playbackScrubber.value = String(Math.max(0, Math.min(1, playheadSeconds / Math.max(0.001, duration))));
   playbackScrubber.setAttribute("aria-valuetext", `${formatClock(playheadSeconds)} of ${formatClock(duration)}`);
   playbackScrubber.disabled = soundMode === "resynthesis" && !analysisResult;
-  downloadButton.disabled = !!renderAbortController || current.durationSeconds <= 0 || (soundMode === "resynthesis" && !analysisResult);
+  downloadButton.disabled = renderAbortController ? renderAbortController.signal.aborted : current.durationSeconds <= 0 || (soundMode === "resynthesis" && !analysisResult);
   playButton.disabled = current.durationSeconds <= 0 || soundMode === "resynthesis" && !analysisResult;
   stopButton.disabled = !isPlaying;
 }
@@ -591,8 +591,14 @@ function stop(reset = true) {
 async function downloadWav() {
   if (settings().durationSeconds <= 0) return;
   if (soundMode === "resynthesis" && !analysisResult) return;
-  if (renderAbortController) renderAbortController.abort();
+  if (renderAbortController) {
+    renderAbortController.abort();
+    downloadButton.textContent = "Cancelling";
+    downloadButton.disabled = true;
+    return;
+  }
   renderAbortController = new AbortController();
+  downloadButton.textContent = "Cancel";
   setBusy(true);
   readouts.download.textContent = "rendering 0%";
   try {
@@ -613,13 +619,16 @@ async function downloadWav() {
     readouts.download.textContent = `${result.channelCount}ch 48k/24`;
     readouts.safety.textContent = result.peak > 0.98 ? "auto gain / limited" : "auto gain / limiter";
   } catch (error) {
-    if (error.name !== "AbortError") {
+    if (error.name === "AbortError") {
+      readouts.download.textContent = "cancelled";
+    } else {
       console.error(error);
       readouts.download.textContent = "export failed";
       alert(error.message || String(error));
     }
   } finally {
     renderAbortController = null;
+    downloadButton.textContent = "Download WAV";
     setBusy(false);
     updateTransport();
   }

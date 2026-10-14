@@ -193,3 +193,7 @@ Static parameter descriptions are available on the relevant buttons using the Au
 
 ## 2026-10-14 — Disclosure keyboard ownership
 Synthesis detail 등 summary에 포커스한 Space는 기본 패널 열기/닫기에 맡기고 transport가 가로채지 않는다. Enter·Tab과 나머지 Space 재생 정책은 유지한다. 음향 엔진 변경 없음.
+
+## 2026-10-15 — Reachable export cancellation
+
+Download WAV becomes Cancel during rendering. A second click aborts the existing job and returns without starting another render. Cancelling is disabled until cleanup; completion restores Download WAV and controls. Abort reports cancelled. Previously an AbortController existed but the download control was disabled, making cancellation unreachable. Settings, curves, synthesis, IR, resynthesis, WAV format and DSP are unchanged. Future standalone should likewise expose cancellation and allow a clean retry. Verification: actual-handler regression and Safari lifecycle; listening and Windows remain separate.

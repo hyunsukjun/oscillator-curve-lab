@@ -85,3 +85,6 @@ Approved circular dotted-i disclosure immediately left of Open Audio. Default fo
 ## 2026-10-14 — Family parameter help
 
 Static parameter descriptions are available on the relevant buttons using the Audio help design; current values, axes and activation feedback remain visible. See `docs/PARAMETER_HELP.md` (or `PARAMETER_HELP.md` in this directory). No DSP or curve mapping changes.
+
+## 2026-10-15 Render action label
+The existing Download WAV control changes to Cancel while exporting, then Cancelling until cleanup. It returns to Download WAV after success, cancellation or error. No new color or separate control; no DSP change.
