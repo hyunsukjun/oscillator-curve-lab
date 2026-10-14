@@ -100,3 +100,7 @@ Family verification: all six information panels passed desktop/narrow bounds and
 ## 2026-10-14 — Family parameter help
 
 Static parameter descriptions are available on the relevant buttons using the Audio help design; current values, axes and activation feedback remain visible. See `docs/PARAMETER_HELP.md` (or `PARAMETER_HELP.md` in this directory). No DSP or curve mapping changes.
+
+
+## 2026-10-14 — Disclosure keyboard ownership
+Synthesis detail 등 summary에 포커스한 Space는 기본 패널 열기/닫기에 맡기고 transport가 가로채지 않는다. Enter·Tab과 나머지 Space 재생 정책은 유지한다. 음향 엔진 변경 없음.

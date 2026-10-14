@@ -1336,7 +1336,7 @@ downloadButton.addEventListener("click", downloadWav);
 
 function isTransportInput(target) {
   return target instanceof HTMLInputElement || target instanceof HTMLSelectElement ||
-    target instanceof HTMLTextAreaElement || target?.isContentEditable;
+    target instanceof HTMLTextAreaElement || target?.isContentEditable || target?.closest?.("summary");
 }
 
 window.addEventListener("keydown", (event) => {

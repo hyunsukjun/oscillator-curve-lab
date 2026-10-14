@@ -54,7 +54,7 @@ test('disabled transport and active render block Space even if UI enablement cha
 test('text, range, select and editable targets retain their native Space behavior', () => {
   const h = harness();
   for (const target of [new h.context.HTMLInputElement(), new h.context.HTMLSelectElement(),
-    new h.context.HTMLTextAreaElement(), {isContentEditable:true}]) {
+    new h.context.HTMLTextAreaElement(), {isContentEditable:true}, {closest: selector => selector === "summary" ? {} : null}]) {
     for (const type of ['keydown','keyup']) assert.equal(h.send(type,{target}).prevented,false);
   }
   assert.deepEqual(h.calls, []);
