@@ -151,3 +151,8 @@ Return / Play / Pause retain their order and behavior. Each occupies a 38 × 32p
 Oscillator layout correction: file help + Open Audio are now in the top-right header. Synthesis detail is always visible; this supersedes the previous collapsible detail decision. Curve canvas reserves 10px at top/bottom/right for endpoint circles, with inverse pointer mapping and axis/grid coordinates updated together. Verified Deviation point add/erase and Clear Current, default Play/Pause/rewind, 600px narrow layout without horizontal overflow. Six-Lab transport DOM measurements confirm equal button widths/heights, equal Y and 4px spacing. No commit/deployment in this review.
 
 Release approval (2026-10-15): user approved the reviewed transport/layout changes. All six transport-keyboard suites passed (27 tests total); Oscillator syntax and diff checks passed. Prior browser measurements confirmed equal transport cells, and Oscillator point add/erase, Clear Current, Play/Pause/rewind and narrow layout were checked.
+
+### Transport surface continuity — 2026-10-15 (uncommitted review)
+Transport and surrounding page #373B43, no outer border. Fixed transport docks at bottom:0 (no 12px floating gap); bar padding 8px vertically, minimum 56px. At <=1180px all transport containers return to document flow so wrapped controls/meters do not cover editors. Remaining track uses #8290A1; completed portion retains each Lab accent. Audio's canvas track already uses the same remaining color. Transport button capsule remains #292F37 / #596472. This supersedes older #30343C transport surface and mixed footer breakpoints.
+
+- 좁은 화면(1180 CSS px 이하)에서는 Oscillator 커브 높이를 220px로 유지하여 재생부의 문서 흐름 전환 후 편집 영역이 축소되지 않도록 한다.
