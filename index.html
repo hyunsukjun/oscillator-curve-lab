@@ -42,9 +42,9 @@
                 <dt>Input</dt><dd>WAV, MP3 recommended.</dd>
                 <dt>AIFF</dt><dd>Mono/stereo 16/24-bit PCM (8–192 kHz), converted locally on import. AIFF-C is not supported.</dd>
                 <dt>File size</dt><dd>Up to 16 MiB.</dd>
-                <dt>Output</dt><dd>1–600 sec synthesis, plus file IR tail when used · Mono / stereo · 48 kHz / 24-bit WAV.</dd>
+                <dt>Output</dt><dd>1–600 s synthesis, plus file IR tail when used · Mono / stereo · 48 kHz / 24-bit WAV.</dd>
               </dl>
-              <p>Resynthesis analyses at most 30 sec of the file. Short excerpts recommended. Use one Lab at a time for heavy processing.</p>
+              <p>Resynthesis analyses at most 30 s of the file. Short excerpts recommended. Use one Lab at a time for heavy processing.</p>
             </div>
           </details>
           <button title="AIFF: mono/stereo 16/24-bit PCM is converted locally on import. AIFF-C is not supported." id="openAudioButton" type="button">Open Audio</button>
@@ -56,7 +56,7 @@
             </select>
           </label>
           <div class="exportStatus" role="status" aria-label="Export status" hidden><strong id="downloadReadout">ready</strong></div>
-          <button id="downloadButton" type="button" title="1–600 sec synthesis, plus file IR tail when used · Mono / stereo · 48 kHz / 24-bit WAV.">Download WAV</button>
+          <button id="downloadButton" type="button" title="1–600 s synthesis, plus file IR tail when used · Mono / stereo · 48 kHz / 24-bit WAV.">Download WAV</button>
         </div>
       </header>
 
@@ -167,10 +167,10 @@
 
         <section id="durationPanel" class="durationPanel" aria-label="Output Duration">
           <label for="durationInput">Output Duration</label>
-          <span id="durationMin">0 sec</span>
+          <span id="durationMin">0 s</span>
           <input id="durationInput" type="range" min="0" max="600" step="1" value="20" aria-label="Output Duration">
           <span id="durationMax">10 min</span>
-          <output id="durationValue" for="durationInput">20 sec</output>
+          <output id="durationValue" for="durationInput">20 s</output>
           <span id="durationEstimate"></span>
 
         </section>
@@ -185,7 +185,7 @@
           <div class="readout"><span>Points</span><strong id="pointsReadout">2</strong></div>
           <div class="readout"><span>Stack</span><strong id="stackReadout">Unison 4</strong></div>
           <div class="readout"><span>Base</span><strong id="basePitchReadout">110 Hz</strong></div>
-          <div class="readout"><span>Deviation</span><strong id="deviationReadout">0 c</strong></div>
+          <div class="readout"><span>Deviation</span><strong id="deviationReadout">0 cents</strong></div>
           <div class="readout"><span>Slope</span><strong id="slopeReadout">-9.0 dB/oct</strong></div>
           <div class="readout"><span>Voices</span><strong id="voicesReadout">current values</strong></div>
           <div class="readout safetyReadout"><span>Safety</span><strong id="safetyReadout">auto gain / limiter</strong></div>
@@ -228,7 +228,7 @@
     </main>
 
     <script src="src/file-help.js?v=20261014-family1" type="module"></script>
-    <script src="src/app.js?v=20261015-oscillator4" type="module"></script>
+    <script src="src/app.js?v=20261015-units1" type="module"></script>
   <div id="basePitchModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Base Frequency · 20–4000 Hz</strong><span>Set the base for the oscillator stack, or transpose the analyzed partials in File Resynthesis.</span><span class="helpState"></span></div>
 <div id="deviationModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Deviation · Depends on source and layout</strong><span>Unison spreads voices up to ±50 cents. Other layouts and File Resynthesis bend partial relationships with an amount of 0–0.38. Zero keeps the original layout.</span><span class="helpState"></span></div>
 <div id="slopeModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Spectral Slope · −24 to +12 dB/oct</strong><span>Tilt voice or partial levels by frequency relative to the base. Negative values favor lower frequencies; positive values favor higher frequencies.</span><span class="helpState"></span></div>

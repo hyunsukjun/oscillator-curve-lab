@@ -222,7 +222,7 @@ function outputDuration() {
 }
 
 function formatDurationLabel(seconds) {
-  return seconds < 60 ? `${seconds} sec` : `${Math.floor(seconds / 60)} min${seconds % 60 ? ` ${seconds % 60} sec` : ""}`;
+  return seconds < 60 ? `${seconds} s` : `${Math.floor(seconds / 60)} min${seconds % 60 ? ` ${seconds % 60} s` : ""}`;
 }
 
 function updateDurationDisplay() {
@@ -275,10 +275,10 @@ function resizeCanvas() {
 }
 
 function formatClock(seconds) {
-  const safeSeconds = Math.max(0, seconds || 0);
-  const minutes = Math.floor(safeSeconds / 60);
-  const remaining = safeSeconds - (minutes * 60);
-  return `${String(minutes).padStart(2, "0")}:${remaining.toFixed(2).padStart(5, "0")}`;
+  const hundredths = Math.round(Math.max(0, Number.isFinite(seconds) ? seconds : 0) * 100);
+  const minutes = Math.floor(hundredths / 6000);
+  const rest = (hundredths % 6000) / 100;
+  return `${String(minutes).padStart(2, "0")}:${rest.toFixed(2).padStart(5, "0")}`;
 }
 
 function formatPointValue(curveName, point) {
@@ -286,7 +286,7 @@ function formatPointValue(curveName, point) {
     const frequency = baseFrequencyFromNorm(point.y);
     return `${Math.round(frequency)} Hz · ${formatPitch(frequency)}`;
   }
-  if (curveName === "deviation" && soundMode !== "resynthesis" && stackSelect.value === "unison") return `${centsFromNorm(deviationAmountFromCurveY(point.y))} c`;
+  if (curveName === "deviation" && soundMode !== "resynthesis" && stackSelect.value === "unison") return `${centsFromNorm(deviationAmountFromCurveY(point.y))} cents`;
   if (curveName === "deviation") return `${partialDeviationFromNorm(deviationAmountFromCurveY(point.y)).toFixed(2)} partial`;
   if (curveName === "fmIndex") return `${((1 - point.y) * 4).toFixed(2)} index`;
   if (curveName === "amDepth" || curveName === "ringMix") return `${(1 - point.y).toFixed(2)}`;
@@ -986,7 +986,7 @@ function updateReadouts() {
   readouts.basePitch.textContent = `${Math.round(effectiveBaseFrequency(currentSettings, t))} Hz`;
   const deviationAmount = deviationAmountFromCurveY(valueAt(curves.deviation, t));
   readouts.deviation.textContent = soundMode !== "resynthesis" && stackSelect.value === "unison"
-    ? `${centsFromNorm(deviationAmount)} c`
+    ? `${centsFromNorm(deviationAmount)} cents`
     : `${partialDeviationFromNorm(deviationAmount).toFixed(2)} partial`;
   readouts.slope.textContent = `${slopeDbFromNorm(valueAt(curves.slope, t)).toFixed(1)} dB/oct`;
   readouts.voices.textContent = `${voices.length}/${soundMode === "resynthesis" ? analysisResult?.partialCount || 0 : countSelect.value} visible`;
