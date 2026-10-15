@@ -40,3 +40,11 @@
 .parameterHelp strong { font-weight:600; }
 .parameterHelp .helpState { font-weight:400; }
 /* Duration14/600 remains an intentional readout role, not an oversized button. */
+
+/* Oscillator compact settings: text-only refinement; retain existing control dimensions. */
+.compactField select { font-size:12px; }
+.voiceDetails .synthesisHeading { line-height:18px; }
+.voiceDetails .synthesisHeading span { white-space:normal; overflow-wrap:anywhere; }
+@media (max-width:700px) {
+ .voiceDetails .synthesisHeading span { display:block; margin-left:0; margin-top:2px; line-height:16px; }
+}

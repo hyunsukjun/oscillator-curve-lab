@@ -254,3 +254,9 @@ Commit/deployment withheld for user preview. Native confirmation keyboard and co
 - Approved typography refinement verified in Brave actual 125% (1189×609 CSS px, DPR 2.5) and 150% (990×508 CSS px, DPR 3). No document horizontal overflow or clipped button labels; transport remains reachable by vertical scrolling.
 - Existing narrow-screen and representative parameter/playback checks retained. Granular additionally imported recovery-8s-test.wav via the native file picker: playback/meter activity, pause, resume from position, and rewind verified.
 - Scope is presentation only. Native confirmation keyboard behavior and comparative listening remain deferred; this does not claim new DSP/export or cross-device certification.
+
+## 2026-10-15 — Compact select typography (local review)
+Oscillator compact selects use12px instead of11.5px; retain34px height, existing widths/padding/weight/options. Synthesis detail secondary instruction, formerly hidden below700px, now appears on a separate wrapping line (11px/16px). Long status wrapping rules retained. No processing/parameter/interaction code changed.
+Browser observed1333/900/390CSS-pixel widths: selectors12px and33.99px measured height, no document horizontal overflow. Odd Harmonics/FM long visible guidance and no-file Resynthesis/Partials32↔64 selection checked; no-file playback/export remain disabled. Defaults restored; viewport override reset. Console errors none. CSS/HTML-only scope; no sound, analysis, export or listening certification. Pending user preview; no commit/deployment. Evidence: shared QA evidence/oscillator-compact-select-audit.json and screenshots.
+
+Release approved: compact-select preview accepted by user. Final diff is limited to CSS, cache reference and design records; previous390/900px UI evidence applies. No JavaScript or DSP changes.
