@@ -23,3 +23,12 @@
   .modulationGroup { border-left:0; padding-left:0; gap:8px 12px; }
   .voiceDetails .synthesisHeading { padding-block:5px; }
 }
+
+/* Long file/status strings wrap instead of hiding their diagnostic content. */
+.impulseStatus, #analysisStatus {
+  min-width:0; max-width:100%; white-space:normal;
+  overflow-wrap:anywhere; overflow:visible; text-overflow:clip;
+}
+.resynthesisControls, .convolutionControls { min-width:0; max-width:100%; }
+.voiceDetails .frequencyFrame { overflow-x:auto; overflow-y:hidden; }
+#frequencyCanvas { max-width:none; height:110px !important; }

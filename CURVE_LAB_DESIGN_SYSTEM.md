@@ -188,3 +188,10 @@ Below 900 CSS px, current-value strip vertical padding 8→6px, row gap 12→8px
 ### Oscillator candidate — narrow settings density (2026-10-15, approved)
 Below900px reduce source/control vertical padding to6px and synthesis heading padding to5px. At <=520px keep four waveform buttons in one row, with Oscillators/Frequency layout in two labeled columns. Keep DOM/tab order, control heights, labels, modulation and always-visible synthesis details. No new collapse UI, hidden information or DSP changes.
 - Browser checked at actual local widths1280/853/600/390: no horizontal overflow or waveform button clipping. At390px control band190.5→165.2px compared with public baseline. FM parameter, transport and Resynthesis/IR no-file transitions checked. Actual file analysis/IR processing and listening not repeated for CSS-only layout.
+
+### Oscillator candidate — voice and status readability (2026-10-15, approved)
+- File/analysis status wraps anywhere without ellipsis; preserve complete diagnostic text and previous-file state.
+- Values monitor reserves 96px per voice plus margins, minimum container width. Overflow scrolls horizontally inside the focusable monitor only. Height110px replaces the unreadable64px band. Every analyzed partial label is drawn instead of the former every-Nth label, without changing voices or sound. Main normalized curve and DSP are unchanged.
+- At390px,16voices no longer overlap; keyboard Right moves the monitor. At1280px/4voices it fits normally. Approved after user review and 32/64-partial browser verification.
+
+- Dense display verification: generated2s/48kHz64-tone source (100–6400Hz) actually analyzed32 and64partials. At390px,64/64 retained and keyboard scroll reached the last label64/6400Hz, without page overflow. Play/Pause/rewind and switching back to32 passed; no captured console errors. This verifies display and basic operation, not perceptual quality or all long-file performance. Shared evidence: oscillator-partial-density-20261015.json and oscillator-64-partials-20261015.png.

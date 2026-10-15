@@ -709,6 +709,14 @@ function prepareContext(renderCtx, width, height) {
 }
 
 function drawFrequency() {
+  // Reserve one readable column per voice; scrolling belongs to the monitor only.
+  const totalColumns = soundMode === "resynthesis" ? (analysisResult?.partialCount || 1) : Number(countSelect.value);
+  const monitorWidth = Math.max(frequencyCanvas.parentElement.clientWidth, 150 + totalColumns * 96);
+  if (Math.abs(frequencyCssWidth - monitorWidth) > 1) {
+    frequencyCanvas.style.width = `${monitorWidth}px`;
+    frequencyCssWidth = monitorWidth;
+    frequencyCanvas.width = Math.max(1, Math.floor(monitorWidth * (window.devicePixelRatio || 1)));
+  }
   prepareContext(frequencyCtx, frequencyCssWidth, frequencyCssHeight);
   frequencyCtx.fillStyle = "#191c20";
   frequencyCtx.fillRect(0, 0, frequencyCssWidth, frequencyCssHeight);
@@ -750,7 +758,7 @@ function drawFrequency() {
     frequencyCtx.fill();
     frequencyCtx.globalAlpha = 1;
     frequencyCtx.fillStyle = "#e8f0f6";
-    if (soundMode !== "resynthesis" || voice.index % Math.ceil(total / 16) === 0) {
+    {
       frequencyCtx.fillText(`${Math.round(voice.frequency)} Hz`, x + 12, y + 4);
       frequencyCtx.fillStyle = "rgba(170, 188, 204, 0.78)";
       frequencyCtx.fillText(voice.label, x + 12, y + 18);

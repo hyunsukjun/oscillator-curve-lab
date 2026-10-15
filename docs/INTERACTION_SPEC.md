@@ -123,3 +123,6 @@ Idle WAV ready/not ready/needs export badges are hidden. The Download control re
 Open Audio and its file-help control move to the header, before channel selection. Synthesis detail is always visible (section, not disclosure), superseding the previous collapsed default. Curve display has 10px top/bottom/right inset; normalized parameter values and time remain unchanged. Pointer Y inversion and point hit-testing use the same inset plot height.
 
 Expanded-editor layout (2026-10-15): viewport/control resizing changes canvas display dimensions only. Existing canvas sizing observers update backing stores and pointer coordinates; Oscillator additionally observes its main canvas. Curve data and transport state are retained. If controls plus minimum canvas exceed viewport height, use page scrolling rather than covering controls or compressing the editor.
+
+## 2026-10-15 — values monitor
+The always-visible oscillator/partial monitor may scroll horizontally when voices exceed readable width. It is focusable; keyboard arrows scroll its viewport. This changes presentation only, not the voices selected, Nyquist filtering or synthesis. Long source/analysis text wraps in full. Approved after 32/64-partial display and transport verification.
