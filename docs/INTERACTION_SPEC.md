@@ -112,3 +112,12 @@ Download WAV becomes Cancel during rendering. A second click aborts the existing
 ## Information-density pilot — local review, 2026-10-15
 
 Selected parameter name/value visible; statistics and full overview in disclosure. Existing synthesis values at output playhead, before IR/output processing; voice/safety detail retained. All original readout IDs and update sources preserved. Details summary Space does not start transport. COMMON CANDIDATE for standalone; not committed/deployed.
+
+## Readout disclosure rollback — 2026-10-15
+User requested removal of the newly introduced Details disclosures across the family. Original always-visible readout panels restored; Oscillator retains its pre-existing Synthesis detail panel and original contents. Value computation and audio behavior unchanged. Do not add disclosure or restructure information during color/minor-UI work. Audio also removes the border above EDIT AUDIO.
+
+## Export feedback visibility
+Idle WAV ready/not ready/needs export badges are hidden. The Download control retains its normal state. Progress, cancellation, limits and failure feedback remain visible; status values are not audio-engine inputs.
+
+## 2026-10-15 review correction (uncommitted)
+Open Audio and its file-help control move to the header, before channel selection. Synthesis detail is always visible (section, not disclosure), superseding the previous collapsed default. Curve display has 10px top/bottom/right inset; normalized parameter values and time remain unchanged. Pointer Y inversion and point hit-testing use the same inset plot height.

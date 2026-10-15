@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="src/studio-theme.css?v=20261015-family1">
     <link rel="stylesheet" href="src/button-states.css?v=20261015-2">
   <link rel="stylesheet" href="src/value-strip.css?v=20261015-1">
+  <link rel="stylesheet" href="src/functional-surfaces.css?v=20261015-oscillator4">
+    <link rel="stylesheet" href="src/content-alignment.css?v=20261015-1">
+  <link rel="stylesheet" href="src/transport-polish.css?v=20261015-2">
 </head>
   <body>
     <main class="app">
@@ -27,25 +30,6 @@
           </div>
         </div>
         <div class="transport">
-          <label class="outputSelect">
-            <select id="formatSelect" aria-label="Final output format">
-              <option value="stereo">Stereo 2ch</option>
-              <option value="mono">Mono 1ch</option>
-            </select>
-          </label>
-          <div class="readout"><span>WAV</span><strong id="downloadReadout">ready</strong></div>
-          <button id="downloadButton" type="button" title="1–600 sec synthesis, plus file IR tail when used · Mono / stereo · 48 kHz / 24-bit WAV.">Download WAV</button>
-        </div>
-      </header>
-
-      <section class="editor">
-        <div class="sourceBand" title="Choose a synthesis path. File IR processes the oscillator sound.">
-          <span class="sectionLabel">Synthesis source</span>
-          <div class="soundModes" role="group" aria-label="Sound generation mode">
-            <button id="oscillatorMode" class="active" type="button" aria-pressed="true">Basic Waveform</button>
-            <button id="resynthesisMode" type="button" aria-pressed="false">File Resynthesis</button>
-            <button id="convolutionButton" type="button" aria-pressed="false">Oscillator + File IR</button>
-          </div>
           <details id="fileHelp" class="fileHelp">
             <summary aria-label="Audio file and export information" title="Audio file and export information"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="4" r="1" fill="currentColor"/><path d="M6.5 7h1.5v5m-1.5 0h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
             <div class="fileHelpPanel">
@@ -61,6 +45,26 @@
           </details>
           <button title="AIFF: mono/stereo 16/24-bit PCM is converted locally on import. AIFF-C is not supported." id="openAudioButton" type="button">Open Audio</button>
           <input id="impulseInput" type="file" accept="audio/*,.wav,.aif,.aiff,.aifc,.mp3,.m4a,.flac" hidden>
+          <label class="outputSelect">
+            <select id="formatSelect" aria-label="Final output format">
+              <option value="stereo">Stereo 2ch</option>
+              <option value="mono">Mono 1ch</option>
+            </select>
+          </label>
+          <div class="exportStatus" role="status" aria-label="Export status" hidden><strong id="downloadReadout">ready</strong></div>
+          <button id="downloadButton" type="button" title="1–600 sec synthesis, plus file IR tail when used · Mono / stereo · 48 kHz / 24-bit WAV.">Download WAV</button>
+        </div>
+      </header>
+
+      <section class="editor">
+        <div class="sourceBand" title="Choose a synthesis path. File IR processes the oscillator sound.">
+          <span class="sectionLabel">Synthesis source</span>
+          <div class="soundModes" role="group" aria-label="Sound generation mode">
+            <button id="oscillatorMode" class="active" type="button" aria-pressed="true">Basic Waveform</button>
+            <button id="resynthesisMode" type="button" aria-pressed="false">File Resynthesis</button>
+            <button id="convolutionButton" type="button" aria-pressed="false">Oscillator + File IR</button>
+          </div>
+
         </div>
         <div class="controlBand" id="oscillatorControls">
           <div class="synthesisGroup">
@@ -169,11 +173,11 @@
 
         <div class="workspace">
           <div class="curveStack">
-            <section class="valueStrip" aria-label="Current parameter values"><span class="valueBasis" title="Calculated synthesis values at the output playhead before file IR and output processing.">At playhead</span><span class="compactValue"><strong id="modeReadout">Base Freq</strong> <strong id="selectedValue">—</strong></span></section>
-<details id="voiceDetails" class="voiceDetails">
-              <summary>Synthesis detail <span>Oscillator / partial values · before modulation and file IR</span></summary>
-        <div class="panel">
 
+<section id="voiceDetails" class="voiceDetails" aria-label="Synthesis details">
+              <div class="synthesisHeading">Synthesis detail <span>Oscillator / partial values · before modulation and file IR</span></div>
+        <div class="panel currentValues">
+          <div class="readout"><span>Curve</span><strong id="modeReadout">Base Freq</strong></div>
           <div class="readout"><span>Points</span><strong id="pointsReadout">2</strong></div>
           <div class="readout"><span>Stack</span><strong id="stackReadout">Unison 4</strong></div>
           <div class="readout"><span>Base</span><strong id="basePitchReadout">110 Hz</strong></div>
@@ -186,7 +190,7 @@
             <div class="canvasFrame frequencyFrame">
               <canvas id="frequencyCanvas" width="1800" height="110"></canvas>
             </div>
-            </details>
+            </section>
             <div class="canvasFrame curveFrame">
               <canvas id="curveCanvas" width="1800" height="440"></canvas>
             </div>
@@ -220,7 +224,7 @@
     </main>
 
     <script src="src/file-help.js?v=20261014-family1" type="module"></script>
-    <script src="src/app.js?v=20261015-density2" type="module"></script>
+    <script src="src/app.js?v=20261015-oscillator4" type="module"></script>
   <div id="basePitchModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Base Frequency · 20–4000 Hz</strong><span>Set the base for the oscillator stack, or transpose the analyzed partials in File Resynthesis.</span><span class="helpState"></span></div>
 <div id="deviationModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Deviation · Depends on source and layout</strong><span>Unison spreads voices up to ±50 cents. Other layouts and File Resynthesis bend partial relationships with an amount of 0–0.38. Zero keeps the original layout.</span><span class="helpState"></span></div>
 <div id="slopeModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Spectral Slope · −24 to +12 dB/oct</strong><span>Tilt voice or partial levels by frequency relative to the base. Negative values favor lower frequencies; positive values favor higher frequencies.</span><span class="helpState"></span></div>

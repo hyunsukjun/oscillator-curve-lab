@@ -247,9 +247,7 @@ function fitEditorControls(force = false) {
   const available = Math.max(100, footer.getBoundingClientRect().top - workspace.getBoundingClientRect().top - 36);
   const details = document.getElementById("voiceDetails");
   const frequency = 64;
-  const detailHeight = details.open
-    ? frequency + details.querySelector("summary").getBoundingClientRect().height + details.querySelector(".panel").getBoundingClientRect().height + 12
-    : details.querySelector("summary").getBoundingClientRect().height;
+  const detailHeight = frequency + details.querySelector(".synthesisHeading").getBoundingClientRect().height + details.querySelector(".panel").getBoundingClientRect().height + 12;
   const curve = Math.max(80, available - detailHeight - gap - 4);
   document.documentElement.style.setProperty("--transport-reserve", `${footer.getBoundingClientRect().height + 20}px`);
   const value = `${curve}px`;
@@ -340,7 +338,7 @@ function sendCurves() {
 function markDownloadStale() {
   if (downloadUrl) URL.revokeObjectURL(downloadUrl);
   downloadUrl = null;
-  readouts.download.textContent = "needs export";
+  setExportStatus("needs export");
 }
 
 function clearDownload() {
@@ -600,14 +598,14 @@ async function downloadWav() {
   renderAbortController = new AbortController();
   downloadButton.textContent = "Cancel";
   setBusy(true);
-  readouts.download.textContent = "rendering 0%";
+  setExportStatus("rendering 0%");
   try {
     const result = await renderOscillator({
       settings: settings(),
       impulse: impulseBuffer48k,
       signal: renderAbortController.signal,
       onProgress: (progress) => {
-        readouts.download.textContent = `rendering ${Math.round(progress * 100)}%`;
+        setExportStatus(`rendering ${Math.round(progress * 100)}%`);
       }
     });
     clearDownload();
@@ -616,14 +614,14 @@ async function downloadWav() {
     anchor.href = downloadUrl;
     anchor.download = `oscillator-curve-lab-${Date.now()}-${result.channelCount}ch-48k-24bit.wav`;
     anchor.click();
-    readouts.download.textContent = `${result.channelCount}ch 48k/24`;
+    setExportStatus(`${result.channelCount}ch 48k/24`);
     readouts.safety.textContent = result.peak > 0.98 ? "auto gain / limited" : "auto gain / limiter";
   } catch (error) {
     if (error.name === "AbortError") {
-      readouts.download.textContent = "cancelled";
+      setExportStatus("cancelled");
     } else {
       console.error(error);
-      readouts.download.textContent = "export failed";
+      setExportStatus("export failed");
       alert(error.message || String(error));
     }
   } finally {
@@ -638,7 +636,7 @@ function canvasPoint(event) {
   const rect = canvas.getBoundingClientRect();
   return {
     x: Math.max(0, Math.min(1, ((event.clientX - rect.left) - curveAxisWidth) / curvePlotWidth())),
-    y: (event.clientY - rect.top) / rect.height
+    y: Math.max(0, Math.min(1, (event.clientY - rect.top - 10) / curvePlotHeight()))
   };
 }
 
@@ -646,7 +644,7 @@ function findPoint(point) {
   const curve = curves[activeCurve];
   for (let i = 0; i < curve.length; i += 1) {
     const dx = (curve[i].x - point.x) * curvePlotWidth();
-    const dy = (curve[i].y - point.y) * canvasCssHeight;
+    const dy = (curve[i].y - point.y) * curvePlotHeight();
     if (Math.hypot(dx, dy) < 12) return i;
   }
   return -1;
@@ -711,7 +709,6 @@ function prepareContext(renderCtx, width, height) {
 }
 
 function drawFrequency() {
-  if (!document.getElementById("voiceDetails").open) return;
   prepareContext(frequencyCtx, frequencyCssWidth, frequencyCssHeight);
   frequencyCtx.fillStyle = "#191c20";
   frequencyCtx.fillRect(0, 0, frequencyCssWidth, frequencyCssHeight);
@@ -785,7 +782,7 @@ function drawGrid() {
   }
   for (let y = 0; y <= 8; y += 1) {
     ctx.strokeStyle = y % 2 === 0 ? "rgba(139, 149, 162, 0.18)" : "rgba(139, 149, 162, 0.08)";
-    const py = (y / 8) * canvasCssHeight;
+    const py = curveToCanvasY(y / 8);
     ctx.beginPath();
     ctx.moveTo(curveAxisWidth, py);
     ctx.lineTo(canvasCssWidth, py);
@@ -794,7 +791,7 @@ function drawGrid() {
 }
 
 function drawFrequencyAxis() {
-  ctx.fillStyle = "#222a34";
+  ctx.fillStyle = "#191c20";
   ctx.fillRect(0, 0, curveAxisWidth, canvasCssHeight);
   ctx.strokeStyle = "rgba(95, 141, 177, 0.6)";
   ctx.lineWidth = 1;
@@ -828,30 +825,30 @@ function axisMarksForActiveCurve() {
   if (activeCurve === "fmIndex") {
     return [0, 0.25, 0.5, 0.75, 1].map((y) => ({
       label: ((1 - y) * 4).toFixed(0),
-      y: y * canvasCssHeight
+      y: curveToCanvasY(y)
     }));
   }
   if (activeCurve === "amDepth" || activeCurve === "ringMix") {
     return [0, 0.25, 0.5, 0.75, 1].map((y) => ({
       label: (1 - y).toFixed(y === 0 || y === 1 ? 0 : 2),
-      y: y * canvasCssHeight
+      y: curveToCanvasY(y)
     }));
   }
   if (activeCurve === "slope") {
     return [0, 0.25, 0.5, 0.75, 1].map((y) => ({
       label: `${slopeDbFromNorm(y) > 0 ? "+" : ""}${slopeDbFromNorm(y)}`,
-      y: y * canvasCssHeight
+      y: curveToCanvasY(y)
     }));
   }
   if (activeCurve === "deviation") {
     return [1, 0.75, 0.5, 0.25, 0].map((amount) => ({
       label: formatDeviationAxis(amount),
-      y: (1 - amount) * canvasCssHeight
+      y: curveToCanvasY(1 - amount)
     }));
   }
   return [4000, 2000, 1000, 500, 200, 100, 50, 20].map((hz) => ({
     label: formatAxisFrequency(hz),
-    y: normFromBaseFrequency(hz) * canvasCssHeight
+    y: curveToCanvasY(normFromBaseFrequency(hz))
   }));
 }
 
@@ -877,7 +874,7 @@ function drawCurve(name, isActive) {
   for (let index = 0; index <= samples; index += 1) {
     const normX = index / samples;
     const x = curveToCanvasX(normX);
-    const y = valueAt(curve, normX) * canvasCssHeight;
+    const y = curveToCanvasY(valueAt(curve, normX));
     if (index === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   }
@@ -887,7 +884,7 @@ function drawCurve(name, isActive) {
   if (!isActive) return;
   curve.forEach((point, index) => {
     const x = curveToCanvasX(point.x);
-    const y = point.y * canvasCssHeight;
+    const y = curveToCanvasY(point.y);
     ctx.beginPath();
     ctx.fillStyle = index === selectedPoint ? "#e8f0f6" : curveColors[name];
     ctx.strokeStyle = "#06111c";
@@ -906,7 +903,7 @@ function drawPointTooltip(name) {
   if (!point) return;
 
   const x = curveToCanvasX(point.x);
-  const y = point.y * canvasCssHeight;
+  const y = curveToCanvasY(point.y);
   const label = `${formatPointTime(point)}  ${formatPointValue(name, point)}`;
   ctx.font = "12px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
   const paddingX = 8;
@@ -953,8 +950,11 @@ function drawPlayhead() {
   ctx.stroke();
 }
 
+function curvePlotHeight() { return Math.max(1, canvasCssHeight - 20); }
+function curveToCanvasY(value) { return 10 + value * curvePlotHeight(); }
+
 function curvePlotWidth() {
-  return Math.max(1, canvasCssWidth - curveAxisWidth);
+  return Math.max(1, canvasCssWidth - curveAxisWidth - 10);
 }
 
 function curveToCanvasX(value) {
@@ -989,7 +989,6 @@ function updateReadouts() {
     ? `${centsFromNorm(deviationAmount)} c`
     : `${partialDeviationFromNorm(deviationAmount).toFixed(2)} partial`;
   readouts.slope.textContent = `${slopeDbFromNorm(valueAt(curves.slope, t)).toFixed(1)} dB/oct`;
-  document.getElementById("selectedValue").textContent = readouts[activeCurve] ? readouts[activeCurve].textContent : `${modulationAmountAt(currentSettings, t).toFixed(2)} / ${currentSettings.modulationMode === "fm" ? 4 : 1}`;
   readouts.voices.textContent = `${voices.length}/${soundMode === "resynthesis" ? analysisResult?.partialCount || 0 : countSelect.value} visible`;
   const mode = currentSettings.modulationMode;
   if (soundMode !== "resynthesis" && mode !== "off") {
@@ -1007,7 +1006,7 @@ function updateReadouts() {
     modulationAmountInfo.textContent = descriptions[mode];
   }
   updateTransport();
-  if (!downloadUrl && readouts.download.textContent === "not ready") readouts.download.textContent = "ready";
+  if (!downloadUrl && readouts.download.textContent === "not ready") setExportStatus("ready");
 }
 
 Object.entries(modeButtons).forEach(([name, button]) => button.addEventListener("click", () => setActiveCurve(name)));
@@ -1366,7 +1365,7 @@ window.addEventListener("keyup", (event) => {
 });
 
 window.addEventListener("resize", () => fitEditorControls(true));
-document.getElementById("voiceDetails").addEventListener("toggle", () => fitEditorControls(true));
+
 
 if ("ResizeObserver" in window) {
   const controlsObserver = new ResizeObserver(() => fitEditorControls());
@@ -1379,3 +1378,10 @@ requestAnimationFrame(updateMeter);
 
 
 mountTransport({onScrub:value=>{isScrubbing=value;},state:()=>({duration:outputDuration(),seconds:playheadSeconds,playing:isPlaying,disabled:playButton.disabled||!!renderAbortController}),seek:p=>{playbackScrubber.value=String(p);seekFromScrubber();}});
+
+// Idle readiness is conveyed by the Download control; retain actionable feedback.
+function setExportStatus(message) {
+  const output = document.getElementById("downloadReadout");
+  output.textContent = message;
+  output.parentElement.hidden = ["", "ready", "not ready", "needs export"].includes(message);
+}

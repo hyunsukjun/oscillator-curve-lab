@@ -132,3 +132,22 @@ See `docs/SHARED_VISUAL_CONTRACT.md` for the accepted shared baseline and resolu
 ## Information-density pilot — local review, 2026-10-15
 
 Selected parameter name/value visible; statistics and full overview in disclosure. Existing synthesis values at output playhead, before IR/output processing; voice/safety detail retained. All original readout IDs and update sources preserved. Details summary Space does not start transport. COMMON CANDIDATE for standalone; not committed/deployed.
+
+## Functional surfaces
+See docs/FUNCTIONAL_SURFACE_PILOT.md. Upper controls share the title background; waveform/analysis area has its own uniform surface. This refines continuous-shell styling without changing button identity or states.
+
+## Readout disclosure rollback — 2026-10-15
+User requested removal of the newly introduced Details disclosures across the family. Original always-visible readout panels restored; Oscillator retains its pre-existing Synthesis detail panel and original contents. Value computation and audio behavior unchanged. Do not add disclosure or restructure information during color/minor-UI work. Audio also removes the border above EDIT AUDIO.
+
+## Shared content rails — 2026-10-15 (local review)
+Title/icon, primary controls, values, editor outer edges and transport contents share 20px side insets; <=600px uses 10px. Dark canvas surfaces stop at this rail with neutral #373B43 outer gutters. Internal axis labels/plot margins remain part of the canvas, not the shell rail. Space retains its two-column spatial view; Oscillator retains Synthesis detail without double insets. Colors of controls/transport and all DSP behavior are preserved. Implementation: src/content-alignment.css. No release authorized for this alignment pass.
+
+### Oscillator family surface review — 2026-10-15 (uncommitted)
+Use #373B43 for the header, controls, transport and surrounding blank page space, matching approved Timbre/Granular/Spectral surfaces. Frequency display, curve canvas and frequency-axis gutter use #191C20. Remove transport outer border/shadow and Clear Current divider; retain controls and meter outlines. Preserve 20px content rails (10px narrow) and the original Synthesis details grouping. This supersedes initial waveform #252C32 / transport #30343C pilot colors. DSP, parameter values, curve coordinates and frequency-axis geometry remain unchanged. Review before commit/deployment.
+
+### Shared transport alignment — 2026-10-15 (uncommitted review)
+Return / Play / Pause retain their order and behavior. Each occupies a 38 × 32px cell with 4px spacing and a centered 16px icon. Remove the first button's extra 7px offset/divider so visual spacing is uniform. Audio reference palette: surround #292F37, thin border #596472, hover #343A42, playing #5C6978; no per-button accent colors. Override generic button backgrounds only inside transport. Preserve keyboard focus and disabled states.
+
+Oscillator layout correction: file help + Open Audio are now in the top-right header. Synthesis detail is always visible; this supersedes the previous collapsible detail decision. Curve canvas reserves 10px at top/bottom/right for endpoint circles, with inverse pointer mapping and axis/grid coordinates updated together. Verified Deviation point add/erase and Clear Current, default Play/Pause/rewind, 600px narrow layout without horizontal overflow. Six-Lab transport DOM measurements confirm equal button widths/heights, equal Y and 4px spacing. No commit/deployment in this review.
+
+Release approval (2026-10-15): user approved the reviewed transport/layout changes. All six transport-keyboard suites passed (27 tests total); Oscillator syntax and diff checks passed. Prior browser measurements confirmed equal transport cells, and Oscillator point add/erase, Clear Current, Play/Pause/rewind and narrow layout were checked.

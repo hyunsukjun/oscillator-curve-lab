@@ -1,3 +1,5 @@
+> Superseded: the new readout disclosures/compact strip were reverted by user request. Original presentation restored; see INTERACTION_SPEC.md.
+
 # Information density pilot
 
 ## Information-density pilot — local review, 2026-10-15
