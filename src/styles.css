@@ -1018,3 +1018,8 @@ button:disabled {
  .durationPanel #durationValue { grid-column:2; grid-row:1; }
  .durationPanel #durationInput { grid-column:1/-1; grid-row:2; }
 }
+
+/* Original-file visual reference: quiet static panel, separate from synthesis time. */
+.sourceOverview { min-width:0; border:1px solid #424952; background:#191c20; }
+.sourceOverview[hidden] { display:none; }
+#sourceOverviewCanvas { display:block; width:100%; height:96px; }

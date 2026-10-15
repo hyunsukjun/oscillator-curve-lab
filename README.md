@@ -93,3 +93,5 @@ Single 0–10 min Output Duration; zero disables Play/Download. FFT Preview remo
 Partial-count changes automatically refresh analysis while retaining current playback until results are ready. The separate Reanalyze button is no longer shown. Pending/errors remain visible; the monitor retains actual partial counts.
 
 2026-10-15 local review: remove the header Mono/Stereo selector; application settings always use stereo for both synthesis paths. Export help states Stereo 2ch /48kHz/24-bit. Input mono/stereo support unchanged. Browser playback and a saved1s WAV confirmed2ch48kHz24-bit. Not committed/deployed.
+
+Imported files also appear in a static source-time waveform overview. Colors describe source frequency character, not generated sound; this is not a seek control.

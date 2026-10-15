@@ -1,3 +1,4 @@
+import {createSourceOverview} from "./source-overview.js";
 import {mountTransport} from "./common-transport.js?v=20261013-1";
 import { readAudioFile } from "./audio-import.js?v=20261011-aiff1";
 import {
@@ -70,6 +71,7 @@ const convolutionWetValue = document.getElementById("convolutionWetValue");
 const impulseLengthInput = document.getElementById("impulseLength");
 const impulseLengthValue = document.getElementById("impulseLengthValue");
 const impulseUsedLength = document.getElementById("impulseUsedLength");
+const sourceOverview = createSourceOverview(document.getElementById("sourceOverviewCanvas"));
 const frequencyCanvas = document.getElementById("frequencyCanvas");
 const frequencyCtx = frequencyCanvas.getContext("2d");
 const canvas = document.getElementById("curveCanvas");
@@ -1194,6 +1196,7 @@ impulseInput.addEventListener("change", async () => {
     analysisSamples = input.samples;
     analysisSource = input.source;
     resynthesisSource.textContent = file.name;
+    sourceOverview.setBuffer(decoded);
     for (const [name, y] of Object.entries(curveDefaults)) {
       resynthesisState.curves[name] = defaultCurve(name === "slope" ? normFromSlopeDb(0) : y);
       resynthesisState.editedCurves[name] = false;

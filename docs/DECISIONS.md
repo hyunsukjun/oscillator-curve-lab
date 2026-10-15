@@ -266,3 +266,11 @@ File import errors must remain visible in the active synthesis path. Mirror the 
 
 ## 2026-10-15 — Support wording alignment (reviewed; release authorized)
 Use MiB in the oversized-file error to match MAX_IR_FILE_BYTES and file help. Explain that Resynthesis uses up to 30 seconds from the file center. Presentation only; size threshold and analysis behavior unchanged.
+
+## 2026-10-15 — Imported-source tone overview (local review)
+
+Oscillator previously had only frequency/partial and curve canvases, not a source waveform. A 96px source-time overview now appears after a successful file import, before Synthesis detail; it is hidden without a file. It shows the full imported recording, not the IR crop, center analysis excerpt, generated output or output-time seek position. There is no seek/playhead on this static reference. Original-file meaning is retained in the canvas accessible label/title and wide-screen caption; compact screens retain Source time and Source tone.
+
+Shared family palette maps original spectral centroid blue→teal→gold→peach. Up to16k signed min/max buckets and HiDPI envelope retain transients; shared display gain preserves channel-relative level without altering samples. Bounded worker analysis copies at most8MiB /2,048 FFT windows; previous job terminates on replacement. Colors fall back to blue if analysis fails. Static drawing runs on load/color completion/resize, not per audio frame. Failure hides this optional panel without rejecting audio.
+
+Verified: source-color/immutability tests, syntax and diff checks; actual stereo file import, File Resynthesis selection,32→64 partial selection, Play/Pause, File IR mode playback and rewind; narrow approximately600px view and console without errors. No-file state hides overview. Follow-up: actual Brave125%/150% zoom verified at a900×700 viewport (600CSS px at150%). Both modes retain readable source waveform/legend; no horizontal document overflow. Transport reachable by vertical scrolling; Play/Pause checked. User musical listening, Windows and DSP regressions are separate. User approved commit/deployment after zoom verification (2026-10-15).
