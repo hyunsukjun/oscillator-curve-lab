@@ -1,0 +1,25 @@
+/* Compact settings at narrow widths; keep all controls in their source order. */
+@media (max-width:899px) {
+  .sourceBand { padding-block:6px; gap:6px 10px; }
+  .controlBand { padding-block:6px; gap:8px 12px; align-items:start; }
+  .voiceDetails .synthesisHeading { padding-block:5px; }
+}
+@media (max-width:520px) {
+  .synthesisGroup {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px 12px;
+    width:100%;
+    min-width:0;
+  }
+  .synthesisGroup .waveformButtons {
+    grid-column:1/-1;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:4px 6px;
+  }
+  .waveformButtons > span { grid-column:1/-1; }
+  .synthesisGroup .compactField { grid-template-columns:minmax(0,1fr); gap:4px; }
+  .synthesisGroup .compactField select { width:100%; min-width:0; }
+  .modulationGroup { border-left:0; padding-left:0; gap:8px 12px; }
+  .voiceDetails .synthesisHeading { padding-block:5px; }
+}

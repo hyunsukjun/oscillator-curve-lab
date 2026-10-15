@@ -184,3 +184,7 @@ Supersedes the 300px fixed curve below 900px: at every width calculate space lef
 
 ### COMMON CANDIDATE — compact current-value spacing (2026-10-15, approved)
 Below 900 CSS px, current-value strip vertical padding 8→6px, row gap 12→8px, label/value gap 4→2px. Retain label 11px/14px and value 14px/18px typography, existing column counts, wrapping exceptions and all semantic values. No fields hidden, no Details controls introduced. Desktop spacing unchanged.
+
+### Oscillator candidate — narrow settings density (2026-10-15, approved)
+Below900px reduce source/control vertical padding to6px and synthesis heading padding to5px. At <=520px keep four waveform buttons in one row, with Oscillators/Frequency layout in two labeled columns. Keep DOM/tab order, control heights, labels, modulation and always-visible synthesis details. No new collapse UI, hidden information or DSP changes.
+- Browser checked at actual local widths1280/853/600/390: no horizontal overflow or waveform button clipping. At390px control band190.5→165.2px compared with public baseline. FM parameter, transport and Resynthesis/IR no-file transitions checked. Actual file analysis/IR processing and listening not repeated for CSS-only layout.
