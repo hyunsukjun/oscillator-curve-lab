@@ -108,3 +108,7 @@ Synthesis detail 등 summary에 포커스한 Space는 기본 패널 열기/닫�
 ## 2026-10-15 — Reachable export cancellation
 
 Download WAV becomes Cancel during rendering. A second click aborts the existing job and returns without starting another render. Cancelling is disabled until cleanup; completion restores Download WAV and controls. Abort reports cancelled. Previously an AbortController existed but the download control was disabled, making cancellation unreachable. Settings, curves, synthesis, IR, resynthesis, WAV format and DSP are unchanged. Future standalone should likewise expose cancellation and allow a clean retry. Verification: actual-handler regression and Safari lifecycle; listening and Windows remain separate.
+
+## Information-density pilot — local review, 2026-10-15
+
+Selected parameter name/value visible; statistics and full overview in disclosure. Existing synthesis values at output playhead, before IR/output processing; voice/safety detail retained. All original readout IDs and update sources preserved. Details summary Space does not start transport. COMMON CANDIDATE for standalone; not committed/deployed.

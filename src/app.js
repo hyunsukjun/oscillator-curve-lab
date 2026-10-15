@@ -989,6 +989,7 @@ function updateReadouts() {
     ? `${centsFromNorm(deviationAmount)} c`
     : `${partialDeviationFromNorm(deviationAmount).toFixed(2)} partial`;
   readouts.slope.textContent = `${slopeDbFromNorm(valueAt(curves.slope, t)).toFixed(1)} dB/oct`;
+  document.getElementById("selectedValue").textContent = readouts[activeCurve] ? readouts[activeCurve].textContent : `${modulationAmountAt(currentSettings, t).toFixed(2)} / ${currentSettings.modulationMode === "fm" ? 4 : 1}`;
   readouts.voices.textContent = `${voices.length}/${soundMode === "resynthesis" ? analysisResult?.partialCount || 0 : countSelect.value} visible`;
   const mode = currentSettings.modulationMode;
   if (soundMode !== "resynthesis" && mode !== "off") {
