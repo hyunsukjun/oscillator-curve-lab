@@ -46,7 +46,6 @@ const durationInput = document.getElementById("durationInput");
 const durationPanel = document.getElementById("durationPanel");
 const durationValue = document.getElementById("durationValue");
 const durationEstimate = document.getElementById("durationEstimate");
-const formatSelect = document.getElementById("formatSelect");
 const waveformButtons = [...document.querySelectorAll(".waveformButton")];
 const countSelect = document.getElementById("countSelect");
 const stackSelect = document.getElementById("stackSelect");
@@ -209,7 +208,7 @@ function settings() {
     convolutionWet: convolutionWetAmount,
     impulseRevision,
     tailSeconds: soundMode === "convolution" && impulseBuffer48k && convolutionWetAmount > 0 ? tailSeconds(impulseBuffer48k) : 0,
-    format: formatSelect.value,
+    format: "stereo",
     curves
   };
 }
@@ -1328,7 +1327,6 @@ window.addEventListener("blur", () => updateEraseCursor());
 [
   countSelect,
   stackSelect,
-  formatSelect
 ].forEach((control) => {
   control.addEventListener("input", sendSettings);
   control.addEventListener("change", sendSettings);

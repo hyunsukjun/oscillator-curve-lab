@@ -91,3 +91,5 @@ navigates output time. Source guides, sound engines and export policies are unch
 Single 0–10 min Output Duration; zero disables Play/Download. FFT Preview removed from web UI; Resynthesis analysis remains. Responsive canvas budget keeps verified laptop viewports within one screen. [Review and validation](docs/UI_REVIEW_2026-10-14.md). Not committed/deployed yet.
 
 Partial-count changes automatically refresh analysis while retaining current playback until results are ready. The separate Reanalyze button is no longer shown. Pending/errors remain visible; the monitor retains actual partial counts.
+
+2026-10-15 local review: remove the header Mono/Stereo selector; application settings always use stereo for both synthesis paths. Export help states Stereo 2ch /48kHz/24-bit. Input mono/stereo support unchanged. Browser playback and a saved1s WAV confirmed2ch48kHz24-bit. Not committed/deployed.
