@@ -1371,6 +1371,7 @@ if ("ResizeObserver" in window) {
   const controlsObserver = new ResizeObserver(() => fitEditorControls());
   [document.querySelector(".sourceBand"), oscillatorControls, document.querySelector(".impulseBand"), document.querySelector(".legend"), modulationInfo, durationPanel, document.querySelector(".topbar"), document.querySelector(".panel"), document.querySelector(".playbackBar")].forEach((element) => controlsObserver.observe(element));
 }
+if ("ResizeObserver" in window) new ResizeObserver(resizeCanvas).observe(canvas);
 setSoundMode("oscillator");
 fitEditorControls(true);
 updateTransport();

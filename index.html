@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="src/brand-layout.css?v=20261015-1">
     <link rel="stylesheet" href="src/readout-layout.css?v=20261015-1">
     <link rel="stylesheet" href="src/header-rhythm.css?v=20261015-2">
+    <link rel="stylesheet" href="src/expanded-editor.css?v=20261015-1">
   </head>
   <body>
     <main class="app">
@@ -228,12 +229,13 @@
     </main>
 
     <script src="src/file-help.js?v=20261014-family1" type="module"></script>
-    <script src="src/app.js?v=20261015-units1" type="module"></script>
+    <script src="src/app.js?v=20261015-expand1" type="module"></script>
   <div id="basePitchModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Base Frequency · 20–4000 Hz</strong><span>Set the base for the oscillator stack, or transpose the analyzed partials in File Resynthesis.</span><span class="helpState"></span></div>
 <div id="deviationModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Deviation · Depends on source and layout</strong><span>Unison spreads voices up to ±50 cents. Other layouts and File Resynthesis bend partial relationships with an amount of 0–0.38. Zero keeps the original layout.</span><span class="helpState"></span></div>
 <div id="slopeModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Spectral Slope · −24 to +12 dB/oct</strong><span>Tilt voice or partial levels by frequency relative to the base. Negative values favor lower frequencies; positive values favor higher frequencies.</span><span class="helpState"></span></div>
 <div id="modulationCurveModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Modulation Strength · FM / AM / Ring</strong><span>FM uses an index of 0–4. AM Depth and Ring Blend use 0–100%. The curve follows the selected modulation mode.</span><span class="helpState"></span></div>
 <script type="module" src="src/parameter-help.js?v=20261014-family1"></script>
 <script src="src/value-details.js?v=20261015-1" type="module"></script>
-</body>
+  <script type="module" src="src/expanded-editor.js?v=20261015-1"></script>
+  </body>
 </html>

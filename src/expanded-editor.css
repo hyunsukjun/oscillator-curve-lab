@@ -1,0 +1,6 @@
+/* Fill available desktop height, then scroll naturally when controls need space. */
+.app { display:block; height:auto; min-height:100dvh; padding-bottom:0; }
+.editor { height:auto; align-content:start; padding-bottom:0; }
+.app > .playbackBar, .app > .playbackDock { position:static; inset:auto; margin-bottom:0; }
+.workspace, .curveStack { height:auto; align-content:start; }
+#curveCanvas { height:var(--available-curve-height,300px) !important; }
