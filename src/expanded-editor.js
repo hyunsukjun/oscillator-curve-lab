@@ -8,7 +8,7 @@ function fitAvailableHeight() {
   const height = curve.getBoundingClientRect().height;
   const footerBottom = footer.getBoundingClientRect().bottom + window.scrollY;
   // The minimum keeps editing usable when controls exceed the viewport.
-  const target = window.innerWidth < 900 ? 300 : Math.max(220, Math.floor(height + window.innerHeight - footerBottom));
+  const target = Math.max(220, Math.floor(height + window.innerHeight - footerBottom));
   if (Math.abs(target - height) > 1) curve.style.setProperty('--available-curve-height', `${target}px`);
 }
 function scheduleFit() {
