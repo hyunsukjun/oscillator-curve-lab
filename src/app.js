@@ -45,7 +45,6 @@ const resetButton = document.getElementById("resetButton");
 const durationInput = document.getElementById("durationInput");
 const durationPanel = document.getElementById("durationPanel");
 const durationValue = document.getElementById("durationValue");
-const durationEstimate = document.getElementById("durationEstimate");
 const waveformButtons = [...document.querySelectorAll(".waveformButton")];
 const countSelect = document.getElementById("countSelect");
 const stackSelect = document.getElementById("stackSelect");
@@ -225,14 +224,9 @@ function formatDurationLabel(seconds) {
 function updateDurationDisplay() {
   const current = settings();
   const label = formatDurationLabel(current.durationSeconds);
-  durationValue.textContent = label;
+  durationValue.textContent = `${String(Math.floor(current.durationSeconds / 60)).padStart(2, "0")}:${String(current.durationSeconds % 60).padStart(2, "0")}`;
   durationInput.setAttribute("aria-valuetext", label);
-  const frames = Math.ceil(current.durationSeconds * TARGET_SAMPLE_RATE)
-    + (current.tailSeconds ? Math.round(current.tailSeconds * TARGET_SAMPLE_RATE) : 0)
-    + Math.round(LOOKAHEAD_SECONDS * TARGET_SAMPLE_RATE);
-  const channels = current.format === "mono" ? 1 : 2;
-  const megabytes = (44 + frames * channels * 3) / 1_000_000;
-  durationEstimate.textContent = current.durationSeconds === 0 ? "Choose duration > 0" : `WAV ~${megabytes.toFixed(1)} MB${current.tailSeconds ? ` · includes ${current.tailSeconds.toFixed(1)} s IR tail` : ""}`;
+
 }
 
 function fitEditorControls(force = false) {
