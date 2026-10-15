@@ -1156,8 +1156,8 @@ impulseInput.addEventListener("change", async () => {
   const file = impulseInput.files?.[0];
   if (!file) return;
   if (file.size > MAX_IR_FILE_BYTES) {
-    impulseStatus.textContent = "File too large (16 MB max)";
-    analysisStatus.textContent = "File too large (16 MB max)";
+    impulseStatus.textContent = "File too large (16 MiB max)";
+    analysisStatus.textContent = "File too large (16 MiB max)";
     impulseInput.value = "";
     return;
   }

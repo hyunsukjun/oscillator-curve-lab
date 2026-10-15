@@ -263,3 +263,6 @@ Release approved: compact-select preview accepted by user. Final diff is limited
 
 ## 2026-10-15 — Import error visibility
 File import errors must remain visible in the active synthesis path. Mirror the full error into impulseStatus, retaining the previous-audio-kept notice. analysisStatus remains available to Resynthesis. Verified at 390px with unsupported AIFF-C, valid WAV recovery, and a second failed import. UI-only; no DSP/import algorithm changes. Local review completed; release authorized by the user.
+
+## 2026-10-15 — Support wording alignment (reviewed; release authorized)
+Use MiB in the oversized-file error to match MAX_IR_FILE_BYTES and file help. Explain that Resynthesis uses up to 30 seconds from the file center. Presentation only; size threshold and analysis behavior unchanged.

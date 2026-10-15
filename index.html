@@ -47,7 +47,7 @@
                 <dt>File size</dt><dd>Up to 16 MiB.</dd>
                 <dt>Output</dt><dd>1–600 s synthesis, plus file IR tail when used · Stereo 2ch · 48 kHz / 24-bit WAV.</dd>
               </dl>
-              <p>Resynthesis analyses at most 30 s of the file. Short excerpts recommended. Use one Lab at a time for heavy processing.</p>
+              <p>Resynthesis analyzes up to 30 s from the center of the file. Short excerpts recommended. Use one Lab at a time for heavy processing.</p>
             </div>
           </details>
           <button title="AIFF: mono/stereo 16/24-bit PCM is converted locally on import. AIFF-C is not supported." id="openAudioButton" type="button">Open Audio</button>
@@ -219,7 +219,7 @@
     </main>
 
     <script src="src/file-help.js?v=20261014-family1" type="module"></script>
-    <script src="src/app.js?v=20261015-error-guide1" type="module"></script>
+    <script src="src/app.js?v=20261015-support-copy1" type="module"></script>
   <div id="basePitchModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Base Frequency · 20–4000 Hz</strong><span>Set the base for the oscillator stack, or transpose the analyzed partials in File Resynthesis.</span><span class="helpState"></span></div>
 <div id="deviationModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Deviation · Depends on source and layout</strong><span>Unison spreads voices up to ±50 cents. Other layouts and File Resynthesis bend partial relationships with an amount of 0–0.38. Zero keeps the original layout.</span><span class="helpState"></span></div>
 <div id="slopeModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Spectral Slope · −24 to +12 dB/oct</strong><span>Tilt voice or partial levels by frequency relative to the base. Negative values favor lower frequencies; positive values favor higher frequencies.</span><span class="helpState"></span></div>
