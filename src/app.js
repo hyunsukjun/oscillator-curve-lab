@@ -713,11 +713,11 @@ function prepareContext(renderCtx, width, height) {
 function drawFrequency() {
   if (!document.getElementById("voiceDetails").open) return;
   prepareContext(frequencyCtx, frequencyCssWidth, frequencyCssHeight);
-  frequencyCtx.fillStyle = "#0c1f31";
+  frequencyCtx.fillStyle = "#191c20";
   frequencyCtx.fillRect(0, 0, frequencyCssWidth, frequencyCssHeight);
   frequencyCtx.lineWidth = 1;
   for (let x = 80, index = 0; x < frequencyCssWidth; x += 60, index += 1) {
-    frequencyCtx.strokeStyle = index % 2 === 0 ? "rgba(79, 121, 155, 0.28)" : "rgba(63, 101, 132, 0.12)";
+    frequencyCtx.strokeStyle = index % 2 === 0 ? "rgba(139, 149, 162, 0.18)" : "rgba(139, 149, 162, 0.08)";
     frequencyCtx.beginPath();
     frequencyCtx.moveTo(x, 18);
     frequencyCtx.lineTo(x, frequencyCssHeight - 24);
@@ -764,7 +764,7 @@ function drawFrequency() {
 
 function drawCurves() {
   prepareContext(ctx, canvasCssWidth, canvasCssHeight);
-  ctx.fillStyle = "#0c1f31";
+  ctx.fillStyle = "#191c20";
   ctx.fillRect(0, 0, canvasCssWidth, canvasCssHeight);
   drawGrid();
   Object.keys(curves).filter((name) => !Object.values(modulationCurves).includes(name) || (soundMode !== "resynthesis" && name === modulationCurves[modulationSelect.value]))
@@ -776,7 +776,7 @@ function drawGrid() {
   drawFrequencyAxis();
   ctx.lineWidth = 1;
   for (let x = 0; x <= 20; x += 1) {
-    ctx.strokeStyle = x % 2 === 0 ? "rgba(79, 121, 155, 0.28)" : "rgba(63, 101, 132, 0.12)";
+    ctx.strokeStyle = x % 2 === 0 ? "rgba(139, 149, 162, 0.18)" : "rgba(139, 149, 162, 0.08)";
     const px = curveToCanvasX(x / 20);
     ctx.beginPath();
     ctx.moveTo(px, 0);
@@ -784,7 +784,7 @@ function drawGrid() {
     ctx.stroke();
   }
   for (let y = 0; y <= 8; y += 1) {
-    ctx.strokeStyle = y % 2 === 0 ? "rgba(79, 121, 155, 0.28)" : "rgba(63, 101, 132, 0.12)";
+    ctx.strokeStyle = y % 2 === 0 ? "rgba(139, 149, 162, 0.18)" : "rgba(139, 149, 162, 0.08)";
     const py = (y / 8) * canvasCssHeight;
     ctx.beginPath();
     ctx.moveTo(curveAxisWidth, py);
@@ -794,7 +794,7 @@ function drawGrid() {
 }
 
 function drawFrequencyAxis() {
-  ctx.fillStyle = "#0a1724";
+  ctx.fillStyle = "#222a34";
   ctx.fillRect(0, 0, curveAxisWidth, canvasCssHeight);
   ctx.strokeStyle = "rgba(95, 141, 177, 0.6)";
   ctx.lineWidth = 1;

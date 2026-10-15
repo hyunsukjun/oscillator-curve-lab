@@ -88,3 +88,43 @@ Static parameter descriptions are available on the relevant buttons using the Au
 
 ## 2026-10-15 Render action label
 The existing Download WAV control changes to Cancel while exporting, then Cancelling until cleanup. It returns to Download WAV after success, cancellation or error. No new color or separate control; no DSP change.
+
+
+## 2026-10-15 — Studio family visual pilot (local)
+Reference: approved Audio design, commit 3e9723b. Apply deep cool-grey surfaces,
+high-contrast typography, continuous panel boundaries and framed meters through
+src/studio-theme.css. Preserve this Lab's brand accent, effect identities,
+parameter mapping, feature layout and audio engine. No JS/DSP change.
+This is a local first-pass candidate, not deployed; Canvas-rendered colors remain
+the current implementation pending individual visual review. Narrow transport
+uses document flow to avoid covering the editor. Listening is not implied.
+
+Pilot smoke evidence: 1422px viewport, no horizontal overflow; default initialization and one parameter/effect selection verified; no browser errors captured. No full audio lifecycle, narrow/zoom certification or listening repeated. Only HTML/CSS/documentation changed.
+
+### 2026-10-15 — Canvas alignment and zoom verification
+
+- Canvas paper `#191C20`; neutral minor/major grid `rgba(139,149,162,.08/.18)`, matching the approved Audio direction. Parameter colors and audio processing are unchanged.
+- Local browser: 800 CSS px viewport; actual Brave 125% (952 CSS px, DPR 2.5) and 150% (793 CSS px, DPR 3). No document horizontal overflow in any of the five Labs. Narrow layouts use vertical scrolling.
+- Parameter selection and Clear Current smoke passed in all five; no captured console errors. Timbre play/pause/rewind smoke passed.
+- Oscillator only: narrow-screen curve minimum height 220 px prevents crowded frequency labels; expanded Synthesis detail remains accessible.
+- Syntax, keyboard tests and whitespace checks passed. Evidence: family workspace `evidence/family-studio-zoom-checks-20261015.json` and `*-studio-150-20261015.png`.
+- Not a listening approval or a complete Safari/Windows regression. Local changes only; release decision remains pending.
+- Additional targeted lifecycle/render regression suites passed; full results in family `UI_DESIGN_FAMILY_CANVAS_2026-10-15.md`.
+
+## Common button states — 2026-10-15
+
+`src/button-states.css` is the identical six-Lab contract, loaded after studio-theme.
+Available off/bypassed: Audio reference gradient #363F4B → #2D3540, text #F0F3F7, edge #626C79. Unavailable: #353B44 / #949EAC / #495360 at full opacity. Selected: preserve existing parameter-specific fill, text and border colors, replace text underline with a full-width dark lower inset bevel (3 px). Focus remains independent. No hit-target, state, DSP or timing changes.
+
+### Common role dimensions — 2026-10-15
+
+- Main text buttons: 13px, weight 500, line-height 18px; 4px corner radius.
+- Open/Download/Save: 38px high. Parameter/effect/waveform/synthesis mode/chain/action/dialog buttons: 34px.
+- Pen/Eraser: 32px with shared 4px outer group; joined inner edges remain square. Transport: 32px, existing 3px corners and CSS glyphs retained.
+- Audio edit helpers: 26px, 11px text; zoom symbols 14px. Fade handles are excluded.
+- Secondary status text 12px; readout labels 11px, strong values 14px. Parameter colors and state semantics unchanged.
+- Verified all six at 1422px and 640px CSS widths: no document horizontal overflow or measured button text clipping. Representative mode switching passed; Timbre Flanger expanded controls inspected, Audio Pen/Eraser and zoom/Fit exercised. Keyboard regression and diff whitespace checks passed.
+- This is CSS-only verification, not fresh audio/export or listening certification. Local changes remain unpublished.
+
+## Current precedence
+See `docs/SHARED_VISUAL_CONTRACT.md` for the accepted shared baseline and resolution of older pilot conflicts. Newer role/state rules supersede old underline and 30px compact-button guidance.

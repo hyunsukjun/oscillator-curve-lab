@@ -1,0 +1,54 @@
+/* Family studio pilot, derived from Audio 3e9723b. Presentation only.
+   Keep each Lab's accent, parameter colors, enabled/bypassed states and layout. */
+:root {
+ --cl-bg: #292f38; --cl-bg-deep: #222830; --cl-surface: #252c35;
+ --cl-surface-raised: #303945; --cl-surface-hover: #444f5e;
+ --cl-border: #46515e; --cl-border-strong: #637182;
+ --cl-text: #f0f3f7; --cl-text-secondary: #d5dce5; --cl-text-muted: #c3cdd9;
+ --cl-canvas: #191c20; --cl-radius-md: 4px; --cl-radius-lg: 5px;
+}
+body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background: #292f38; }
+body::before,body::after { display:none; }
+.app { background:#292f38; }
+.topbar { background:#292f38; border-bottom-color:transparent; box-shadow:none; }
+.brand h1 { font-weight:600; letter-spacing:-.025em; }
+.brandAccent { color:#e3e9f1; }
+button,.fileButton,select,input { font-weight:500; }
+button:not(.active):not(.enabled):not(.bypassed):not(.clipped):not(:disabled):not([aria-pressed="true"]),
+.fileButton,select,input[type="number"] {
+ background:#303945; color:#edf1f6; border-color:#626f7f;
+}
+button:focus-visible,select:focus-visible,input:focus-visible { outline:2px solid var(--cl-focus); outline-offset:2px; }
+button:disabled { opacity:.6; }
+.editor { gap:0; padding:0; }
+.legend,.effectBar,.panel,.controlBand,.sourceBand,.impulseBand,
+.canvasFrame,.outputWaveFrame,.spatialPanel,.playbackBar,.playbackDock {
+ border-radius:0; box-shadow:none;
+}
+.legend,.effectBar,.controlBand,.sourceBand,.impulseBand,.panel {
+ background:#252c35; border:0; border-bottom:1px solid #46515e;
+}
+.legend,.effectBar { background:#292f38; }
+.panel .readout strong { font-weight:500; }
+.canvasFrame,.outputWaveFrame { border:0; background:#191c20; }
+.curveStack { gap:1px; }
+.chainDiagram,.spatialPanel { background:#252c35; border-color:#46515e; }
+.parameterBar,.durationPanel,.roomControls { background:#252c35; border-color:#46515e; }
+.playbackBar,.playbackDock { background:#292f38; border-color:#46515e; }
+#clearCurveButton,#resetButton { background:#2d3540; color:#edf1f6; border-color:#626f7f; font-weight:500; }
+#clearCurveButton:hover:not(:disabled),#resetButton:hover:not(:disabled) { background:#444f5e; border-color:#8796a8; color:#fff; }
+.fileHelpPanel,.parameterHelp,.confirmDialog { background:#252e39; color:#d5dce5; border-color:#718196; }
+.fileHelpPanel p,.fileHelpPanel dt,.parameterHelp .helpState { color:#c3cdd9; }
+.playbackBar .meterTrack { box-shadow:0 0 0 1px #788492; }
+.playbackBar .meterChannelLabel { color:#d1dbe7; }
+.curveMode.active,.parameterButton.active { box-shadow:inset 0 -2px currentColor; }
+@media(max-width:899px) {
+ .app { padding-bottom:0; }
+ .playbackBar,.playbackDock { position:static; inset:auto; margin:0; }
+ .tagline { display:none; }
+}
+
+/* Keep frequency labels and editing targets legible at browser zoom. */
+@media (max-width: 899px) {
+  #curveCanvas { min-height: 220px; }
+}
