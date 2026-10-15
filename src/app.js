@@ -1203,8 +1203,11 @@ impulseInput.addEventListener("change", async () => {
     sendSettings();
   } catch (error) {
     console.error(error);
-    impulseStatus.textContent = impulseBuffer48k ? "Open failed · previous audio kept" : "Could not decode audio file";
-    analysisStatus.textContent = error.message || String(error);
+    const message = error.message || String(error);
+    impulseStatus.textContent = impulseBuffer48k
+      ? `${message} Previous audio remains available.`
+      : message;
+    analysisStatus.textContent = message;
   } finally {
     openAudioButton.disabled = false;
     impulseLengthInput.disabled = false;

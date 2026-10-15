@@ -260,3 +260,6 @@ Oscillator compact selects use12px instead of11.5px; retain34px height, existing
 Browser observed1333/900/390CSS-pixel widths: selectors12px and33.99px measured height, no document horizontal overflow. Odd Harmonics/FM long visible guidance and no-file Resynthesis/Partials32↔64 selection checked; no-file playback/export remain disabled. Defaults restored; viewport override reset. Console errors none. CSS/HTML-only scope; no sound, analysis, export or listening certification. Pending user preview; no commit/deployment. Evidence: shared QA evidence/oscillator-compact-select-audit.json and screenshots.
 
 Release approved: compact-select preview accepted by user. Final diff is limited to CSS, cache reference and design records; previous390/900px UI evidence applies. No JavaScript or DSP changes.
+
+## 2026-10-15 — Import error visibility
+File import errors must remain visible in the active synthesis path. Mirror the full error into impulseStatus, retaining the previous-audio-kept notice. analysisStatus remains available to Resynthesis. Verified at 390px with unsupported AIFF-C, valid WAV recovery, and a second failed import. UI-only; no DSP/import algorithm changes. Local review completed; release authorized by the user.
