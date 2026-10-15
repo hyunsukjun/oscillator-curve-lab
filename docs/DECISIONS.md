@@ -244,3 +244,13 @@ Validation: pending-play-context, convolution (including bypass WAV identity), r
 Remove Reanalyze: importing a file and changing32/64 already trigger analysis. On a partial-count change with an existing result, keep the old result and transport running until the latest generation completes, then send updated settings without seek/restart. Preserve base curve, paused position, and paused state. Failure retains the old playable result and shows an error. Initial import retains its existing stop/invalidation contract. Remove the redundant Estimated base completion sentence; pending/error text remains and actual counts/base values stay in the monitor. This supersedes the earlier Reanalyze-label note.
 
 Validation: live-partial-switch controlled race/failure tests and pending-play-context/resynthesis regressions pass. Browser32→64 at7.20s continued through7.36s with Play active and64/64; paused64→32 stayed paused at7.42s. This proves transport continuity, not artifact-free perceptual switching; comparison listening remains deferred.
+
+
+## Restrained typography — 2026-10-15 local review
+COMMON CANDIDATE, Audio-approved visual direction. Shared typography.css gives ordinary text controls/readout values400 weight, section labels500,13px/500 transport time,10px/600 CLIP. Readout labels use natural case and zero tracking. Button dimensions and Lab-specific active/enabled colors remain; decorative highlights removed, active lower bevel1px. Duration14/600 remains intentional. Canvas excessive600/650/750 weights reduced; point tooltip13→12px where applicable; waveform headings natural case. No normalized coordinates, DSP, parameter meanings or transport logic changed.
+Commit/deployment withheld for user preview. Native confirmation keyboard and comparative listening remain deferred.
+
+### 2026-10-15 — Family typography release verification
+- Approved typography refinement verified in Brave actual 125% (1189×609 CSS px, DPR 2.5) and 150% (990×508 CSS px, DPR 3). No document horizontal overflow or clipped button labels; transport remains reachable by vertical scrolling.
+- Existing narrow-screen and representative parameter/playback checks retained. Granular additionally imported recovery-8s-test.wav via the native file picker: playback/meter activity, pause, resume from position, and rewind verified.
+- Scope is presentation only. Native confirmation keyboard behavior and comparative listening remain deferred; this does not claim new DSP/export or cross-device certification.
