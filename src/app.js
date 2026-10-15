@@ -60,12 +60,10 @@ const modulationAmountInfo = document.getElementById("modulationAmountInfo");
 const impulseInput = document.getElementById("impulseInput");
 const impulseStatus = document.getElementById("impulseStatus");
 const convolutionButton = document.getElementById("convolutionButton");
-const oscillatorModeButton = document.getElementById("oscillatorMode");
 const resynthesisModeButton = document.getElementById("resynthesisMode");
 const oscillatorControls = document.getElementById("oscillatorControls");
 const resynthesisControls = document.getElementById("resynthesisControls");
 const resynthesisSource = document.getElementById("resynthesisSource");
-const analyzeButton = document.getElementById("analyzeButton");
 const partialCountSelect = document.getElementById("partialCountSelect");
 const analysisStatus = document.getElementById("analysisStatus");
 const convolutionControls = document.getElementById("convolutionControls");
@@ -352,7 +350,7 @@ function setBusy(isBusy) {
   downloadButton.disabled = renderAbortController ? renderAbortController.signal.aborted : isBusy || settings().durationSeconds <= 0;
   document.querySelectorAll("input, select, button").forEach((control) => {
     if ([playButton, stopButton, downloadButton].includes(control)) return;
-    control.disabled = isBusy || (control === analyzeButton && !analysisSamples);
+    control.disabled = isBusy;
   });
 }
 
@@ -750,7 +748,7 @@ function drawFrequency() {
     const y = bottom - ((Math.log10(voice.frequency / minHz) / Math.log10(maxHz / minHz)) * (bottom - top));
     const total = soundMode === "resynthesis" ? analysisResult.partialCount : Number(countSelect.value);
     const x = 90 + ((voice.index + 0.5) * ((frequencyCssWidth - 150) / Math.max(1, total)));
-    const radius = (5 + Math.min(18, voice.amplitude * 40)) * 0.5;
+    const radius = (5 + Math.min(18, voice.amplitude * 40)) * 0.25;
     frequencyCtx.beginPath();
     frequencyCtx.fillStyle = curveColors.deviation;
     frequencyCtx.globalAlpha = 0.86;
@@ -1074,7 +1072,7 @@ function setSoundMode(nextMode) {
     editedCurves = resynthesisState.editedCurves;
   }
   if (nextMode === "resynthesis" && Object.values(modulationCurves).includes(activeCurve)) activeCurve = "basePitch";
-  for (const [mode, button] of [["oscillator", oscillatorModeButton], ["resynthesis", resynthesisModeButton], ["convolution", convolutionButton]]) {
+  for (const [mode, button] of [["resynthesis", resynthesisModeButton], ["convolution", convolutionButton]]) {
     const active = mode === nextMode;
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
@@ -1091,15 +1089,17 @@ function setSoundMode(nextMode) {
   sendSettings();
 }
 
-async function runResynthesisAnalysis() {
+async function runResynthesisAnalysis({ preservePlayback = false } = {}) {
   if (!analysisSamples) return;
-  if (isPlaying) stop(true);
-  else nextPlaybackToken();
+  const keepCurrent = preservePlayback && Boolean(analysisResult);
+  if (!keepCurrent) {
+    if (isPlaying) stop(true);
+    else nextPlaybackToken();
+  }
   analysisWorker?.terminate();
   const generation = ++analysisGeneration;
-  analysisResult = null;
+  if (!keepCurrent) analysisResult = null;
   analysisStatus.textContent = "Analyzing spectrum...";
-  analyzeButton.disabled = true;
   sendSettings();
   const worker = new Worker(new URL("./resynthesis-worker.js?v=20260930-resynthesis2", import.meta.url), { type: "module" });
   analysisWorker = worker;
@@ -1107,24 +1107,22 @@ async function runResynthesisAnalysis() {
     if (generation !== analysisGeneration) return;
     worker.terminate();
     analysisWorker = null;
-    analyzeButton.disabled = false;
     if (data.error) {
       analysisStatus.textContent = `Analysis failed: ${data.error}`;
       return;
     }
     analysisResult = data.result;
     const base = Math.max(20, Math.min(4000, analysisResult.fundamentalEstimate));
-    if (resynthesisState && !resynthesisState.editedCurves.basePitch) {
+    if (!keepCurrent && resynthesisState && !resynthesisState.editedCurves.basePitch) {
       resynthesisState.curves.basePitch = defaultCurve(normFromBaseFrequency(base));
     }
-    analysisStatus.textContent = `Estimated base ${analysisResult.fundamentalEstimate.toFixed(1)} Hz · ${analysisResult.partialCount} detected partials`;
+    analysisStatus.textContent = "";
     sendSettings();
   };
   worker.onerror = (error) => {
     if (generation !== analysisGeneration) return;
     worker.terminate();
     analysisWorker = null;
-    analyzeButton.disabled = false;
     analysisStatus.textContent = `Analysis failed: ${error.message}`;
   };
   const samples = analysisSamples.slice();
@@ -1156,11 +1154,9 @@ async function prepareResynthesisInput(file, decoded) {
   };
 }
 
-oscillatorModeButton.addEventListener("click", () => setSoundMode("oscillator"));
 resynthesisModeButton.addEventListener("click", () => setSoundMode("resynthesis"));
 convolutionButton.addEventListener("click", () => setSoundMode("convolution"));
-analyzeButton.addEventListener("click", runResynthesisAnalysis);
-partialCountSelect.addEventListener("change", () => { if (analysisSamples) runResynthesisAnalysis(); });
+partialCountSelect.addEventListener("change", () => { if (analysisSamples) runResynthesisAnalysis({ preservePlayback: true }); });
 
 openAudioButton.addEventListener("click", () => impulseInput.click());
 impulseInput.addEventListener("change", async () => {
@@ -1275,7 +1271,10 @@ eraserTool.addEventListener("click", () => setTool("eraser"));
 waveformButtons.forEach((button) => {
   button.addEventListener("click", () => {
     selectedWaveform = button.dataset.waveform || "sine";
-    waveformButtons.forEach((candidate) => candidate.classList.toggle("active", candidate === button));
+    waveformButtons.forEach((candidate) => {
+      candidate.classList.toggle("active", candidate === button);
+      candidate.setAttribute("aria-pressed", String(candidate === button));
+    });
     sendSettings();
   });
 });
@@ -1380,7 +1379,7 @@ if ("ResizeObserver" in window) {
   [document.querySelector(".sourceBand"), oscillatorControls, document.querySelector(".impulseBand"), document.querySelector(".legend"), modulationInfo, durationPanel, document.querySelector(".topbar"), document.querySelector(".panel"), document.querySelector(".playbackBar")].forEach((element) => controlsObserver.observe(element));
 }
 if ("ResizeObserver" in window) new ResizeObserver(resizeCanvas).observe(canvas);
-setSoundMode("oscillator");
+setSoundMode("convolution");
 fitEditorControls(true);
 updateTransport();
 requestAnimationFrame(updateMeter);

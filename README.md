@@ -20,7 +20,7 @@ Oscillator Curve Lab draws how a small oscillator stack changes over time. The f
 
 Set output time from the always-visible Output Duration row below the curve toolbar. It offers 1-60 seconds and 1-10 minutes in one-second steps, with an estimated WAV file size. Duration stretches the same normalized curves; Convolution may add an IR tail beyond the selected time. WAV export compensates the limiter’s 5 ms latency while preserving that tail. Ten-minute renders can require substantially more working memory than the shown WAV size.
 
-The sound selector has Oscillator (default), Resynthesis, and Convolution modes. One Open Audio import serves both file-based modes: Resynthesis analyzes it into up to 32/64 significant sine partials, while Convolution uses it as an IR with the oscillator. Neither mode directly plays the imported recording. Resynthesis uses the fixed, user-approved C stereo placement. See the dedicated specification for analysis limits and unverified sonic questions.
+The sound selector has File Resynthesis and Oscillator + File IR (default) paths. Without an IR, the latter retains dry basic synthesis; with an IR, Dry/Wet=0 retains dry synthesis. The separate Basic Waveform button and Synthesis source heading are removed. One Open Audio import serves both file-based modes: Resynthesis analyzes it into up to 32/64 significant sine partials, while Convolution uses it as an IR with the oscillator. Neither mode directly plays the imported recording. Resynthesis uses the fixed, user-approved C stereo placement. See the dedicated specification for analysis limits and unverified sonic questions.
 
 ## v1 scope
 
@@ -89,3 +89,5 @@ navigates output time. Source guides, sound engines and export policies are unch
 
 ## Local UI revision — 2026-10-14
 Single 0–10 min Output Duration; zero disables Play/Download. FFT Preview removed from web UI; Resynthesis analysis remains. Responsive canvas budget keeps verified laptop viewports within one screen. [Review and validation](docs/UI_REVIEW_2026-10-14.md). Not committed/deployed yet.
+
+Partial-count changes automatically refresh analysis while retaining current playback until results are ready. The separate Reanalyze button is no longer shown. Pending/errors remain visible; the monitor retains actual partial counts.

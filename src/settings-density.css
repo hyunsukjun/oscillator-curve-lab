@@ -32,3 +32,12 @@
 .resynthesisControls, .convolutionControls { min-width:0; max-width:100%; }
 .voiceDetails .frequencyFrame { overflow-x:auto; overflow-y:hidden; }
 #frequencyCanvas { max-width:none; height:110px !important; }
+
+/* One connected waveform selector; preserve individual native buttons/focus. */
+.synthesisGroup .waveformButtons { column-gap:0; row-gap:4px; }
+.waveformButtons > span { margin-right:7px; }
+.waveformButtons .waveformButton { border-radius:0; position:relative; }
+.waveformButtons .waveformButton + .waveformButton { margin-left:-1px; }
+.waveformButtons .waveformButton:first-of-type { border-radius:4px 0 0 4px; }
+.waveformButtons .waveformButton:last-of-type { border-radius:0 4px 4px 0; }
+.waveformButtons .waveformButton:is(.active,:focus-visible) { z-index:1; }

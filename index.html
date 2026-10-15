@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="src/readout-layout.css?v=20261015-compact2">
     <link rel="stylesheet" href="src/header-rhythm.css?v=20261015-2">
     <link rel="stylesheet" href="src/expanded-editor.css?v=20261015-1">
-    <link rel="stylesheet" href="src/settings-density.css?v=20261015-readability2">
+    <link rel="stylesheet" href="src/settings-density.css?v=20261015-segments1">
   </head>
   <body>
     <main class="app">
@@ -64,22 +64,20 @@
 
       <section class="editor">
         <div class="sourceBand" title="Choose a synthesis path. File IR processes the oscillator sound.">
-          <span class="sectionLabel">Synthesis source</span>
           <div class="soundModes" role="group" aria-label="Sound generation mode">
-            <button id="oscillatorMode" class="active" type="button" aria-pressed="true">Basic Waveform</button>
             <button id="resynthesisMode" type="button" aria-pressed="false">File Resynthesis</button>
-            <button id="convolutionButton" type="button" aria-pressed="false">Oscillator + File IR</button>
+            <button id="convolutionButton" class="active" type="button" aria-pressed="true">Oscillator + File IR</button>
           </div>
 
         </div>
         <div class="controlBand" id="oscillatorControls">
           <div class="synthesisGroup">
-          <div class="waveformButtons" aria-label="Waveform">
+          <div class="waveformButtons" role="group" aria-label="Waveform">
             <span>Waveform</span>
-            <button class="waveformButton active" type="button" data-waveform="sine">Sine</button>
-            <button class="waveformButton" type="button" data-waveform="triangle">Triangle</button>
-            <button class="waveformButton" type="button" data-waveform="saw">Saw</button>
-            <button class="waveformButton" type="button" data-waveform="square">Square</button>
+            <button class="waveformButton active" type="button" aria-pressed="true" data-waveform="sine">Sine</button>
+            <button class="waveformButton" type="button" aria-pressed="false" data-waveform="triangle">Triangle</button>
+            <button class="waveformButton" type="button" aria-pressed="false" data-waveform="saw">Saw</button>
+            <button class="waveformButton" type="button" aria-pressed="false" data-waveform="square">Square</button>
           </div>
           <label class="compactField countField">
             Oscillators
@@ -118,7 +116,6 @@
           </div>
           <div id="resynthesisControls" class="resynthesisControls" hidden>
             <span id="resynthesisSource" class="impulseStatus" role="status">No sound file loaded</span>
-            <button id="analyzeButton" type="button" disabled>Analyze</button>
             <label class="compactField resynthesisCount">Partials
               <select id="partialCountSelect"><option value="32">32</option><option value="64">64</option></select>
             </label>
@@ -127,7 +124,7 @@
         </div>
 
         <div class="impulseBand">
-          <span id="impulseStatus" class="impulseStatus" role="status" hidden>No audio loaded</span>
+          <span id="impulseStatus" class="impulseStatus" role="status" hidden>No IR loaded · dry oscillator</span>
           <div id="convolutionControls" class="convolutionControls" hidden>
             <label class="wetControl">Dry/Wet
               <input id="convolutionWet" type="range" min="0" max="100" value="50">
@@ -230,7 +227,7 @@
     </main>
 
     <script src="src/file-help.js?v=20261014-family1" type="module"></script>
-    <script src="src/app.js?v=20261015-readability2" type="module"></script>
+    <script src="src/app.js?v=20261015-live-partials1" type="module"></script>
   <div id="basePitchModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Base Frequency · 20–4000 Hz</strong><span>Set the base for the oscillator stack, or transpose the analyzed partials in File Resynthesis.</span><span class="helpState"></span></div>
 <div id="deviationModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Deviation · Depends on source and layout</strong><span>Unison spreads voices up to ±50 cents. Other layouts and File Resynthesis bend partial relationships with an amount of 0–0.38. Zero keeps the original layout.</span><span class="helpState"></span></div>
 <div id="slopeModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Spectral Slope · −24 to +12 dB/oct</strong><span>Tilt voice or partial levels by frequency relative to the base. Negative values favor lower frequencies; positive values favor higher frequencies.</span><span class="helpState"></span></div>

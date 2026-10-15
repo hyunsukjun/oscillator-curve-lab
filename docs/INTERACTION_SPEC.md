@@ -126,3 +126,13 @@ Expanded-editor layout (2026-10-15): viewport/control resizing changes canvas di
 
 ## 2026-10-15 — values monitor
 The always-visible oscillator/partial monitor may scroll horizontally when voices exceed readable width. It is focusable; keyboard arrows scroll its viewport. This changes presentation only, not the voices selected, Nyquist filtering or synthesis. Long source/analysis text wraps in full. Approved after 32/64-partial display and transport verification.
+
+## 2026-10-15 — two visible synthesis paths (local review)
+The top selector contains File Resynthesis and Oscillator + File IR; remove the redundant SYNTHESIS SOURCE label and standalone Basic Waveform button. Default to Oscillator + File IR with no IR, retaining the previous dry oscillator sound. The empty state reads “No IR loaded · dry oscillator”. Resynthesis shows file/Analyze/Partials; the oscillator path shows Waveform/Count/Layout/Modulation plus IR controls only when a file is available. Wet=0 preserves dry synthesis after import. Existing internal oscillator DSP branch and separate curve stores remain; no synthesis algorithm or parameter mapping change. Mode switching still stops playback and preserves each path's curves/settings.
+
+Validation: pending-play-context, convolution (including bypass WAV identity), resynthesis tests pass. Actual browser dry/resynthesis/IR playback and four WAV saves passed (48kHz, 24-bit stereo; dry/resynthesis/Wet0=1s, Wet100=3s including 2s IR tail). FM choice restored after switching back. Both modes at900/390 CSS px had no horizontal overflow or curve/transport overlap; natural vertical scrolling remains. Listening and native confirmation keyboard deferred. No commit or deployment yet.
+
+## 2026-10-15 — automatic partial refresh
+Remove Reanalyze: importing a file and changing32/64 already trigger analysis. On a partial-count change with an existing result, keep the old result and transport running until the latest generation completes, then send updated settings without seek/restart. Preserve base curve, paused position, and paused state. Failure retains the old playable result and shows an error. Initial import retains its existing stop/invalidation contract. Remove the redundant Estimated base completion sentence; pending/error text remains and actual counts/base values stay in the monitor. This supersedes the earlier Reanalyze-label note.
+
+Validation: live-partial-switch controlled race/failure tests and pending-play-context/resynthesis regressions pass. Browser32→64 at7.20s continued through7.36s with Play active and64/64; paused64→32 stayed paused at7.42s. This proves transport continuity, not artifact-free perceptual switching; comparison listening remains deferred.

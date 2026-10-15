@@ -195,3 +195,19 @@ Below900px reduce source/control vertical padding to6px and synthesis heading pa
 - At390px,16voices no longer overlap; keyboard Right moves the monitor. At1280px/4voices it fits normally. Approved after user review and 32/64-partial browser verification.
 
 - Dense display verification: generated2s/48kHz64-tone source (100–6400Hz) actually analyzed32 and64partials. At390px,64/64 retained and keyboard scroll reached the last label64/6400Hz, without page overflow. Play/Pause/rewind and switching back to32 passed; no captured console errors. This verifies display and basic operation, not perceptual quality or all long-file performance. Shared evidence: oscillator-partial-density-20261015.json and oscillator-64-partials-20261015.png.
+
+## 2026-10-15 — two visible synthesis paths (local review)
+The top selector contains File Resynthesis and Oscillator + File IR; remove the redundant SYNTHESIS SOURCE label and standalone Basic Waveform button. Default to Oscillator + File IR with no IR, retaining the previous dry oscillator sound. The empty state reads “No IR loaded · dry oscillator”. Resynthesis shows file/Analyze/Partials; the oscillator path shows Waveform/Count/Layout/Modulation plus IR controls only when a file is available. Wet=0 preserves dry synthesis after import. Existing internal oscillator DSP branch and separate curve stores remain; no synthesis algorithm or parameter mapping change. Mode switching still stops playback and preserves each path's curves/settings.
+
+Validation: pending-play-context, convolution (including bypass WAV identity), resynthesis tests pass. Actual browser dry/resynthesis/IR playback and four WAV saves passed (48kHz, 24-bit stereo; dry/resynthesis/Wet0=1s, Wet100=3s including 2s IR tail). FM choice restored after switching back. Both modes at900/390 CSS px had no horizontal overflow or curve/transport overlap; natural vertical scrolling remains. Listening and native confirmation keyboard deferred. No commit or deployment yet.
+
+### Voice monitor markers — local review, 2026-10-15
+Halve current marker diameter in both oscillator and analyzed-partial monitors (radius factor0.5→0.25;1.25–5.75 CSS px). Preserve amplitude-dependent sizing, color, frequency mapping, labels and DSP. User fraction was incomplete; half-size is a stated provisional interpretation.
+
+### Connected waveform selection — 2026-10-15 local review
+Sine/Triangle/Saw/Square form a single adjoining button group with outer corners only; individual native button focus and click/Enter behavior remain. One active/aria-pressed choice follows the existing waveform setting. Reanalyze replaces Analyze to describe repeating automatic file analysis. Synthesis detail and all existing information remain visible; optional hiding is discussion only. Browser checked all four choices, Enter activation,390px single-row fit/no horizontal overflow, and successful real-file reanalysis. DSP unchanged; no commit/deploy.
+
+## 2026-10-15 — automatic partial refresh
+Remove Reanalyze: importing a file and changing32/64 already trigger analysis. On a partial-count change with an existing result, keep the old result and transport running until the latest generation completes, then send updated settings without seek/restart. Preserve base curve, paused position, and paused state. Failure retains the old playable result and shows an error. Initial import retains its existing stop/invalidation contract. Remove the redundant Estimated base completion sentence; pending/error text remains and actual counts/base values stay in the monitor. This supersedes the earlier Reanalyze-label note.
+
+Validation: live-partial-switch controlled race/failure tests and pending-play-context/resynthesis regressions pass. Browser32→64 at7.20s continued through7.36s with Play active and64/64; paused64→32 stayed paused at7.42s. This proves transport continuity, not artifact-free perceptual switching; comparison listening remains deferred.

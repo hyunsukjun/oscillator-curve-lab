@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+const source=readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
+const start=source.indexOf('async function runResynthesisAnalysis(');
+const code=source.slice(start,source.indexOf('\n}',start)+2).replaceAll('import.meta.url',JSON.stringify(import.meta.url));
+let stops=0,tokens=0;const workers=[];
+const c={analysisSamples:new Float32Array(10),analysisResult:{partialCount:32},isPlaying:true,playheadSeconds:7.5,analysisWorker:null,analysisGeneration:0,analysisStatus:{},partialCountSelect:{value:'64'},analysisSource:{},TARGET_SAMPLE_RATE:48000,URL,stop(){stops++},nextPlaybackToken(){tokens++},sendSettings(){},resynthesisState:{editedCurves:{basePitch:false},curves:{basePitch:'keep'}},Worker:class{constructor(){workers.push(this)}terminate(){this.terminated=true}postMessage(){}}};
+vm.createContext(c);vm.runInContext(code,c);
+await c.runResynthesisAnalysis({preservePlayback:true});
+assert.equal(c.analysisResult.partialCount,32);assert.equal(stops,0);assert.equal(tokens,0);
+const stale=workers.at(-1);await c.runResynthesisAnalysis({preservePlayback:true});
+stale.onmessage({data:{result:{partialCount:1}}});assert.equal(c.analysisResult.partialCount,32);
+workers.at(-1).onmessage({data:{result:{partialCount:64,fundamentalEstimate:100}}});
+assert.equal(c.analysisResult.partialCount,64);assert.equal(c.isPlaying,true);assert.equal(c.playheadSeconds,7.5);assert.equal(c.resynthesisState.curves.basePitch,'keep');assert.equal(c.analysisStatus.textContent,'');
+await c.runResynthesisAnalysis({preservePlayback:true});workers.at(-1).onerror({message:'test'});assert.equal(c.analysisResult.partialCount,64);assert.match(c.analysisStatus.textContent,/failed/);
+c.isPlaying=false;await c.runResynthesisAnalysis({preservePlayback:true});workers.at(-1).onmessage({data:{result:{partialCount:32,fundamentalEstimate:100}}});assert.equal(c.isPlaying,false);assert.equal(c.playheadSeconds,7.5);
+console.log('PASS live/paused position retention, stale result rejection, failure preserves previous result, base curve retained, no playback restart');
