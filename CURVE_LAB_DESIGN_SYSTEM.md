@@ -247,5 +247,10 @@ Verified: source-color/immutability tests, syntax and diff checks; actual stereo
 
 - Release check 2026-10-18: native Brave 125% and 150% reviewed across the family; curve point add/move/Command-delete verified in every Lab. Small viewport checks retained separately. Canvas-grid, source-colors, transport-keyboard and syntax checks passed. Listening/DSP and native confirmation-dialog checks remain separate.
 
-## Voice count wording — 2026-10-18, local review
+## Voice count wording — 2026-10-18
 - Voices uses `N/M in range`, replacing `visible` after hiding the partial monitor. Numerator remains the current curve-position voices accepted by the existing synthesis frequency limit; denominator remains configured oscillator count or actual analyzed partial count. Not a playback-state or on-screen count. Tooltip explains this; initial unloaded text is an em dash. Numeric calculation and DSP unchanged.
+
+## Shared axis gutter — 2026-10-18
+- Curve and source waveform plot starts use canvasAxisWidth = 64 CSS px. Audio fade handle/navigator and source pointer conversion share the same gutter. Normalized curve points, timing and DSP remain unchanged. Absolute frequency axes retain their logarithmic scale.
+
+Verification: 600px layout and actual Brave 125%/150% checked. Pointer add/move/modifier-delete checked across all six labs; Audio source edit lifecycle passed. Oscillator imported 8-second WAV overview aligns with the curve axis. This is UI evidence, not DSP/listening certification.

@@ -1,5 +1,5 @@
-import {drawEditorGrid, frequencyTicks, frequencyLabel, spacedMarks, canvasLabelFont} from "./canvas-grid.js";
-import {createSourceOverview} from "./source-overview.js";
+import {canvasAxisWidth, drawEditorGrid, frequencyTicks, frequencyLabel, spacedMarks, canvasLabelFont} from "./canvas-grid.js";
+import {createSourceOverview} from "./source-overview.js?v=20261018-axis64";
 import {mountTransport} from "./common-transport.js?v=20261013-1";
 import { readAudioFile } from "./audio-import.js?v=20261011-aiff1";
 import {
@@ -164,7 +164,7 @@ let frequencyCssWidth = 1;
 let frequencyCssHeight = 1;
 const canvasBaseHeight = 440;
 const frequencyBaseHeight = 110;
-const curveAxisWidth = 62;
+const curveAxisWidth = canvasAxisWidth;
 const frequencyAxisPadding = 14;
 
 let curves = Object.fromEntries(Object.entries(curveDefaults).map(([name, y]) => [name, defaultCurve(y)]));

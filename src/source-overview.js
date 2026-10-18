@@ -1,3 +1,4 @@
+import {canvasAxisWidth} from './canvas-grid.js';
 // Display-only imported recording. It is neither synthesis output nor a seek surface.
 import {analyzeSourceColors} from './source-colors.js';
 import {summarizeChannels,paintEnvelope,peakOf,paintToneLegend} from './source-envelope.js';
@@ -14,7 +15,7 @@ export function createSourceOverview(canvas){
     const hint='Original file · Not synthesis output';
     if(w>650)ctx.fillText(hint,110,14);
     paintToneLegend(ctx,w,12);
-    const left=48,width=Math.max(1,w-left-10),peak=peakOf(lanes),step=w<600?2:4;
+    const left=canvasAxisWidth,width=Math.max(1,w-left-10),peak=peakOf(lanes),step=w<600?2:4;
     ctx.strokeStyle='rgba(139,149,162,.18)';ctx.lineWidth=1;
     for(let i=0;i<=step;i++){const x=left+width*i/step;ctx.beginPath();ctx.moveTo(x,21);ctx.lineTo(x,77);ctx.stroke();
       const t=buffer.duration*i/step;ctx.fillStyle='#a9b1bb';ctx.textAlign=i===0?'left':i===step?'right':'center';ctx.fillText(`${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toFixed(2).padStart(5,'0')}`,x,91);}
