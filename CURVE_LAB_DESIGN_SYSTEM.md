@@ -246,3 +246,6 @@ Verified: source-color/immutability tests, syntax and diff checks; actual stereo
 - Verified locally: grid/log-label/worker-error tests, source-color tests, keyboard tests, JS syntax; browser initial load and Play/Pause (Granular with 8-second WAV). Independent app tabs reported no console errors. 600 px iframe inspection: all six document widths match their viewport (583 px after scrollbar), minimum curve height about 220 px and transport retained through vertical scrolling. This is not a new native browser zoom or listening certification.
 
 - Release check 2026-10-18: native Brave 125% and 150% reviewed across the family; curve point add/move/Command-delete verified in every Lab. Small viewport checks retained separately. Canvas-grid, source-colors, transport-keyboard and syntax checks passed. Listening/DSP and native confirmation-dialog checks remain separate.
+
+## Voice count wording — 2026-10-18, local review
+- Voices uses `N/M in range`, replacing `visible` after hiding the partial monitor. Numerator remains the current curve-position voices accepted by the existing synthesis frequency limit; denominator remains configured oscillator count or actual analyzed partial count. Not a playback-state or on-screen count. Tooltip explains this; initial unloaded text is an em dash. Numeric calculation and DSP unchanged.

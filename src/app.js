@@ -975,7 +975,7 @@ function updateReadouts() {
     ? `${centsFromNorm(deviationAmount)} cents`
     : `${partialDeviationFromNorm(deviationAmount).toFixed(2)} partial`;
   readouts.slope.textContent = `${slopeDbFromNorm(valueAt(curves.slope, t)).toFixed(1)} dB/oct`;
-  readouts.voices.textContent = `${voices.length}/${soundMode === "resynthesis" ? analysisResult?.partialCount || 0 : countSelect.value} visible`;
+  readouts.voices.textContent = `${voices.length}/${soundMode === "resynthesis" ? analysisResult?.partialCount || 0 : countSelect.value} in range`;
   const mode = currentSettings.modulationMode;
   if (soundMode !== "resynthesis" && mode !== "off") {
     const carrier = voices[0]?.frequency;
