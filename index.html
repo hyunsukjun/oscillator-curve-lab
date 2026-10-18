@@ -171,7 +171,7 @@
 
 <div id="sourceOverview" class="sourceOverview" hidden><canvas id="sourceOverviewCanvas" role="img" aria-label="Original imported audio, source-time waveform. Color indicates source frequency character, not synthesis output." title="Original imported file · Not synthesis output · No playback seeking"></canvas></div>
 <section id="voiceDetails" class="voiceDetails" aria-label="Synthesis details">
-              <div class="synthesisHeading">Synthesis detail <span>Oscillator / partial values · before modulation and file IR</span></div>
+              <div class="synthesisHeading" hidden>Synthesis detail <span>Oscillator / partial values · before modulation and file IR</span></div>
         <div class="panel currentValues">
           <div class="readout"><span>Curve</span><strong id="modeReadout">Base Freq</strong></div>
           <div class="readout"><span>Points</span><strong id="pointsReadout">2</strong></div>
@@ -183,7 +183,7 @@
           <div class="readout safetyReadout"><span>Safety</span><strong id="safetyReadout">auto gain / limiter</strong></div>
         </div>
 
-            <div class="canvasFrame frequencyFrame" tabindex="0" role="region" aria-label="Oscillator and partial values. Scroll horizontally to inspect all voices.">
+            <div class="canvasFrame frequencyFrame" hidden tabindex="0" role="region" aria-label="Oscillator and partial values. Scroll horizontally to inspect all voices.">
               <canvas id="frequencyCanvas" width="1800" height="110"></canvas>
             </div>
             </section>

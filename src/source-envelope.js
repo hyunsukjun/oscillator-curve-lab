@@ -13,6 +13,7 @@ export function summarizeChannels(channels, buckets=16000) {
 
 import {toneColor} from './source-colors.js';
 export function paintEnvelope(ctx,lane,spectrum,left,width,mid,amplitude,scale,referencePeak){
+  if(!spectrum)return; // Wait for color analysis; no legacy waveform flash.
   if(!lane?.length)return;
   ctx.fillStyle='#8bc9ff';
   if(spectrum?.length){const gradient=ctx.createLinearGradient(left,0,left+width,0),n=Math.max(2,Math.min(256,spectrum.length));

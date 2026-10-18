@@ -1,3 +1,4 @@
+import {drawEditorGrid, frequencyTicks, frequencyLabel, spacedMarks, canvasLabelFont} from "./canvas-grid.js";
 import {createSourceOverview} from "./source-overview.js";
 import {mountTransport} from "./common-transport.js?v=20261013-1";
 import { readAudioFile } from "./audio-import.js?v=20261011-aiff1";
@@ -239,7 +240,7 @@ function fitEditorControls(force = false) {
   // Measure actual wrapped controls and footer instead of subtracting fixed estimates.
   const available = Math.max(100, footer.getBoundingClientRect().top - workspace.getBoundingClientRect().top - 36);
   const details = document.getElementById("voiceDetails");
-  const frequency = 64;
+  const frequency = frequencyCanvas.closest(".frequencyFrame").hidden ? 0 : 64;
   const detailHeight = frequency + details.querySelector(".synthesisHeading").getBoundingClientRect().height + details.querySelector(".panel").getBoundingClientRect().height + 12;
   const curve = Math.max(80, available - detailHeight - gap - 4);
   document.documentElement.style.setProperty("--transport-reserve", `${footer.getBoundingClientRect().height + 20}px`);
@@ -690,7 +691,7 @@ function resetAll() {
 }
 
 function draw() {
-  drawFrequency();
+  if (!frequencyCanvas.closest(".frequencyFrame").hidden) drawFrequency();
   drawCurves();
   updateReadouts();
 }
@@ -771,24 +772,8 @@ function drawCurves() {
 }
 
 function drawGrid() {
+  drawEditorGrid(ctx, curveAxisWidth, 10, curvePlotWidth(), curvePlotHeight(), {frequency:activeCurve==='basePitch'});
   drawFrequencyAxis();
-  ctx.lineWidth = 1;
-  for (let x = 0; x <= 20; x += 1) {
-    ctx.strokeStyle = x % 2 === 0 ? "rgba(139, 149, 162, 0.18)" : "rgba(139, 149, 162, 0.08)";
-    const px = curveToCanvasX(x / 20);
-    ctx.beginPath();
-    ctx.moveTo(px, 0);
-    ctx.lineTo(px, canvasCssHeight);
-    ctx.stroke();
-  }
-  for (let y = 0; y <= 8; y += 1) {
-    ctx.strokeStyle = y % 2 === 0 ? "rgba(139, 149, 162, 0.18)" : "rgba(139, 149, 162, 0.08)";
-    const py = curveToCanvasY(y / 8);
-    ctx.beginPath();
-    ctx.moveTo(curveAxisWidth, py);
-    ctx.lineTo(canvasCssWidth, py);
-    ctx.stroke();
-  }
 }
 
 function drawFrequencyAxis() {
@@ -802,14 +787,14 @@ function drawFrequencyAxis() {
   ctx.stroke();
 
   ctx.font = "11px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-  ctx.fillStyle = "rgba(170, 188, 204, 0.9)";
+  ctx.fillStyle = "#a9b1bb";
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
-  for (const mark of axisMarksForActiveCurve()) {
-    ctx.strokeStyle = "rgba(95, 141, 177, 0.4)";
+  for (const mark of spacedMarks(axisMarksForActiveCurve())) {
+    ctx.strokeStyle = "rgba(139,149,162,.18)";
     ctx.beginPath();
     ctx.moveTo(curveAxisWidth - 7, mark.y);
-    ctx.lineTo(curveAxisWidth, mark.y);
+    ctx.lineTo(activeCurve === "basePitch" ? canvasCssWidth - 10 : curveAxisWidth, mark.y);
     ctx.stroke();
     ctx.fillText(mark.label, curveAxisWidth - 10, Math.min(canvasCssHeight - 8, Math.max(8, mark.y)));
   }
@@ -847,8 +832,8 @@ function axisMarksForActiveCurve() {
       y: curveToCanvasY(1 - amount)
     }));
   }
-  return [4000, 2000, 1000, 500, 200, 100, 50, 20].map((hz) => ({
-    label: formatAxisFrequency(hz),
+  return frequencyTicks(20, 4000).map((hz) => ({
+    label: frequencyLabel(hz),
     y: curveToCanvasY(normFromBaseFrequency(hz))
   }));
 }
@@ -906,7 +891,7 @@ function drawPointTooltip(name) {
   const x = curveToCanvasX(point.x);
   const y = curveToCanvasY(point.y);
   const label = `${formatPointTime(point)}  ${formatPointValue(name, point)}`;
-  ctx.font = "12px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  ctx.font = "500 12px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
   const paddingX = 8;
   const width = Math.ceil(ctx.measureText(label).width + (paddingX * 2));
   const height = 26;
