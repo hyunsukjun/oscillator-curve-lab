@@ -11,7 +11,11 @@ const end = source.indexOf('window.addEventListener("resize"', begin);
 assert(begin >= 0 && end > begin);
 function harness() {
   class HTMLInputElement {}
-  class HTMLSelectElement {}
+  class HTMLSelectElement {
+    constructor(open = false) { this.open = open; }
+    matches() { return this.open; }
+    blur() { this.blurred = true; }
+  }
   class HTMLTextAreaElement {}
   class HTMLButtonElement { blur() { this.blurred = true; } }
   const handlers = {}, calls = [];
@@ -51,9 +55,9 @@ test('disabled transport and active render block Space even if UI enablement cha
     h.context.renderAbortController = null; h.send(); assert.equal(h.calls.length, 1);
   }
 });
-test('text, range, select and editable targets retain their native Space behavior', () => {
+test('text, range, open select and editable targets retain their native Space behavior', () => {
   const h = harness();
-  for (const target of [new h.context.HTMLInputElement(), new h.context.HTMLSelectElement(),
+  for (const target of [new h.context.HTMLInputElement(), new h.context.HTMLSelectElement(true),
     new h.context.HTMLTextAreaElement(), {isContentEditable:true}, {closest: selector => selector === "summary" ? {} : null}]) {
     for (const type of ['keydown','keyup']) assert.equal(h.send(type,{target}).prevented,false);
   }
@@ -64,4 +68,22 @@ test('unrelated keys are not consumed', () => {
   assert.equal(h.send('keydown',{code:'Enter'}).prevented,false);
   assert.equal(h.send('keyup',{code:'Enter'}).prevented,false);
   assert.deepEqual(h.calls,[]);
+});
+
+test('closed select Space plays and pauses without a blank-area click', () => {
+  const h = harness();
+  const select = new h.context.HTMLSelectElement();
+  h.context.document.activeElement = select;
+  assert(h.send().prevented);
+  assert(select.blurred);
+  h.send('keyup');
+  h.send();
+  assert.deepEqual(h.calls, ['play', ['stop', false]]);
+});
+test('unsupported open-select detection preserves native behavior', () => {
+  const h = harness();
+  const select = new h.context.HTMLSelectElement();
+  select.matches = () => { throw new SyntaxError(); };
+  assert.equal(h.send('keydown', {target:select}).prevented, false);
+  assert.deepEqual(h.calls, []);
 });

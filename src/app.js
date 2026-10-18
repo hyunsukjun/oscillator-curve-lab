@@ -1334,7 +1334,12 @@ meterClipButton.addEventListener("click", () => {
 downloadButton.addEventListener("click", downloadWav);
 
 function isTransportInput(target) {
-  return target instanceof HTMLInputElement || target instanceof HTMLSelectElement ||
+  if (target instanceof HTMLSelectElement) {
+    // A closed select retains focus after choosing; Space should control transport.
+    // An open native popup keeps its own selection keys.
+    try { return target.matches(":open"); } catch { return true; }
+  }
+  return target instanceof HTMLInputElement ||
     target instanceof HTMLTextAreaElement || target?.isContentEditable || target?.closest?.("summary");
 }
 
@@ -1343,7 +1348,7 @@ window.addEventListener("keydown", (event) => {
   event.preventDefault();
   event.stopPropagation();
   if (event.repeat || playButton.disabled || renderAbortController) return;
-  if (document.activeElement instanceof HTMLButtonElement) document.activeElement.blur();
+  if (document.activeElement instanceof HTMLButtonElement || document.activeElement instanceof HTMLSelectElement) document.activeElement.blur();
   if (isPlaying) stop(false);
   else play();
 });

@@ -139,3 +139,6 @@ Validation: live-partial-switch controlled race/failure tests and pending-play-c
 
 ### Compact duration clock — 2026-10-15 approved release
 Match approved Granular layout: mm:ss readout at14px/600 with tabular digits, continuous slider, no endpoint labels or WAV estimate. Preserve0–600s/1s increments and zero-disabled behavior. Duration remains synthesis length; IR tail can extend total output (retained in help/footer). Browser483→08:03,0→00:00/disabled,600→10:00 and390px layout passed. Display only; no DSP/tail changes. Approved for commit and deployment. Native confirmation keyboard checks and comparison listening remain deferred.
+
+## Space after selecting settings — 2026-10-18
+A closed native select retaining focus must allow Space to play/pause in place. Open native menus, text/numeric inputs, editable content and summaries retain native key behavior. Repeat, disabled transport and active export guards remain. Closed Modulation selection followed by Space play/pause passed in Brave; native open-menu interaction remains a manual check. DSP unchanged.
