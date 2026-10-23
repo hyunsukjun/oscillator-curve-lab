@@ -33,17 +33,16 @@ The sound selector has File Resynthesis and Oscillator + File IR (default) paths
 - Spectral Slope curve
 - Single modulation path: Off, FM, AM, or Ring; a shared carrier-relative ratio (0.25-8)
 - FM Index curve (0-4), AM Depth curve (0-1), and Ring Mix curve (0-1), each preserved when switching modes
-- Optional Convolution mode: open a local audio file as an impulse response, then set Dry/Wet and IR Length. IR Length 0% uses the first 3 seconds (or the full file when shorter); 100% uses the full file. IR files are limited to 16 MB. Oscillator mode bypasses the IR. WAV and FFT output include the selected IR tail when active.
+- Optional Convolution mode: open a local audio file as an impulse response, then set Dry/Wet and IR Length. IR Length 0% uses the first 3 seconds (or the full file when shorter); 100% uses the full file. Imported files are limited to 16 MiB. Oscillator mode bypasses the IR. WAV export includes the selected IR tail when active.
 - Dry/Wet uses a smooth endpoint taper; Stop silences the output and clears the current convolution tail.
 - Saw and Square use band-limited edge correction, and high Triangle notes use band-limited harmonics; normal-level oscillator output remains unshaped by the safety limiter.
 - Modulation is reduced near Nyquist; the existing auto gain and output limiter remain active
 - Current oscillator value visualization
-- Optional output FFT preview
 - Auto Gain Compensation
 - Nyquist Protection
 - Safety Limiter
 - 48 kHz WAV export at 24-bit PCM
-- 8 ms start and 12 ms end source fades in realtime playback, WAV, and dry FFT preview
+- 8 ms start and 12 ms end source fades in realtime playback and WAV; internal FFT reference checks are documented separately
 
 ## Out of scope for v1
 
@@ -67,9 +66,9 @@ Then open `http://localhost:8080/`.
 
 Run the focused modulation and convolution checks with `node --test tests/modulation.test.mjs tests/convolution.test.mjs`.
 
-## FFT Preview
+## Historical FFT verification
 
-Enable FFT Preview to inspect the actual synthesized output in a separate frequency/time panel. Brightness uses a fixed −90…0 dBFS scale. After changing sound settings or curves, stop playback and choose Update preview. This is an overview; brief events may fall between columns.
+The output FFT preview is no longer exposed in the current web UI. Resynthesis analysis remains available. The FFT report and internal comparison tools are retained as historical and technical evidence; they are not current user controls.
 
 See [FFT refinement and verification](docs/FFT-REFINEMENT-REPORT.md). Run `node tests/output-preview.mjs` for WAV/Worklet/FFT parity, or open `tests/browser-output-preview.html` through the local server for native browser Worklet checks.
 
@@ -87,11 +86,14 @@ Pause keeps the current position; Return to start seeks to zero. The thin slider
 navigates output time. Source guides, sound engines and export policies are unchanged.
 
 
-## Local UI revision — 2026-10-14
-Single 0–10 min Output Duration; zero disables Play/Download. FFT Preview removed from web UI; Resynthesis analysis remains. Responsive canvas budget keeps verified laptop viewports within one screen. [Review and validation](docs/UI_REVIEW_2026-10-14.md). Not committed/deployed yet.
+## UI revision history — 2026-10-14–15
+
+These entries describe the state at the time of the original review; the interface changes are present in the current checkout.
+
+Single 0–10 min Output Duration; zero disables Play/Download. FFT Preview removed from web UI; Resynthesis analysis remains. Responsive canvas budget keeps verified laptop viewports within one screen. [Review and validation](docs/UI_REVIEW_2026-10-14.md).
 
 Partial-count changes automatically refresh analysis while retaining current playback until results are ready. The separate Reanalyze button is no longer shown. Pending/errors remain visible; the monitor retains actual partial counts.
 
-2026-10-15 local review: remove the header Mono/Stereo selector; application settings always use stereo for both synthesis paths. Export help states Stereo 2ch /48kHz/24-bit. Input mono/stereo support unchanged. Browser playback and a saved1s WAV confirmed2ch48kHz24-bit. Not committed/deployed.
+2026-10-15 local review: remove the header Mono/Stereo selector; application settings always use stereo for both synthesis paths. Export help states Stereo 2ch /48kHz/24-bit. Input mono/stereo support unchanged. Browser playback and a saved1s WAV confirmed2ch48kHz24-bit.
 
 Imported files also appear in a static source-time waveform overview. Colors describe source frequency character, not generated sound; this is not a seek control.
