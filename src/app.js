@@ -772,7 +772,11 @@ function drawCurves() {
 }
 
 function drawGrid() {
+  // Quiet background grid; retain scales, points and curve contrast.
+  ctx.save();
+  ctx.globalAlpha *= 0.65;
   drawEditorGrid(ctx, curveAxisWidth, 10, curvePlotWidth(), curvePlotHeight(), {frequency:activeCurve==='basePitch'});
+  ctx.restore();
   drawFrequencyAxis();
 }
 

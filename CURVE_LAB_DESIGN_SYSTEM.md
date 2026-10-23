@@ -254,3 +254,8 @@ Verified: source-color/immutability tests, syntax and diff checks; actual stereo
 - Curve and source waveform plot starts use canvasAxisWidth = 64 CSS px. Audio fade handle/navigator and source pointer conversion share the same gutter. Normalized curve points, timing and DSP remain unchanged. Absolute frequency axes retain their logarithmic scale.
 
 Verification: 600px layout and actual Brave 125%/150% checked. Pointer add/move/modifier-delete checked across all six labs; Audio source edit lifecycle passed. Oscillator imported 8-second WAV overview aligns with the curve axis. This is UI evidence, not DSP/listening certification.
+
+## Quiet context trial — 2026-10-23
+Audio-approved family tokens: resting controls #303740 / #48515c border; hover #404a56 / #7a899b; focus #a9cfff; secondary readout labels #adb6c2; separators #454b54. Background grid draws at 0.65 of its previous opacity. Selected/enabled effect colors, disabled states, font sizes, geometry, parameter scales, points and DSP remain unchanged. COMMON CANDIDATE; user approved family rollout on 2026-10-23.
+
+Verification: Brave wide and 600×700 viewport reviewed (585px client/scroll width, no horizontal overflow); native 150% layout reviewed for all five, 125% additionally reviewed for Timbre. Selected colors retained; playback/stop UI and meters checked (Granular with source-tone-demo.wav). Syntax and diff whitespace checks pass. This is UI evidence, not listening or WAV export acceptance. Family rollout approved for commit/deployment on 2026-10-23.
