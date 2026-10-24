@@ -208,3 +208,9 @@ Verified: source-color/immutability tests, syntax and diff checks; actual stereo
 
 ## Web partial monitor visibility — 2026-10-18
 Current Oscillator Values canvas and Synthesis detail heading are hidden, with monitor drawing skipped. DOM, renderer, and synthesis model are retained for later Standalone evaluation. Current parameter readouts remain visible. Freed monitor height is available to the curve editor; short windows retain scrolling. No DSP change.
+
+## IR retained-history control — 2026-10-25
+
+- BEHAVIOR: active wet-IR Pause/Resume retains valid processing history; the slider selects sound duration, and the clock separately includes tail/flush. Invalidating changes discard history; same-mode no-op and pre-admission rejection preserve it. No arbitrary tail seek.
+- IMPLEMENTATION: local src/app.js control/state/meter change; core DSP, safety algorithms, WAV engine and shared transport are unchanged. No O3 B placement change.
+- EVIDENCE: prior isolated retained-node, late-cancel, meter, dry and two-boundary checks, user IR listening and actual nonplaying navigation are linked in KNOWLEDGE_PRESERVATION.md. Product integration checks are recorded separately. Implementation and publication are separate from final scoped acceptance.

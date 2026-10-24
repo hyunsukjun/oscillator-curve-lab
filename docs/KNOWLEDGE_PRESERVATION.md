@@ -143,3 +143,18 @@ Ten-minute dry Node16-voice extremeFM: correct600s/172800044bytes/peak0.89125090
 Final browser run (no simultaneous long Node render):60s dry9.247s/maxgap37.1ms;30s+6sIR Wet.5/1 each6.42s/maxgap37.3/39ms. Compared with earlier5.32s dry and4.61–4.63s wet, total time increases while UI pauses shrink. These are local observations, not a throughput guarantee. All lengths/peaks/tails and3 generation cancel/recover cycles passed. Browser allocation/Blob copying and long-IR memory still require attention.
 
 API basis: https://webaudio.github.io/web-audio-api/#OfflineAudioContext — suspend/resume scheduling is used while retaining completion ownership.
+
+## IR retained-history control — 2026-10-25
+
+WHAT/WHY: local wet-IR transport now retains the graph rather than rebuilding an empty convolver when resuming a tail. Sound time and output-tail time are distinct; admission rejection/no-op preserves state. The synthesis, IR preparation, limiter and WAV algorithms are unchanged.
+
+EVIDENCE (separate scopes): retained graph at about 5.028354 s and nonzero resumed output; late Pause/Resume cancellation and stopped meters; real pointer/keyboard nonplaying navigation; two actual retained-tail boundary groups in Brave at 48 kHz. The user independently reported natural tail continuation without a separate click, uncomfortable delay or position regression. Exact physical latency and all browser/device/IR conditions are unconfirmed. The listening telemetry was preparation-only, so user observations remain independent evidence.
+
+Standalone should preserve these time/history/cancellation contracts with its own platform verification. The application/run evidence predates publication; publication does not itself constitute final product acceptance.
+
+- [IR retained graph](/Users/hyunsukjun/Documents/Codex/2026-10-15/referenced-chatgpt-conversation-this-is-an/outputs/CurveLabAudioQuality/Oscillator_IR_Retained_Candidate_2026-10-25/Report.txt)
+- [Cancellation, meters and dry](/Users/hyunsukjun/Documents/Codex/2026-10-15/referenced-chatgpt-conversation-this-is-an/outputs/CurveLabAudioQuality/Oscillator_IR_Cancel_Meter_Run_2026-10-25/Report.txt)
+- [User listening](/Users/hyunsukjun/Documents/Codex/2026-10-15/referenced-chatgpt-conversation-this-is-an/outputs/CurveLabAudioQuality/Oscillator_IR_Listening_Result_2026-10-25/Report.txt)
+- [Actual nonplaying navigation](/Users/hyunsukjun/Documents/Codex/2026-10-15/referenced-chatgpt-conversation-this-is-an/outputs/CurveLabAudioQuality/Oscillator_IR_Pointer_Keyboard_2026-10-25/Report.txt)
+- [Admission and mode boundaries](/Users/hyunsukjun/Documents/Codex/2026-10-15/referenced-chatgpt-conversation-this-is-an/outputs/CurveLabAudioQuality/Oscillator_IR_Admission_Mode_Boundaries_2026-10-25/Report.txt)
+- [Local product application record](/Users/hyunsukjun/Documents/Codex/2026-10-15/referenced-chatgpt-conversation-this-is-an/outputs/CurveLabAudioQuality/Oscillator_IR_Product_Application_2026-10-25)

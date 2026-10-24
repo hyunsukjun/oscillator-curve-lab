@@ -156,6 +156,45 @@ let isScrubbing = false;
 let meterClipLatched = false;
 const meterDisplay = [{ peak: 0, rms: 0, hold: 0, holdUntil: 0 }, { peak: 0, rms: 0, hold: 0, holdUntil: 0 }];
 let playbackToken = 0;
+const irControl = { phase:'idle', epoch:0, snapshot:null, pending:null, note:'' };
+function irBusy(){return irControl.phase==='pausing'||irControl.phase==='resuming';}
+function irFingerprint(){return JSON.stringify(settings());}
+function irForget(note=''){irControl.epoch++;irControl.snapshot=null;irControl.phase='idle';irControl.pending=null;irControl.note=note;}
+function irChanged(){if((irControl.snapshot||irBusy()) && (!irControl.snapshot || irControl.snapshot.fingerprint!==irFingerprint()))stop(true);}
+function irEligible(){return !!(audioContext && node && convolver && settings().convolutionEnabled && settings().convolutionWet>0);}
+async function irPauseRetained(){
+ if(irBusy())return irControl.pending;
+ const epoch=++irControl.epoch, context=audioContext, source=node, filter=convolver, limiter=safetyLimiterNode;
+ irControl.phase='pausing';irControl.note='일시정지 준비';
+ const now=context.currentTime;outputGain.gain.cancelScheduledValues(now);outputGain.gain.setValueAtTime(0,now);updateTransport();
+ const pending=(async()=>{
+  try{
+   await context.suspend();
+   if(epoch!==irControl.epoch)return;
+   if(!isPlaying||source!==node||filter!==convolver){irForget('종료됨');return;}
+   isPlaying=false;
+   irControl.snapshot={context,source,filter,limiter,fingerprint:irFingerprint(),position:playheadSeconds,contextTime:context.currentTime};
+   irControl.phase='pausedRetained';irControl.note='일시정지 · 잔향 이력 보존';updateTransport();draw();
+  }catch(error){if(epoch===irControl.epoch){stop(true);irControl.note='일시정지 실패 · 정지';updateTransport();}throw error;}
+  finally{if(epoch===irControl.epoch)irControl.pending=null;}
+ })();irControl.pending=pending;return pending;
+}
+async function irResumeRetained(){
+ const saved=irControl.snapshot;
+ if(!saved || saved.context!==audioContext||saved.source!==node||saved.filter!==convolver||saved.limiter!==safetyLimiterNode||saved.fingerprint!==irFingerprint()){
+  stop(true);irControl.note='보존 상태 변경 · 처음부터 다시 재생 필요';updateTransport();return;
+ }
+ const epoch=++irControl.epoch;irControl.phase='resuming';irControl.note='재개 준비';updateTransport();
+ const pending=(async()=>{
+  try{
+   const now=audioContext.currentTime;outputGain.gain.cancelScheduledValues(now);outputGain.gain.setValueAtTime(0,now);outputGain.gain.linearRampToValueAtTime(1,now+.003);
+   await audioContext.resume();
+   if(epoch!==irControl.epoch)return;
+   irControl.snapshot=null;irControl.phase='idle';irControl.note='같은 잔향 재개';isPlaying=true;updateTransport();draw();
+  }catch(error){if(epoch===irControl.epoch){stop(true);irControl.note='재개 실패 · 정지';updateTransport();}throw error;}
+  finally{if(epoch===irControl.epoch)irControl.pending=null;}
+ })();irControl.pending=pending;return pending;
+}
 let downloadUrl = null;
 let renderAbortController = null;
 let canvasCssWidth = 1;
@@ -313,6 +352,7 @@ function sortCurve(curve) {
 }
 
 function sendSettings() {
+  irChanged();
   markDownloadStale();
   node?.port.postMessage({ type: "settings", settings: settings() });
   updateConvolutionRouting();
@@ -323,6 +363,7 @@ function sendSettings() {
 }
 
 function sendCurves() {
+  irChanged();
   markDownloadStale();
   node?.port.postMessage({ type: "curves", curves });
 
@@ -411,6 +452,7 @@ async function setupAudio() {
         draw();
       }
     } else if (event.data.type === "ended" || event.data.type === "stopped") {
+      if(event.data.type === "ended")irForget("자연 종료");
       isPlaying = false;
       playheadSeconds = event.data.type === "stopped" ? event.data.seconds || 0 : 0;
       if (event.data.type === "ended") node.port.postMessage({ type: "seek", seconds: 0, token: playbackToken });
@@ -482,15 +524,19 @@ function updateConvolutionRouting() {
 }
 
 function updateTransport() {
-  const current = settings();
-  const duration = outputDuration();
-  timeStatus.textContent = `${formatClock(playheadSeconds)} / ${formatClock(duration)}`;
-  if (!isScrubbing) playbackScrubber.value = String(Math.max(0, Math.min(1, playheadSeconds / Math.max(0.001, duration))));
-  playbackScrubber.setAttribute("aria-valuetext", `${formatClock(playheadSeconds)} of ${formatClock(duration)}`);
-  playbackScrubber.disabled = soundMode === "resynthesis" && !analysisResult;
-  downloadButton.disabled = renderAbortController ? renderAbortController.signal.aborted : current.durationSeconds <= 0 || (soundMode === "resynthesis" && !analysisResult);
-  playButton.disabled = current.durationSeconds <= 0 || soundMode === "resynthesis" && !analysisResult;
-  stopButton.disabled = !isPlaying;
+ const current=settings(),duration=outputDuration(),source=current.durationSeconds;
+ const sourcePosition=Math.min(source,Math.max(0,playheadSeconds));
+ const phase=irControl.note || (playheadSeconds>=source&&isPlaying?'잔향 중':'');
+ timeStatus.textContent=`출력 ${formatClock(playheadSeconds)} / ${formatClock(duration)} · 발음 탐색 ${formatClock(sourcePosition)} / ${formatClock(source)}${phase?' · '+phase:''}`;
+ if(!isScrubbing)playbackScrubber.value=String(sourcePosition/Math.max(.001,source));
+ playbackScrubber.setAttribute('aria-label','발음 구간 탐색');
+ playbackScrubber.setAttribute('title','발음 구간만 탐색 · 잔향 포함 출력 시간은 별도 표시');
+ playbackScrubber.setAttribute('aria-valuetext',timeStatus.textContent);
+ playbackScrubber.disabled=irBusy() || soundMode==='resynthesis'&&!analysisResult;
+ downloadButton.disabled=irBusy() || (renderAbortController?renderAbortController.signal.aborted:source<=0||(soundMode==='resynthesis'&&!analysisResult));
+ playButton.disabled=irBusy() || source<=0 || soundMode==='resynthesis'&&!analysisResult;
+ playButton.setAttribute('aria-label',!isPlaying&&!irControl.snapshot&&playheadSeconds>=source?'처음부터 재생':'Play');
+ stopButton.disabled=irBusy()||!isPlaying;
 }
 
 function meterPercent(value) {
@@ -498,45 +544,62 @@ function meterPercent(value) {
   return Math.max(0, Math.min(100, (20 * Math.log10(value) + 60) / 60 * 100));
 }
 
+let irMeterAwaitTime=null;
 function updateMeter() {
-  const readings = outputMeter?.read() || [{ peak: 0, rms: 0 }, { peak: 0, rms: 0 }];
-  const now = performance.now();
-  readings.forEach((reading, index) => {
-    const state = meterDisplay[index];
-    const row = meterRows[index];
-    if (!state || !row) return;
-    state.peak = reading.peak >= state.peak ? reading.peak : Math.max(reading.peak, state.peak * 0.88);
-    state.rms = reading.rms >= state.rms ? reading.rms : Math.max(reading.rms, state.rms * 0.8);
-    if (reading.peak >= state.hold) {
-      state.hold = reading.peak;
-      state.holdUntil = now + 1000;
-    } else if (now > state.holdUntil) state.hold *= 0.97;
-    row.querySelector(".meterRms").style.clipPath = `inset(0 ${100 - meterPercent(state.rms)}% 0 0)`;
-    row.querySelector(".meterPeak").style.clipPath = `inset(0 ${100 - meterPercent(state.peak)}% 0 0)`;
-    row.querySelector(".meterHold").style.left = `${meterPercent(state.hold)}%`;
-    row.querySelector(".meterHold").style.opacity = state.hold > 0.001 ? "1" : "0";
-    row.querySelector(".meterValue").textContent = state.peak > 0.0001
-      ? `${Math.max(-60, 20 * Math.log10(state.peak)).toFixed(0)}` : "-∞";
-    if (reading.clipped) meterClipLatched = true;
-  });
-  meterClipButton.classList.toggle("clipped", meterClipLatched);
-  meterClipButton.setAttribute("aria-pressed", String(meterClipLatched));
+  const eligible=!!audioContext && audioContext.state==='running' && isPlaying && !irBusy();
+  if(!eligible)irMeterAwaitTime=audioContext?.currentTime??0;
+  const fresh=eligible && (irMeterAwaitTime===null || audioContext.currentTime>irMeterAwaitTime);
+  if(!fresh){
+    const label=irBusy()?'준비 중':irControl.phase==='pausedRetained'?'일시정지':'정지';
+    meterDisplay.forEach((state,index)=>{
+      state.peak=state.rms=state.hold=state.holdUntil=0;
+      const row=meterRows[index];if(!row)return;
+      row.dataset.readingState=label;row.setAttribute('aria-label',`${index?'R':'L'} 출력 레벨 · ${label} · 실시간 측정 없음`);
+      row.querySelector('.meterRms').style.clipPath='inset(0 100% 0 0)';
+      row.querySelector('.meterPeak').style.clipPath='inset(0 100% 0 0)';
+      row.querySelector('.meterHold').style.left='0%';row.querySelector('.meterHold').style.opacity='0';
+      row.querySelector('.meterValue').textContent='—';
+    });
+  }else{
+    irMeterAwaitTime=null;
+    const readings=outputMeter?.read() || [{peak:0,rms:0},{peak:0,rms:0}];
+    const now=performance.now();
+    readings.forEach((reading,index)=>{
+      const state=meterDisplay[index],row=meterRows[index];if(!state||!row)return;
+      row.dataset.readingState='live';row.setAttribute('aria-label',`${index?'R':'L'} 실시간 출력 레벨`);
+      state.peak=reading.peak>=state.peak?reading.peak:Math.max(reading.peak,state.peak*.88);
+      state.rms=reading.rms>=state.rms?reading.rms:Math.max(reading.rms,state.rms*.8);
+      if(reading.peak>=state.hold){state.hold=reading.peak;state.holdUntil=now+1000;}else if(now>state.holdUntil)state.hold*=.97;
+      row.querySelector('.meterRms').style.clipPath=`inset(0 ${100-meterPercent(state.rms)}% 0 0)`;
+      row.querySelector('.meterPeak').style.clipPath=`inset(0 ${100-meterPercent(state.peak)}% 0 0)`;
+      row.querySelector('.meterHold').style.left=`${meterPercent(state.hold)}%`;
+      row.querySelector('.meterHold').style.opacity=state.hold>.001?'1':'0';
+      row.querySelector('.meterValue').textContent=state.peak>.0001?`${Math.max(-60,20*Math.log10(state.peak)).toFixed(0)}`:'-∞';
+      if(reading.clipped)meterClipLatched=true;
+    });
+  }
+  meterClipButton.classList.toggle('clipped',meterClipLatched);
+  meterClipButton.setAttribute('aria-pressed',String(meterClipLatched));
   requestAnimationFrame(updateMeter);
 }
 
-function seekFromScrubber() {
-  const duration = outputDuration();
-  const soundDuration = settings().durationSeconds;
-  const requested = Number(playbackScrubber.value) * duration;
-  playheadSeconds = Math.min(soundDuration, requested);
-  if (requested !== playheadSeconds) playbackScrubber.value = String(playheadSeconds / Math.max(0.001, duration));
-  node?.port.postMessage({ type: "seek", seconds: playheadSeconds, token: nextPlaybackToken() });
-  safetyLimiterNode?.port.postMessage({ type: "reset" });
-  updateTransport();
-  draw();
+function seekSourceSeconds(requested) {
+ const duration=settings().durationSeconds;
+ if(!Number.isFinite(requested)||requested<0||requested>duration){irControl.note='잔향 시점 직접 탐색 미지원 · 현재 위치 유지';updateTransport();return false;}
+ const invalidates=irControl.snapshot || irBusy();
+ if(invalidates || requested===duration)stop(true);
+ irControl.note=requested===duration?'발음 끝 · 다음 Play는 처음부터': '발음 위치 선택';
+ playheadSeconds=requested;
+ node?.port.postMessage({type:'seek',seconds:requested,token:nextPlaybackToken()});
+ safetyLimiterNode?.port.postMessage({type:'reset'});updateTransport();draw();return true;
 }
+function seekFromScrubber(){return seekSourceSeconds(Number(playbackScrubber.value)*settings().durationSeconds);}
 
 async function play() {
+  if(irBusy())return irControl.pending;
+  if(irControl.phase==='pausedRetained')return irResumeRetained();
+  if(!isPlaying && playheadSeconds>=settings().durationSeconds)playheadSeconds=0;
+  irControl.note='';
   if (isPlaying || settings().durationSeconds <= 0) return;
   if (soundMode === "resynthesis" && !analysisResult) return;
   const requestToken = playbackToken;
@@ -564,6 +627,10 @@ async function play() {
 }
 
 function stop(reset = true) {
+  if(!reset && irControl.phase==='pausedRetained')return;
+  if(!reset && irBusy())return irControl.pending;
+  if(!reset && isPlaying && irEligible())return irPauseRetained();
+  irForget(reset?'정지':'일시정지');
   const token = nextPlaybackToken();
   isPlaying = false;
   playheadSeconds = reset ? 0 : playheadSeconds;
@@ -1040,6 +1107,7 @@ function updateImpulseStatus() {
 
 function setSoundMode(nextMode) {
   if (nextMode === soundMode && nextMode !== "oscillator") return;
+  if(irControl.snapshot || irBusy())stop(true);
   if (isPlaying) stop(true);
   else nextPlaybackToken();
   playheadSeconds = 0;
@@ -1153,7 +1221,7 @@ impulseInput.addEventListener("change", async () => {
     return;
   }
   const modeAtOpen = soundMode;
-  if (isPlaying) stop(true);
+  if (isPlaying || irControl.snapshot || irBusy()) stop(true);
   else nextPlaybackToken();
   openAudioButton.disabled = true;
   impulseLengthInput.disabled = true;
@@ -1377,7 +1445,7 @@ updateTransport();
 requestAnimationFrame(updateMeter);
 
 
-mountTransport({onScrub:value=>{isScrubbing=value;},state:()=>({duration:outputDuration(),seconds:playheadSeconds,playing:isPlaying,disabled:playButton.disabled||!!renderAbortController}),seek:p=>{playbackScrubber.value=String(p);seekFromScrubber();}});
+mountTransport({onScrub:value=>{isScrubbing=value;},state:()=>({duration:settings().durationSeconds,seconds:Math.min(playheadSeconds,settings().durationSeconds),playing:isPlaying,disabled:playButton.disabled||!!renderAbortController}),seek:p=>{playbackScrubber.value=String(p);seekFromScrubber();}});
 
 // Idle readiness is conveyed by the Download control; retain actionable feedback.
 function setExportStatus(message) {

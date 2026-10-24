@@ -34,7 +34,7 @@ The sound selector has File Resynthesis and Oscillator + File IR (default) paths
 - Single modulation path: Off, FM, AM, or Ring; a shared carrier-relative ratio (0.25-8)
 - FM Index curve (0-4), AM Depth curve (0-1), and Ring Mix curve (0-1), each preserved when switching modes
 - Optional Convolution mode: open a local audio file as an impulse response, then set Dry/Wet and IR Length. IR Length 0% uses the first 3 seconds (or the full file when shorter); 100% uses the full file. Imported files are limited to 16 MiB. Oscillator mode bypasses the IR. WAV export includes the selected IR tail when active.
-- Dry/Wet uses a smooth endpoint taper; Stop silences the output and clears the current convolution tail.
+- Dry/Wet uses a smooth endpoint taper. With an active wet IR, Pause preserves valid processing history; reset/seek or an accepted state change discards it.
 - Saw and Square use band-limited edge correction, and high Triangle notes use band-limited harmonics; normal-level oscillator output remains unshaped by the safety limiter.
 - Modulation is reduced near Nyquist; the existing auto gain and output limiter remain active
 - Current oscillator value visualization
@@ -81,9 +81,13 @@ are unchanged. See [support scope and limits](docs/AIFF_IMPORT.md).
 
 
 ### Current transport
-Bottom controls are Return to start / Play / Pause. Space toggles Play/Pause.
-Pause keeps the current position; Return to start seeks to zero. The thin slider
-navigates output time. Source guides, sound engines and export policies are unchanged.
+Bottom controls are Return to start / Play / Pause. Space toggles Play/Pause outside editable controls. With an active wet IR, Pause retains processing history; Play resumes the remaining sound and tail while that history is valid.
+
+The thin slider selects **sound time** (0 to Output Duration), not an arbitrary position in the IR tail. The output clock also includes the IR tail and limiter flush. At the sound endpoint, without a retained paused history, the next explicit Play starts from the beginning.
+
+Return to start selects zero and discards retained tail history; it does not start playback from a stopped or paused state. Actual mode, admitted file, curve or setting changes invalidate that history. Reselecting the same mode is a no-op, and a file rejected before admission preserves the paused history. An accepted import that later fails decoding still cancels the previous playback request; the prior usable file can remain available.
+
+Stopped or paused meters show no live reading (`—`); the previous CLIP warning remains until explicitly reset. Synthesis, IR preparation and WAV output rules are unchanged. Final scoped acceptance is tracked separately from this control update.
 
 
 ## UI revision history — 2026-10-14–15

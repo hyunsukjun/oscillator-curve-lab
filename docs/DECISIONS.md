@@ -274,3 +274,11 @@ Oscillator previously had only frequency/partial and curve canvases, not a sourc
 Shared family palette maps original spectral centroid blue→teal→gold→peach. Up to16k signed min/max buckets and HiDPI envelope retain transients; shared display gain preserves channel-relative level without altering samples. Bounded worker analysis copies at most8MiB /2,048 FFT windows; previous job terminates on replacement. Colors fall back to blue if analysis fails. Static drawing runs on load/color completion/resize, not per audio frame. Failure hides this optional panel without rejecting audio.
 
 Verified: source-color/immutability tests, syntax and diff checks; actual stereo file import, File Resynthesis selection,32→64 partial selection, Play/Pause, File IR mode playback and rewind; narrow approximately600px view and console without errors. No-file state hides overview. Follow-up: actual Brave125%/150% zoom verified at a900×700 viewport (600CSS px at150%). Both modes retain readable source waveform/legend; no horizontal document overflow. Transport reachable by vertical scrolling; Play/Pause checked. User musical listening, Windows and DSP regressions are separate. User approved commit/deployment after zoom verification (2026-10-15).
+
+## IR retained-history control — 2026-10-25
+
+STATUS: user-approved IR control update; release verification is recorded separately, and final scoped acceptance remains pending.
+
+Preserve active wet-IR processing history on Pause and resume only the same valid graph. Keep sound-time seeking distinct from tail-inclusive output time; do not claim arbitrary tail seeking. A rejected admission or same-mode no-op must preserve valid history, while a genuinely accepted state change invalidates it. Use stopped/paused meter states rather than stale analyser readings as live output.
+
+This bounded control fix supersedes the earlier discard-and-rebuild IR resume path. It does not change synthesis/convolution/safety equations or adopt O3 B. Reverting is limited to the approved app/document change set; preserve unrelated work and raw evidence.

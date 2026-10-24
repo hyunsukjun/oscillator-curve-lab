@@ -116,3 +116,9 @@ Output Duration now uses one 0–600s slider (zero disables playback/export); FF
 ## 2026-10-15 — Reachable export cancellation
 
 Download WAV becomes Cancel during rendering. A second click aborts the existing job and returns without starting another render. Cancelling is disabled until cleanup; completion restores Download WAV and controls. Abort reports cancelled. Previously an AbortController existed but the download control was disabled, making cancellation unreachable. Settings, curves, synthesis, IR, resynthesis, WAV format and DSP are unchanged. Future standalone should likewise expose cancellation and allow a clean retry. Verification: actual-handler regression and Safari lifecycle; listening and Windows remain separate.
+
+## IR retained-history control — 2026-10-25
+
+Preserve the behavioral contract, not AudioContext APIs: distinguish sound time D from tail-inclusive output time; retain compatible processing history on Pause; distinguish invalidating accepted changes from rejected input/no-op selections; cancel obsolete async completions; mark stopped meter data as non-live. Arbitrary tail seeking needs a separate history/reconstruction design and is not added here.
+
+The web IR control implementation and scoped evidence do not certify native state restoration, device latency or all sample rates/IRs. O3 B remains a separate deferred sonic choice. See KNOWLEDGE_PRESERVATION.md for the actual conditions and limits.
