@@ -1,5 +1,5 @@
 import { boundaryGain } from "./playback-boundary.js";
-import {renderFrame,createSmoothingState,clamp,edgeFade,TARGET_SAMPLE_RATE,MAX_SOUND_DURATION_SECONDS} from './oscillator-core.js?v=20261005-duration-ui1';
+import {renderFrame,createSmoothingState,clamp,edgeFade,TARGET_SAMPLE_RATE,MAX_SOUND_DURATION_SECONDS} from './oscillator-core.js?v=20261026-harmonic-pan8';
 import {SpectrogramAnalysis} from './spectrogram-core.js?v=20260928-fft1';
 import {LookaheadSafetyLimiter} from './safety-limiter.js?v=20261002-lookahead1';
 self.onmessage=({data:settings})=>{try{

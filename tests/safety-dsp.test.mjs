@@ -100,12 +100,14 @@ test("streaming lookahead matches the offline B future-peak calculation after it
   }
 });
 
-test("approved Harmonic pair pan preserves the outer sweep without changing other stacks", () => {
+test("Harmonic centers 1–8 and alternates higher harmonics without changing other stacks", () => {
   assert.equal(voicePan(0, 1), 0);
-  assert.equal(voicePan(0, 16, "unison"), -1);
-  assert.equal(voicePan(15, 16, "odd"), 1);
-  assert.ok(Math.abs(voicePan(0, 16, "harmonic") + 0.73) < 1e-12);
-  assert.equal(voicePan(15, 16, "harmonic"), 1);
-  assert.ok(voicePan(0, 16, "harmonic") < voicePan(2, 16, "harmonic"));
-  assert.equal(voicePan(0, 16, "multiplier"), -1);
+  for (const count of [2, 4, 8, 16]) {
+    for (let index = 0; index < count; index++) {
+      assert.equal(voicePan(index, count, "harmonic"), index < 8 ? 0 : index % 2 === 0 ? -1 : 1);
+      for (const stack of ["unison", "odd", "multiplier"]) {
+        assert.equal(voicePan(index, count, stack), index / (count - 1) * 2 - 1);
+      }
+    }
+  }
 });

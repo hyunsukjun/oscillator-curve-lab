@@ -1,4 +1,4 @@
-import {clamp, createSmoothingState, edgeFade, renderFrame, resetSmoothingState} from "./oscillator-core.js?v=20261002-fixedpan1";
+import {clamp, createSmoothingState, edgeFade, renderFrame, resetSmoothingState} from "./oscillator-core.js?v=20261026-harmonic-pan8";
 import {LOOKAHEAD_SECONDS} from "./safety-limiter.js?v=20261002-lookahead1";
 
 class OscillatorCurveProcessor extends AudioWorkletProcessor {

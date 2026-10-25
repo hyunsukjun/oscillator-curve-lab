@@ -272,10 +272,12 @@ function normalizeVoices(voices, stack = "harmonic") {
 
 export function voicePan(index, count, stack = "unison") {
   if (count <= 1) return 0;
-  const sweep = ((index / (count - 1)) * 2) - 1;
-  if (stack !== "harmonic") return sweep;
-  const pairSide = Math.floor(index / 2) % 2 === 0 ? -1 : 1;
-  return clamp(0.8 * sweep + 0.45 + 0.38 * pairSide, -1, 1);
+  if (stack === "harmonic") {
+    // Harmonics 1–8 share equal-power center; 9=L, 10=R, then alternate.
+    // Use the original harmonic index, independent of Nyquist culling/count.
+    return index < 8 ? 0 : (index % 2 === 0 ? -1 : 1);
+  }
+  return ((index / (count - 1)) * 2) - 1;
 }
 
 export function createSmoothingState() {

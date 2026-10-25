@@ -1,5 +1,5 @@
 import { fadeOutput } from "./playback-boundary.js";
-import { renderFrame, createSmoothingState, TARGET_SAMPLE_RATE, MAX_SOUND_DURATION_SECONDS, clamp, edgeFade, encodeWav24Steps, outputChannelCount } from "./oscillator-core.js?v=20261006-cooperative1";
+import { renderFrame, createSmoothingState, TARGET_SAMPLE_RATE, MAX_SOUND_DURATION_SECONDS, clamp, edgeFade, encodeWav24Steps, outputChannelCount } from "./oscillator-core.js?v=20261026-harmonic-pan8";
 import { renderConvolved } from "./convolution.js?v=20261006-cancel-drain1";
 import { limitChannelsSteps, LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261006-cooperative1";
 

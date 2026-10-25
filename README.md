@@ -101,3 +101,7 @@ Partial-count changes automatically refresh analysis while retaining current pla
 2026-10-15 local review: remove the header Mono/Stereo selector; application settings always use stereo for both synthesis paths. Export help states Stereo 2ch /48kHz/24-bit. Input mono/stereo support unchanged. Browser playback and a saved1s WAV confirmed2ch48kHz24-bit.
 
 Imported files also appear in a static source-time waveform overview. Colors describe source frequency character, not generated sound; this is not a seek control.
+
+
+## 2026-10-26 — Harmonic stereo placement
+Harmonic centers harmonics 1–8 equally in L/R; harmonics 9–16 alternate left/right (9 left, 10 right, and so on). Preview and WAV use the same placement. Other stack layouts and File Resynthesis are unchanged. See [contract and verification](docs/HARMONIC_STEREO_2026-10-26.md).

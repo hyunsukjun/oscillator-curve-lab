@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {renderOscillator} from '../src/offline-render.js';
 const code=readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
 const pick=name=>{const start=code.search(new RegExp(`(?:async )?function ${name}\\(`));return code.slice(start,code.indexOf('\n}',start)+2)};
-const c={settings:()=>({durationSeconds:0,tailSeconds:30}),isPlaying:false,LOOKAHEAD_SECONDS:.003};vm.createContext(c);vm.runInContext(['play','downloadWav','outputDuration'].map(pick).join('\n'),c);
+const c={settings:()=>({durationSeconds:0,tailSeconds:30}),isPlaying:false,irBusy:()=>false,irControl:{phase:"idle",note:""},playheadSeconds:0,LOOKAHEAD_SECONDS:.005};vm.createContext(c);vm.runInContext(['play','downloadWav','outputDuration'].map(pick).join('\n'),c);
 await c.play();await c.downloadWav();assert.equal(c.outputDuration(),0);
 await assert.rejects(renderOscillator({settings:{durationSeconds:0}}),RangeError);
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');assert(!html.includes('durationRange'));assert(!html.includes('FFT Preview'));assert(!code.includes('fftPreview'));assert.match(html,/id="durationInput"[^>]*min="0" max="600" step="1"/);

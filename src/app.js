@@ -20,9 +20,9 @@ import {
   slopeDbFromNorm,
   stackFrequencies,
   valueAt
-} from "./oscillator-core.js?v=20261005-duration-ui1";
+} from "./oscillator-core.js?v=20261026-harmonic-pan8";
 
-import { renderOscillator } from "./offline-render.js?v=20261025-fade10";
+import { renderOscillator } from "./offline-render.js?v=20261026-harmonic-pan8";
 import { LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261002-lookahead1";
 import { OutputMeterAnalyzer } from "./output-meter.js?v=20261001-playback1";
 import {
@@ -431,7 +431,7 @@ async function ensureAudio() {
 
 async function setupAudio() {
   if (!audioContext.audioWorklet) throw new Error("AudioWorklet is not available. Use a current browser over localhost or HTTPS.");
-  await audioContext.audioWorklet.addModule("src/oscillator-worklet.js?v=20261025-fade10");
+  await audioContext.audioWorklet.addModule("src/oscillator-worklet.js?v=20261026-harmonic-pan8");
   await audioContext.audioWorklet.addModule("src/safety-limiter-worklet.js?v=20261025-fade10");
   node = new AudioWorkletNode(audioContext, "oscillator-curve-processor", {
     numberOfInputs: 0,
