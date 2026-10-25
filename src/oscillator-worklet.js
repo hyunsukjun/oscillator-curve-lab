@@ -65,7 +65,7 @@ class OscillatorCurveProcessor extends AudioWorkletProcessor {
           const sample = renderFrame(this.settings, clamp(this.outputTime / duration), sampleRate, this.phases, this.modPhases, this.smoothingState);
           const frameCount = Math.ceil(duration * sampleRate);
           const frame = Math.min(frameCount - 1, Math.round(this.outputTime * sampleRate));
-          const fade = edgeFade(frame, frameCount, sampleRate);
+          const fade = 1; // Transport boundary is applied after convolution and limiting.
           left = sample.left * fade;
           right = sample.right * fade;
           voices = sample.voices;
@@ -77,7 +77,7 @@ class OscillatorCurveProcessor extends AudioWorkletProcessor {
           this.port.postMessage({ type: "ended", token: this.token });
         }
         if (this.framesUntilUpdate <= 0) {
-          this.port.postMessage({ type: "position", seconds: this.outputTime, voices, token: this.token });
+          this.port.postMessage({ type: "position", seconds: this.outputTime, contextTime: (globalThis.currentTime || 0) + (i + 1) / sampleRate, voices, token: this.token });
           this.framesUntilUpdate = Math.round(sampleRate / 30);
         }
         this.framesUntilUpdate -= 1;

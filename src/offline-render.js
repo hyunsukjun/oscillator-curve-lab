@@ -1,3 +1,4 @@
+import { fadeOutput } from "./playback-boundary.js";
 import { renderFrame, createSmoothingState, TARGET_SAMPLE_RATE, MAX_SOUND_DURATION_SECONDS, clamp, edgeFade, encodeWav24Steps, outputChannelCount } from "./oscillator-core.js?v=20261006-cooperative1";
 import { renderConvolved } from "./convolution.js?v=20261006-cancel-drain1";
 import { limitChannelsSteps, LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261006-cooperative1";
@@ -45,7 +46,7 @@ export async function renderOscillator({ settings, impulse, signal, onProgress, 
     if (signal?.aborted) throw new DOMException("Render cancelled", "AbortError");
     const t = frameCount <= 1 ? 0 : frame / (duration * sampleRate);
     const sample = renderFrame(settings, t, sampleRate, phases, modPhases, smoothingState);
-    const fade = edgeFade(frame, frameCount, sampleRate);
+    const fade = 1; // Apply the boundary once, to completed output including the IR tail.
     const left = sample.left * fade;
     const right = sample.right * fade;
     peak = Math.max(peak, Math.abs(left), Math.abs(right));
@@ -69,6 +70,7 @@ export async function renderOscillator({ settings, impulse, signal, onProgress, 
   output = await consume(limitChannelsSteps(output, sampleRate));
   // Internal FFT/reference PCM retains the realtime timeline. Compensate files only.
   if (!samplesOnly) output = output.map(channel => channel.subarray(latencyFrames));
+  fadeOutput(samplesOnly ? output.map(channel => channel.subarray(latencyFrames)) : output, sampleRate);
   peak = 0;
   for (const channel of output) {
     for (let start = 0; start < channel.length; start += 65536) {

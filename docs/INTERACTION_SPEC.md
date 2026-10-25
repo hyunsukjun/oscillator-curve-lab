@@ -148,3 +148,8 @@ A closed native select retaining focus must allow Space to play/pause in place. 
 The approved local IR control update supersedes earlier output-position wording: the slider maps 0–1 to sound duration D, while the output clock includes the IR tail and limiter flush. Active wet-IR Pause retains the graph; a valid Play resumes it. The sound endpoint without retained history labels the next Play as starting from the beginning. Arbitrary tail seeking is unsupported.
 
 Real mode/file/curve/settings changes invalidate retained history. Same-mode reselection and files rejected before admission preserve it. Return to start selects zero without starting stopped/paused playback. Pausing/resuming transitions and stopped meters are explicitly labelled; CLIP history still requires explicit reset. The shared transport module, source waveform and curve gestures are unchanged. Implementation and publication do not by themselves establish final scoped acceptance.
+
+
+## 10 ms playback boundary candidate — 2026-10-25
+
+The current local candidate supersedes earlier automatic transport-boundary durations with the [10 ms playback/WAV contract](PLAYBACK_BOUNDARY.md). Source/effect envelopes are separate. See that contract for pause-state retention, existing tail-length limits and verification status. Uncommitted; listening acceptance pending.

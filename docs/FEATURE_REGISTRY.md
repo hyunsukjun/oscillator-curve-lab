@@ -214,3 +214,8 @@ Current Oscillator Values canvas and Synthesis detail heading are hidden, with m
 - BEHAVIOR: active wet-IR Pause/Resume retains valid processing history; the slider selects sound duration, and the clock separately includes tail/flush. Invalidating changes discard history; same-mode no-op and pre-admission rejection preserve it. No arbitrary tail seek.
 - IMPLEMENTATION: local src/app.js control/state/meter change; core DSP, safety algorithms, WAV engine and shared transport are unchanged. No O3 B placement change.
 - EVIDENCE: prior isolated retained-node, late-cancel, meter, dry and two-boundary checks, user IR listening and actual nonplaying navigation are linked in KNOWLEDGE_PRESERVATION.md. Product integration checks are recorded separately. Implementation and publication are separate from final scoped acceptance.
+
+
+## 10 ms playback boundary candidate — 2026-10-25
+
+The current local candidate supersedes earlier automatic transport-boundary durations with the [10 ms playback/WAV contract](PLAYBACK_BOUNDARY.md). Source/effect envelopes are separate. See that contract for pause-state retention, existing tail-length limits and verification status. Uncommitted; listening acceptance pending.

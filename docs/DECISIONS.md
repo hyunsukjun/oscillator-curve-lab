@@ -282,3 +282,8 @@ STATUS: user-approved IR control update; release verification is recorded separa
 Preserve active wet-IR processing history on Pause and resume only the same valid graph. Keep sound-time seeking distinct from tail-inclusive output time; do not claim arbitrary tail seeking. A rejected admission or same-mode no-op must preserve valid history, while a genuinely accepted state change invalidates it. Use stopped/paused meter states rather than stale analyser readings as live output.
 
 This bounded control fix supersedes the earlier discard-and-rebuild IR resume path. It does not change synthesis/convolution/safety equations or adopt O3 B. Reverting is limited to the approved app/document change set; preserve unrelated work and raw evidence.
+
+
+## 10 ms playback boundary candidate — 2026-10-25
+
+The current local candidate supersedes earlier automatic transport-boundary durations with the [10 ms playback/WAV contract](PLAYBACK_BOUNDARY.md). Source/effect envelopes are separate. See that contract for pause-state retention, existing tail-length limits and verification status. Uncommitted; listening acceptance pending.

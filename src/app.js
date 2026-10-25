@@ -22,7 +22,7 @@ import {
   valueAt
 } from "./oscillator-core.js?v=20261005-duration-ui1";
 
-import { renderOscillator } from "./offline-render.js?v=20261014-duration1";
+import { renderOscillator } from "./offline-render.js?v=20261025-fade10";
 import { LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261002-lookahead1";
 import { OutputMeterAnalyzer } from "./output-meter.js?v=20261001-playback1";
 import {
@@ -156,6 +156,15 @@ let isScrubbing = false;
 let meterClipLatched = false;
 const meterDisplay = [{ peak: 0, rms: 0, hold: 0, holdUntil: 0 }, { peak: 0, rms: 0, hold: 0, holdUntil: 0 }];
 let playbackToken = 0;
+let playbackClock = null;
+let boundaryPauseRequest = null;
+function awaitBoundaryPause(id) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => { if(boundaryPauseRequest?.id===id)boundaryPauseRequest=null; reject(new Error("Playback pause timed out")); }, 2000);
+    boundaryPauseRequest = {id, complete(){clearTimeout(timer); resolve();}};
+    safetyLimiterNode.port.postMessage({type:"boundaryPause",id});
+  });
+}
 const irControl = { phase:'idle', epoch:0, snapshot:null, pending:null, note:'' };
 function irBusy(){return irControl.phase==='pausing'||irControl.phase==='resuming';}
 function irFingerprint(){return JSON.stringify(settings());}
@@ -166,15 +175,18 @@ async function irPauseRetained(){
  if(irBusy())return irControl.pending;
  const epoch=++irControl.epoch, context=audioContext, source=node, filter=convolver, limiter=safetyLimiterNode;
  irControl.phase='pausing';irControl.note='일시정지 준비';
- const now=context.currentTime;outputGain.gain.cancelScheduledValues(now);outputGain.gain.setValueAtTime(0,now);updateTransport();
+ updateTransport();
  const pending=(async()=>{
   try{
+   await awaitBoundaryPause(epoch);
+   if(epoch!==irControl.epoch)return;
    await context.suspend();
    if(epoch!==irControl.epoch)return;
    if(!isPlaying||source!==node||filter!==convolver){irForget('종료됨');return;}
+   if(playbackClock?.token===playbackToken)playheadSeconds=Math.max(0,Math.min(settings().durationSeconds+settings().tailSeconds+LOOKAHEAD_SECONDS,playbackClock.seconds+context.currentTime-playbackClock.contextTime-LOOKAHEAD_SECONDS));
    isPlaying=false;
    irControl.snapshot={context,source,filter,limiter,fingerprint:irFingerprint(),position:playheadSeconds,contextTime:context.currentTime};
-   irControl.phase='pausedRetained';irControl.note='일시정지 · 잔향 이력 보존';updateTransport();draw();
+   irControl.phase='pausedRetained';irControl.note=filter?'일시정지 · 잔향 이력 보존':'일시정지 · 재생 위치 보존';updateTransport();draw();
   }catch(error){if(epoch===irControl.epoch){stop(true);irControl.note='일시정지 실패 · 정지';updateTransport();}throw error;}
   finally{if(epoch===irControl.epoch)irControl.pending=null;}
  })();irControl.pending=pending;return pending;
@@ -187,10 +199,11 @@ async function irResumeRetained(){
  const epoch=++irControl.epoch;irControl.phase='resuming';irControl.note='재개 준비';updateTransport();
  const pending=(async()=>{
   try{
-   const now=audioContext.currentTime;outputGain.gain.cancelScheduledValues(now);outputGain.gain.setValueAtTime(0,now);outputGain.gain.linearRampToValueAtTime(1,now+.003);
+   const now=audioContext.currentTime;outputGain.gain.cancelScheduledValues(now);outputGain.gain.setValueAtTime(0,now);outputGain.gain.setValueAtTime(1,now);
+   safetyLimiterNode.port.postMessage({type:"boundaryResume"});
    await audioContext.resume();
    if(epoch!==irControl.epoch)return;
-   irControl.snapshot=null;irControl.phase='idle';irControl.note='같은 잔향 재개';isPlaying=true;updateTransport();draw();
+   irControl.snapshot=null;irControl.phase='idle';irControl.note=saved.filter?'같은 잔향 재개':'같은 위치 재개';isPlaying=true;updateTransport();draw();
   }catch(error){if(epoch===irControl.epoch){stop(true);irControl.note='재개 실패 · 정지';updateTransport();}throw error;}
   finally{if(epoch===irControl.epoch)irControl.pending=null;}
  })();irControl.pending=pending;return pending;
@@ -418,8 +431,8 @@ async function ensureAudio() {
 
 async function setupAudio() {
   if (!audioContext.audioWorklet) throw new Error("AudioWorklet is not available. Use a current browser over localhost or HTTPS.");
-  await audioContext.audioWorklet.addModule("src/oscillator-worklet.js?v=20261002-lookahead1");
-  await audioContext.audioWorklet.addModule("src/safety-limiter-worklet.js?v=20261002-lookahead1");
+  await audioContext.audioWorklet.addModule("src/oscillator-worklet.js?v=20261025-fade10");
+  await audioContext.audioWorklet.addModule("src/safety-limiter-worklet.js?v=20261025-fade10");
   node = new AudioWorkletNode(audioContext, "oscillator-curve-processor", {
     numberOfInputs: 0,
     numberOfOutputs: 1,
@@ -433,6 +446,7 @@ async function setupAudio() {
     numberOfOutputs: 1,
     outputChannelCount: [2]
   });
+  safetyLimiterNode.port.onmessage = ({data}) => { if(data.type==="boundaryPaused" && boundaryPauseRequest?.id===data.id){boundaryPauseRequest.complete();boundaryPauseRequest=null;} };
   outputGain = audioContext.createGain();
   bypassGain.gain.value = 1;
   effectDryGain.gain.value = 0;
@@ -446,6 +460,7 @@ async function setupAudio() {
   node.port.onmessage = (event) => {
     if (event.data.token != null && event.data.token !== playbackToken) return;
     if (event.data.type === "position") {
+      playbackClock = {seconds:event.data.seconds, contextTime:event.data.contextTime, token:event.data.token};
       if (isPlaying && !isScrubbing) {
         playheadSeconds = Math.max(0, event.data.seconds - LOOKAHEAD_SECONDS);
         updateTransport();
@@ -611,7 +626,7 @@ async function play() {
     const now = audioContext.currentTime;
     outputGain.gain.cancelScheduledValues(now);
     outputGain.gain.setValueAtTime(0, now);
-    outputGain.gain.linearRampToValueAtTime(1, now + 0.003);
+    outputGain.gain.setValueAtTime(1, now);
     const token = nextPlaybackToken();
     playheadSeconds = Math.min(playheadSeconds, settings().durationSeconds);
     isPlaying = true;
@@ -620,6 +635,7 @@ async function play() {
     sendCurves();
     node.port.postMessage({ type: "seek", seconds: playheadSeconds, token });
     safetyLimiterNode.port.postMessage({ type: "reset" });
+    safetyLimiterNode.port.postMessage({ type: "boundaryStart", seconds: Math.max(0, settings().durationSeconds + settings().tailSeconds + LOOKAHEAD_SECONDS - playheadSeconds) });
     node.port.postMessage({ type: "play", token });
   } catch (error) {
     alert(error.message || String(error));
@@ -629,7 +645,7 @@ async function play() {
 function stop(reset = true) {
   if(!reset && irControl.phase==='pausedRetained')return;
   if(!reset && irBusy())return irControl.pending;
-  if(!reset && isPlaying && irEligible())return irPauseRetained();
+  if(!reset && isPlaying && audioContext && node)return irPauseRetained();
   irForget(reset?'정지':'일시정지');
   const token = nextPlaybackToken();
   isPlaying = false;

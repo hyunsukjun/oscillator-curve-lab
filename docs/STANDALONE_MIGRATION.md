@@ -122,3 +122,8 @@ Download WAV becomes Cancel during rendering. A second click aborts the existing
 Preserve the behavioral contract, not AudioContext APIs: distinguish sound time D from tail-inclusive output time; retain compatible processing history on Pause; distinguish invalidating accepted changes from rejected input/no-op selections; cancel obsolete async completions; mark stopped meter data as non-live. Arbitrary tail seeking needs a separate history/reconstruction design and is not added here.
 
 The web IR control implementation and scoped evidence do not certify native state restoration, device latency or all sample rates/IRs. O3 B remains a separate deferred sonic choice. See KNOWLEDGE_PRESERVATION.md for the actual conditions and limits.
+
+
+## 10 ms playback boundary candidate — 2026-10-25
+
+The current local candidate supersedes earlier automatic transport-boundary durations with the [10 ms playback/WAV contract](PLAYBACK_BOUNDARY.md). Source/effect envelopes are separate. See that contract for pause-state retention, existing tail-length limits and verification status. Uncommitted; listening acceptance pending.
