@@ -134,3 +134,8 @@ The current local candidate supersedes earlier automatic transport-boundary dura
 User explicitly authorized implementation, commit and deployment: fundamental/harmonics 1–8 use equal-power center in Harmonic; 9 onward alternate L/R, starting 9=L and 10=R. Current maximum Harmonic count is 16; no count range was added. The original harmonic index is stable when Nyquist culls voices. Unison/Odd/Multiplier and File Resynthesis retain their existing mapping. Frequency, slope, phase, modulation, normalization, convolution, limiter and 10 ms boundary policies are preserved; the changed synthesis input also reaches convolution. Preview and offline share this core. This is a deliberate change to channel allocation, not global mono summing or a new gain compensation.
 
 The prior isolated eight-harmonic B listening was preferred by the user (steadier center, less unnatural panning, narrower width acceptable). That observation does not certify the new 9–16 placement or all musical material; numerical verification and publication are separate from new personal listening. See `HARMONIC_STEREO_2026-10-26.md` for the exact contract, verification and rollback scope.
+
+
+## Graphite interface roles v1 — 2026-10-26
+
+STANDALONE ASSET. Preserve the role hierarchy and state distinctions in [INTERFACE_GRAPHITE_CONTRACT.md](INTERFACE_GRAPHITE_CONTRACT.md), with machine-readable roles in [graphite-v1.json](../assets/interface/graphite-v1.json). Web styles are a visual reference, not a native framework dependency. Validate native type metrics, system focus and appearance settings independently. This is a presentation revision; DSP, curves and transport semantics are unchanged.

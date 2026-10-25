@@ -1,4 +1,4 @@
-import {canvasAxisWidth, drawEditorGrid, frequencyTicks, frequencyLabel, spacedMarks, canvasLabelFont} from "./canvas-grid.js";
+import {canvasAxisWidth, drawEditorGrid, frequencyTicks, frequencyLabel, spacedMarks, canvasLabelFont} from "./canvas-grid.js?v=20261026-graphite1";
 import {createSourceOverview} from "./source-overview.js?v=20261018-axis64";
 import {mountTransport} from "./common-transport.js?v=20261013-1";
 import { readAudioFile } from "./audio-import.js?v=20261011-aiff1";

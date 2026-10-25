@@ -259,3 +259,8 @@ Verification: 600px layout and actual Brave 125%/150% checked. Pointer add/move/
 Audio-approved family tokens: resting controls #303740 / #48515c border; hover #404a56 / #7a899b; focus #a9cfff; secondary readout labels #adb6c2; separators #454b54. Background grid draws at 0.65 of its previous opacity. Selected/enabled effect colors, disabled states, font sizes, geometry, parameter scales, points and DSP remain unchanged. COMMON CANDIDATE; user approved family rollout on 2026-10-23.
 
 Verification: Brave wide and 600×700 viewport reviewed (585px client/scroll width, no horizontal overflow); native 150% layout reviewed for all five, 125% additionally reviewed for Timbre. Selected colors retained; playback/stop UI and meters checked (Granular with source-tone-demo.wav). Syntax and diff whitespace checks pass. This is UI evidence, not listening or WAV export acceptance. Family rollout approved for commit/deployment on 2026-10-23.
+
+
+## Graphite role system v1 — 2026-10-26
+
+COMMON CANDIDATE / STANDALONE ASSET. The user approved the six-Lab visual refinement. [Graphite interface contract](docs/INTERFACE_GRAPHITE_CONTRACT.md) and [portable roles](assets/interface/graphite-v1.json) supersede earlier neutral shell/control/text and minor-grid emphasis values only. `src/refined-ui.css` is the common implementation. Keep all musical colors, state meanings, font metrics, layout and interaction geometry. The earlier no-underline and continuous functional-surface rules remain. Current runtime/UI verification is recorded in the shared Graphite review evidence; listening/native approval is separate.
