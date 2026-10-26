@@ -268,3 +268,7 @@ COMMON CANDIDATE / STANDALONE ASSET. The user approved the six-Lab visual refine
 ## Readout context family release — 2026-10-27
 
 Reuse existing Graphite colors/type and controls. Stack/Base/Deviation/Slope/Voices captions identify output-playhead synthesis/derived values before modulation/IR/output processing. Static source overview and hidden partial canvas retained. No hidden readouts or Details disclosure, and no hit-target change. Metadata can wrap without clipping on narrow screens. See `docs/READOUT_CONTEXT_CONTRACT.md` for basis, source-range rules, verification boundary and portability.
+
+
+## Common output transport — 2026-10-27
+Use the existing common footer CSS/icons and one elapsed/total clock, without a normal-state second clock or diagnostic sentence. English accessible/title text preserves phase and engine-specific seek limits. Output-clock/progress share one basis; this does not change the synthesis/curve clock or imply unsupported tail seeking. See `docs/TRANSPORT_DISPLAY_CONTRACT.md` for the portable semantic rule.

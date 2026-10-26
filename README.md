@@ -83,7 +83,7 @@ are unchanged. See [support scope and limits](docs/AIFF_IMPORT.md).
 ### Current transport
 Bottom controls are Return to start / Play / Pause. Space toggles Play/Pause outside editable controls. With an active wet IR, Pause retains processing history; Play resumes the remaining sound and tail while that history is valid.
 
-The thin slider selects **sound time** (0 to Output Duration), not an arbitrary position in the IR tail. The output clock also includes the IR tail and limiter flush. At the sound endpoint, without a retained paused history, the next explicit Play starts from the beginning.
+The footer uses one **current output time / total output time** clock and matching output progress, including the IR tail and limiter flush. Click/drag or native range keys seek within the synthesis portion. Arbitrary tail seeking is unsupported: a tail request restores the actual bar position without discarding paused history. English control help explains that limit. At the sound endpoint, without a retained paused history, the next explicit Play starts from the beginning. See [transport display contract](docs/TRANSPORT_DISPLAY_CONTRACT.md).
 
 Return to start selects zero and discards retained tail history; it does not start playback from a stopped or paused state. Actual mode, admitted file, curve or setting changes invalidate that history. Reselecting the same mode is a no-op, and a file rejected before admission preserves the paused history. An accepted import that later fails decoding still cancels the previous playback request; the prior usable file can remain available.
 

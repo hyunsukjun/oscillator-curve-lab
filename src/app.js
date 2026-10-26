@@ -538,19 +538,51 @@ function updateConvolutionRouting() {
   }
 }
 
+function transportState() {
+ const duration=outputDuration();
+ return {duration,seconds:Math.max(0,Math.min(duration,playheadSeconds)),playing:isPlaying,disabled:playButton.disabled||!!renderAbortController};
+}
+
+function transportFailure() {
+ return {
+  '일시정지 실패 · 정지':'Pause failed',
+  '재개 실패 · 정지':'Resume failed',
+  '보존 상태 변경 · 처음부터 다시 재생 필요':'Restart required'
+ }[irControl.note]||'';
+}
+
+function transportDescription() {
+ const current=settings();
+ const failure=transportFailure();
+ const notice=failure ? `${failure}; playback stopped`
+  : irControl.note==='잔향 시점 직접 탐색 미지원 · 현재 위치 유지'?'IR tail seeking is unavailable; current position retained':'';
+ const phase=irBusy() ? (irControl.phase==='pausing'?'Pausing':'Resuming')
+  : isPlaying ? (playheadSeconds>=current.durationSeconds?'Finishing output':'Playing')
+  : irControl.snapshot ? 'Paused; Play resumes the retained playback history'
+  : 'Paused or stopped';
+ const seek=current.tailSeconds>0
+  ? `IR tail is included in output time. Seek within synthesis (${formatClock(current.durationSeconds)}); the tail plays through without direct seeking.`
+  : 'Click or drag to seek.';
+ return `${notice||phase}. ${seek}`;
+}
+
 function updateTransport() {
  const current=settings(),duration=outputDuration(),source=current.durationSeconds;
- const sourcePosition=Math.min(source,Math.max(0,playheadSeconds));
- const phase=irControl.note || (playheadSeconds>=source&&isPlaying?'잔향 중':'');
- timeStatus.textContent=`출력 ${formatClock(playheadSeconds)} / ${formatClock(duration)} · 발음 탐색 ${formatClock(sourcePosition)} / ${formatClock(source)}${phase?' · '+phase:''}`;
- if(!isScrubbing)playbackScrubber.value=String(sourcePosition/Math.max(.001,source));
- playbackScrubber.setAttribute('aria-label','발음 구간 탐색');
- playbackScrubber.setAttribute('title','발음 구간만 탐색 · 잔향 포함 출력 시간은 별도 표시');
+ const position=Math.max(0,Math.min(duration,playheadSeconds));
+ const failure=transportFailure();
+ timeStatus.textContent=`${formatClock(position)} / ${formatClock(duration)}${failure?' · '+failure:''}`;
+ timeStatus.style.whiteSpace=failure?'normal':'';
+ timeStatus.title=transportDescription();
+ if(!isScrubbing)playbackScrubber.value=String(duration>0?position/duration:0);
+ playbackScrubber.setAttribute('aria-label','Output playback position');
+ playbackScrubber.setAttribute('title',timeStatus.title);
+ playbackScrubber.setAttribute('aria-description',timeStatus.title);
  playbackScrubber.setAttribute('aria-valuetext',timeStatus.textContent);
  playbackScrubber.disabled=irBusy() || soundMode==='resynthesis'&&!analysisResult;
  downloadButton.disabled=irBusy() || (renderAbortController?renderAbortController.signal.aborted:source<=0||(soundMode==='resynthesis'&&!analysisResult));
  playButton.disabled=irBusy() || source<=0 || soundMode==='resynthesis'&&!analysisResult;
- playButton.setAttribute('aria-label',!isPlaying&&!irControl.snapshot&&playheadSeconds>=source?'처음부터 재생':'Play');
+ playButton.setAttribute('aria-label','Play');
+ playButton.title=!isPlaying&&!irControl.snapshot&&source>0&&playheadSeconds>=source?'Play from start · Space':'Play · Space';
  stopButton.disabled=irBusy()||!isPlaying;
 }
 
@@ -565,11 +597,11 @@ function updateMeter() {
   if(!eligible)irMeterAwaitTime=audioContext?.currentTime??0;
   const fresh=eligible && (irMeterAwaitTime===null || audioContext.currentTime>irMeterAwaitTime);
   if(!fresh){
-    const label=irBusy()?'준비 중':irControl.phase==='pausedRetained'?'일시정지':'정지';
+    const label=irBusy()?'preparing':irControl.phase==='pausedRetained'?'paused':'stopped';
     meterDisplay.forEach((state,index)=>{
       state.peak=state.rms=state.hold=state.holdUntil=0;
       const row=meterRows[index];if(!row)return;
-      row.dataset.readingState=label;row.setAttribute('aria-label',`${index?'R':'L'} 출력 레벨 · ${label} · 실시간 측정 없음`);
+      row.dataset.readingState=label;row.setAttribute('aria-label',`${index?'R':'L'} output level · ${label} · no live reading`);
       row.querySelector('.meterRms').style.clipPath='inset(0 100% 0 0)';
       row.querySelector('.meterPeak').style.clipPath='inset(0 100% 0 0)';
       row.querySelector('.meterHold').style.left='0%';row.querySelector('.meterHold').style.opacity='0';
@@ -581,7 +613,7 @@ function updateMeter() {
     const now=performance.now();
     readings.forEach((reading,index)=>{
       const state=meterDisplay[index],row=meterRows[index];if(!state||!row)return;
-      row.dataset.readingState='live';row.setAttribute('aria-label',`${index?'R':'L'} 실시간 출력 레벨`);
+      row.dataset.readingState='live';row.setAttribute('aria-label',`${index?'R':'L'} live output level`);
       state.peak=reading.peak>=state.peak?reading.peak:Math.max(reading.peak,state.peak*.88);
       state.rms=reading.rms>=state.rms?reading.rms:Math.max(reading.rms,state.rms*.8);
       if(reading.peak>=state.hold){state.hold=reading.peak;state.holdUntil=now+1000;}else if(now>state.holdUntil)state.hold*=.97;
@@ -608,7 +640,18 @@ function seekSourceSeconds(requested) {
  node?.port.postMessage({type:'seek',seconds:requested,token:nextPlaybackToken()});
  safetyLimiterNode?.port.postMessage({type:'reset'});updateTransport();draw();return true;
 }
-function seekFromScrubber(){return seekSourceSeconds(Number(playbackScrubber.value)*settings().durationSeconds);}
+function seekFromScrubber(){
+ const current=settings();
+ const requested=Number(playbackScrubber.value)*outputDuration();
+ // The output bar follows the whole tail; the existing engine still seeks sound time only.
+ const target=current.tailSeconds>0?requested:Math.min(current.durationSeconds,requested);
+ const accepted=seekSourceSeconds(target);
+ if(!accepted){
+  const state=transportState();
+  playbackScrubber.value=String(state.duration>0?state.seconds/state.duration:0);
+ }
+ return accepted;
+}
 
 async function play() {
   if(irBusy())return irControl.pending;
@@ -1461,7 +1504,7 @@ updateTransport();
 requestAnimationFrame(updateMeter);
 
 
-mountTransport({onScrub:value=>{isScrubbing=value;},state:()=>({duration:settings().durationSeconds,seconds:Math.min(playheadSeconds,settings().durationSeconds),playing:isPlaying,disabled:playButton.disabled||!!renderAbortController}),seek:p=>{playbackScrubber.value=String(p);seekFromScrubber();}});
+mountTransport({onScrub:value=>{isScrubbing=value;},state:transportState,seek:p=>{playbackScrubber.value=String(p);seekFromScrubber();}});
 
 // Idle readiness is conveyed by the Download control; retain actionable feedback.
 function setExportStatus(message) {

@@ -303,3 +303,10 @@ User-authorized six-Lab application and commit of the researched dark interface 
 ## Readout context family release — 2026-10-27
 
 User approved the Audio pilot and sequential six-Lab rollout/commit/verification/deployment. Apply shared semantics selectively: Stack/Base/Deviation/Slope/Voices captions identify output-playhead synthesis/derived values before modulation/IR/output processing. Static source overview and hidden partial canvas retained. Preserve per-Lab behavior instead of forcing Audio calculations or adding nonexistent selection features. See `READOUT_CONTEXT_CONTRACT.md` for basis, source-range rules, verification boundary and portability.
+
+
+## Common output transport presentation — 2026-10-27
+
+Single output `mm:ss.cc / mm:ss.cc` clock and common English control/state descriptions replace the dual Korean output/synthesis diagnostics. The existing common transport now follows full output time, including active IR tail/limiter flush. Range input uses that same output scale; valid sound-time seeks retain their old path, while unsupported tail seeks restore the actual bar position without discarding paused IR history. Dry flush endpoint uses the existing synthesis endpoint.
+
+This supersedes only the source-scaled slider/dual-clock presentation in the 2026-10-25 notes. Retained graph Pause/Resume, natural end, source/curve meaning, render/fade/safety and CLIP rules remain. See [transport display contract](TRANSPORT_DISPLAY_CONTRACT.md). User authorized tests, commit and deployment; technical/browser evidence is separate from listening/Native acceptance.
