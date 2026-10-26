@@ -175,13 +175,13 @@
 <section id="voiceDetails" class="voiceDetails" aria-label="Synthesis details">
               <div class="synthesisHeading" hidden>Synthesis detail <span>Oscillator / partial values · before modulation and file IR</span></div>
         <div class="panel currentValues">
-          <div class="readout primaryReadout"><span>Curve</span><strong id="modeReadout">Base Freq</strong></div>
-          <div class="readout"><span>Points</span><strong id="pointsReadout">2</strong></div>
-          <div class="readout"><span>Stack</span><strong id="stackReadout">Unison 4</strong></div>
-          <div class="readout"><span>Base</span><strong id="basePitchReadout">110 Hz</strong></div>
-          <div class="readout"><span>Deviation</span><strong id="deviationReadout">0 cents</strong></div>
-          <div class="readout"><span>Slope</span><strong id="slopeReadout">-9.0 dB/oct</strong></div>
-          <div class="readout"><span>Voices</span><strong id="voicesReadout" title="Voices within the synthesis frequency limit at the current curve position / configured oscillators or analyzed partials. This is not playback status.">—</strong></div>
+          <div class="readout primaryReadout"><span>Editing</span><strong id="modeReadout">Base Freq</strong></div>
+          <div class="readout"><span>Curve points</span><strong id="pointsReadout">2</strong></div>
+          <div class="readout"><span title="Synthesis curve value or derived voice/stack value at the output playhead, before modulation, file IR and output processing. Not a selected point or rendered measurement.">Stack · playhead</span><strong id="stackReadout">Unison 4</strong></div>
+          <div class="readout"><span title="Synthesis curve value or derived voice/stack value at the output playhead, before modulation, file IR and output processing. Not a selected point or rendered measurement.">Base · playhead</span><strong id="basePitchReadout">110 Hz</strong></div>
+          <div class="readout"><span title="Synthesis curve value or derived voice/stack value at the output playhead, before modulation, file IR and output processing. Not a selected point or rendered measurement.">Deviation · playhead</span><strong id="deviationReadout">0 cents</strong></div>
+          <div class="readout"><span title="Synthesis curve value or derived voice/stack value at the output playhead, before modulation, file IR and output processing. Not a selected point or rendered measurement.">Slope · playhead</span><strong id="slopeReadout">-9.0 dB/oct</strong></div>
+          <div class="readout"><span title="Synthesis curve value or derived voice/stack value at the output playhead, before modulation, file IR and output processing. Not a selected point or rendered measurement.">Voices · playhead</span><strong id="voicesReadout" title="Voices within the synthesis frequency limit at the current curve position / configured oscillators or analyzed partials. This is not playback status.">—</strong></div>
           <div class="readout safetyReadout"><span>Safety</span><strong id="safetyReadout">auto gain / limiter</strong></div>
         </div>
 
@@ -222,7 +222,7 @@
     </main>
 
     <script src="src/file-help.js?v=20261014-family1" type="module"></script>
-    <script src="src/app.js?v=20261026-graphite1" type="module"></script>
+    <script src="src/app.js?v=20261027-context1" type="module"></script>
   <div id="basePitchModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Base Frequency · 20–4000 Hz</strong><span>Set the base for the oscillator stack, or transpose the analyzed partials in File Resynthesis.</span><span class="helpState"></span></div>
 <div id="deviationModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Deviation · Depends on source and layout</strong><span>Unison spreads voices up to ±50 cents. Other layouts and File Resynthesis bend partial relationships with an amount of 0–0.38. Zero keeps the original layout.</span><span class="helpState"></span></div>
 <div id="slopeModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Spectral Slope · −24 to +12 dB/oct</strong><span>Tilt voice or partial levels by frequency relative to the base. Negative values favor lower frequencies; positive values favor higher frequencies.</span><span class="helpState"></span></div>

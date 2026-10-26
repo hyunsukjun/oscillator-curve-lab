@@ -264,3 +264,7 @@ Verification: Brave wide and 600×700 viewport reviewed (585px client/scroll wid
 ## Graphite role system v1 — 2026-10-26
 
 COMMON CANDIDATE / STANDALONE ASSET. The user approved the six-Lab visual refinement. [Graphite interface contract](docs/INTERFACE_GRAPHITE_CONTRACT.md) and [portable roles](assets/interface/graphite-v1.json) supersede earlier neutral shell/control/text and minor-grid emphasis values only. `src/refined-ui.css` is the common implementation. Keep all musical colors, state meanings, font metrics, layout and interaction geometry. The earlier no-underline and continuous functional-surface rules remain. Current runtime/UI verification is recorded in the shared Graphite review evidence; listening/native approval is separate.
+
+## Readout context family release — 2026-10-27
+
+Reuse existing Graphite colors/type and controls. Stack/Base/Deviation/Slope/Voices captions identify output-playhead synthesis/derived values before modulation/IR/output processing. Static source overview and hidden partial canvas retained. No hidden readouts or Details disclosure, and no hit-target change. Metadata can wrap without clipping on narrow screens. See `docs/READOUT_CONTEXT_CONTRACT.md` for basis, source-range rules, verification boundary and portability.

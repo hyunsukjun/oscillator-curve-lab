@@ -153,3 +153,7 @@ Real mode/file/curve/settings changes invalidate retained history. Same-mode res
 ## 10 ms playback boundary candidate — 2026-10-25
 
 The current local candidate supersedes earlier automatic transport-boundary durations with the [10 ms playback/WAV contract](PLAYBACK_BOUNDARY.md). Source/effect envelopes are separate. See that contract for pause-state retention, existing tail-length limits and verification status. Uncommitted; listening acceptance pending.
+
+## Readout context family release — 2026-10-27
+
+Stack/Base/Deviation/Slope/Voices captions identify output-playhead synthesis/derived values before modulation/IR/output processing. Static source overview and hidden partial canvas retained. No new gesture, seeking, point selection, transport command or audio mutation is introduced by displaying these values. See `READOUT_CONTEXT_CONTRACT.md` for basis, source-range rules, verification boundary and portability.
