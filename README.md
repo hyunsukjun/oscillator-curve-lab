@@ -105,3 +105,7 @@ Imported files also appear in a static source-time waveform overview. Colors des
 
 ## 2026-10-26 — Harmonic stereo placement
 Harmonic centers harmonics 1–8 equally in L/R; harmonics 9–16 alternate left/right (9 left, 10 right, and so on). Preview and WAV use the same placement. Other stack layouts and File Resynthesis are unchanged. See [contract and verification](docs/HARMONIC_STEREO_2026-10-26.md).
+
+## Shift group / Option erase — 2026-10-27
+
+Shift-drag a point and following points vertically with X fixed; Mac Option-click erases an interior point (PC Ctrl-click unchanged). Original editing, mappings and DSP remain. User-reviewed UI checks are recorded in the gesture contract; commit/deployment was explicitly authorized on 2026-10-27. See [gesture contract](docs/CURVE_GESTURE_CONTRACT.md).

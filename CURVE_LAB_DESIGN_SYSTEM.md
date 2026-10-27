@@ -272,3 +272,7 @@ Reuse existing Graphite colors/type and controls. Stack/Base/Deviation/Slope/Voi
 
 ## Common output transport — 2026-10-27
 Use the existing common footer CSS/icons and one elapsed/total clock, without a normal-state second clock or diagnostic sentence. English accessible/title text preserves phase and engine-specific seek limits. Output-clock/progress share one basis; this does not change the synthesis/curve clock or imply unsupported tail seeking. See `docs/TRANSPORT_DISPLAY_CONTRACT.md` for the portable semantic rule.
+
+## Shift group / Option erase — 2026-10-27
+
+APPROVED INTERACTION / UI-only addition. Preserve existing point and hit geometry. A thin ring and count communicate the temporary Shift group; vertical cursor communicates the constrained action. Keep axes/focus/data colors and surrounding layout. Option temporary erase supersedes Mac Command erase. Touch is not assigned a desktop modifier gesture. See [gesture contract](docs/CURVE_GESTURE_CONTRACT.md).

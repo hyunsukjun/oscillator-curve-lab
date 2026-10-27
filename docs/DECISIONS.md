@@ -310,3 +310,7 @@ User approved the Audio pilot and sequential six-Lab rollout/commit/verification
 Single output `mm:ss.cc / mm:ss.cc` clock and common English control/state descriptions replace the dual Korean output/synthesis diagnostics. The existing common transport now follows full output time, including active IR tail/limiter flush. Range input uses that same output scale; valid sound-time seeks retain their old path, while unsupported tail seeks restore the actual bar position without discarding paused IR history. Dry flush endpoint uses the existing synthesis endpoint.
 
 This supersedes only the source-scaled slider/dual-clock presentation in the 2026-10-25 notes. Retained graph Pause/Resume, natural end, source/curve meaning, render/fade/safety and CLIP rules remain. See [transport display contract](TRANSPORT_DISPLAY_CONTRACT.md). User authorized tests, commit and deployment; technical/browser evidence is separate from listening/Native acceptance.
+
+## Shift group / Option erase — 2026-10-27
+
+2026-10-27 — User approved extending the released Audio gesture contract to the other five Labs, preserving each Lab mapping and ordinary editor constraints, with web review before commit. The user subsequently reported no major issues in individual tests and explicitly authorized the five-Lab UI commit/deployment. Reuse only the proven normalized group transaction; do not merge differing coordinate decoders or engine paths. No DSP change. See [gesture contract](CURVE_GESTURE_CONTRACT.md).

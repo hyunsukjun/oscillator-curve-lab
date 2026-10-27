@@ -21,7 +21,7 @@ The three sound-mode buttons are mutually exclusive. Oscillator is initially sel
 | Endpoint drag | Start/end points stay at x=0/x=1; vertical value can change. | `updatePoint` fixes endpoint x. |
 | Eraser click interior point | Delete only the targeted point. | `setTool("eraser")`, `findPoint`, splice only for indices between endpoints. |
 | Eraser click empty area or endpoint | Do nothing; never create a replacement point or delete either endpoint. | Eraser branch returns before Pen addition. |
-| Temporary erase | Mac Command-click or PC Ctrl-click has Eraser meaning without changing the persistent tool. | Platform-dependent `metaKey`/`ctrlKey` in `src/app.js`. Physical Windows Ctrl-click remains to be checked. |
+| Temporary erase | Mac Option-click or PC Ctrl-click has Eraser meaning without changing the persistent tool. | Platform-dependent `altKey`/`ctrlKey` in `src/app.js`. Physical Windows Ctrl-click remains to be checked. |
 | Clear Current | Restore only the active parameter's two-point default curve. | `clearCurrentCurve`. |
 | Reset All | Ask for confirmation; accept restores every curve; cancel leaves all curves unchanged. | `window.confirm` then `resetAll`. Acceptance is code-defined; browser automation of cancellation was not completed in the design-system pass. |
 
@@ -164,3 +164,7 @@ Stack/Base/Deviation/Slope/Voices captions identify output-playhead synthesis/de
 Single output `mm:ss.cc / mm:ss.cc` clock and common English control/state descriptions replace the dual Korean output/synthesis diagnostics. The existing common transport now follows full output time, including active IR tail/limiter flush. Range input uses that same output scale; valid sound-time seeks retain their old path, while unsupported tail seeks restore the actual bar position without discarding paused IR history. Dry flush endpoint uses the existing synthesis endpoint.
 
 This supersedes only the source-scaled slider/dual-clock presentation in the 2026-10-25 notes. Retained graph Pause/Resume, natural end, source/curve meaning, render/fade/safety and CLIP rules remain. See [transport display contract](TRANSPORT_DISPLAY_CONTRACT.md). User authorized tests, commit and deployment; technical/browser evidence is separate from listening/Native acceptance.
+
+## Shift group / Option erase — 2026-10-27
+
+Current gesture contract supersedes earlier Mac Command erase statements only. Shift captures the clicked point and ordered suffix in the active curve, fixes all X and applies one normalized Y delta with common bounds. Option-click temporarily erases on Mac, Ctrl-click on PC. Esc/cancellation restores the pending group. Existing normal editing and source/transport semantics remain. See [gesture contract](CURVE_GESTURE_CONTRACT.md).
