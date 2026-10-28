@@ -327,3 +327,8 @@ Scoped UI evidence: 30 focused command checks, 15 same-size before/after pairs, 
 User requested consistent Timbre Shortcuts placement and higher Oscillator clear/reset utilities, then chose: fixed processor names in information; useful dynamic status retained. Move existing Clear Current/Reset All nodes to the first source-path row immediately below Open Audio/Download WAV. Keep IDs/listeners and source-path order. Shortcuts and Safety stay in their existing roles; there is no Engine readout to remove. Preserve musical behavior and use web review before any new publication.
 
 The user confirmed both position changes and authorized commit/deployment on 2026-10-28, including the already-approved processor information scope. UI evidence does not certify new listening, native confirmation keyboard or Windows behavior.
+
+
+## 2026-10-29 — Shared musical default source
+
+User approved the72BPM weak-room MP3 as the shared default/example asset and authorized all six commits/deployments. Preserve each Lab's source handling and keep an example recording distinct from an IR. See [default source](DEFAULT_SOURCE.md).

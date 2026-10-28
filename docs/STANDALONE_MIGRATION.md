@@ -163,3 +163,8 @@ STANDALONE ASSET / approved web UI. Preserve edit target, selected-point values,
 ## Toolbar hierarchy and technical metadata — 2026-10-28
 
 STANDALONE ASSET / approved web UI. Move existing Clear Current/Reset All nodes to the first source-path row immediately below Open Audio/Download WAV. Keep IDs/listeners and source-path order. Shortcuts and Safety stay in their existing roles; there is no Engine readout to remove. Group editing help with editing tools and reset utilities with upper file/task actions. Separate fixed implementation identity from actionable state. Native layout, focus conventions and dimensions require independent validation; no native implementation or listening acceptance implied.
+
+
+## 2026-10-29 — Shared musical default source
+
+STANDALONE ASSET: approved source identity, user-file precedence and source-vs-IR meaning are portable. HTTP loading/MP3 delivery are web choices, not native requirements. See [default source](DEFAULT_SOURCE.md).

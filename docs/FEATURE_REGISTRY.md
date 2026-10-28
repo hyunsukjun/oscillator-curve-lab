@@ -250,3 +250,8 @@ IMPLEMENTED / USER-APPROVED WEB UI. Existing fields/IDs/labels/units/value origi
 ## Toolbar and information visibility — 2026-10-28
 
 IMPLEMENTED / USER-APPROVED WEB UI. Move existing Clear Current/Reset All nodes to the first source-path row immediately below Open Audio/Download WAV. Keep IDs/listeners and source-path order. Shortcuts and Safety stay in their existing roles; there is no Engine readout to remove. No new controls, shortcuts, processing or value model. The user approved commit/deployment after visual review on 2026-10-28; publication success is verified separately.
+
+
+## 2026-10-29 — Shared musical default source
+
+Use the approved shared Bach mallet MP3 in the role documented in [default source](DEFAULT_SOURCE.md). Existing chosen-energy-channel analysis,32/64 partial selection, separate mode curves, output duration, native synthesis, modulation, IR and safety algorithms are unchanged. DSP and musical mappings are unchanged.

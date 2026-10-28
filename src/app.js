@@ -1,3 +1,4 @@
+import {createSourceLoadGate, fetchDefaultSource} from "./default-source.js?v=20261029-bach1";
 import {beginVerticalGroup, moveVerticalGroup, restoreVerticalGroup, verticalGroupSuffix, drawVerticalGroupRing} from "./curve-group-edit.js?v=20261027-shift1";
 import {canvasAxisWidth, drawEditorGrid, frequencyTicks, frequencyLabel, spacedMarks, canvasLabelFont} from "./canvas-grid.js?v=20261026-graphite1";
 import {createSourceOverview} from "./source-overview.js?v=20261018-axis64";
@@ -33,6 +34,9 @@ import {
   prepareImpulse,
   tailSeconds
 } from "./convolution.js?v=20261002-stereotail1";
+
+const sourceLoadGate = createSourceLoadGate();
+let defaultResynthesisRequest = null;
 
 const timeStatus = document.getElementById("timeStatus");
 const playbackScrubber = document.getElementById("playbackScrubber");
@@ -1174,6 +1178,11 @@ function updateImpulseStatus() {
 }
 
 function setSoundMode(nextMode) {
+  if (nextMode !== "resynthesis" && defaultResynthesisRequest) {
+    sourceLoadGate.cancel();
+    defaultResynthesisRequest = null;
+    analysisStatus.textContent = "";
+  }
   if (verticalDrag) finishCurveDrag(true);
   if (nextMode === soundMode && nextMode !== "oscillator") return;
   if(irControl.snapshot || irBusy())stop(true);
@@ -1275,7 +1284,10 @@ async function prepareResynthesisInput(file, decoded) {
   };
 }
 
-resynthesisModeButton.addEventListener("click", () => setSoundMode("resynthesis"));
+resynthesisModeButton.addEventListener("click", () => {
+  setSoundMode("resynthesis");
+  loadDefaultResynthesisSource();
+});
 convolutionButton.addEventListener("click", () => setSoundMode("convolution"));
 partialCountSelect.addEventListener("change", () => { if (analysisSamples) runResynthesisAnalysis({ preservePlayback: true }); });
 
@@ -1289,6 +1301,8 @@ impulseInput.addEventListener("change", async () => {
     impulseInput.value = "";
     return;
   }
+  const sourceRequest = sourceLoadGate.begin();
+  defaultResynthesisRequest = null;
   const modeAtOpen = soundMode;
   if (isPlaying || irControl.snapshot || irBusy()) stop(true);
   else nextPlaybackToken();
@@ -1300,8 +1314,10 @@ impulseInput.addEventListener("change", async () => {
     const bytes = await readAudioFile(file, Math.max(TARGET_SAMPLE_RATE, audioContext?.sampleRate || TARGET_SAMPLE_RATE));
     const decoder = new OfflineAudioContext(2, 1, TARGET_SAMPLE_RATE);
     const decoded = await decoder.decodeAudioData(bytes.slice(0));
+    if (!sourceRequest.current()) return;
     const prepared = prepareImpulse(decoder, decoded, Number(impulseLengthInput.value));
     const input = await prepareResynthesisInput(file, decoded);
+    if (!sourceRequest.current()) return;
     const nativeSource = node && soundMode === "convolution" && audioContext.sampleRate !== TARGET_SAMPLE_RATE
       ? await audioContext.decodeAudioData(bytes.slice(0)) : null;
     const installedNative = node && soundMode === "convolution"
@@ -1627,4 +1643,30 @@ function setExportStatus(message) {
   const output = document.getElementById("downloadReadout");
   output.textContent = message;
   output.parentElement.hidden = ["", "ready", "not ready", "needs export"].includes(message);
+}
+
+async function loadDefaultResynthesisSource() {
+  if (analysisSamples || defaultResynthesisRequest || openAudioButton.disabled) return;
+  const request = sourceLoadGate.begin();
+  defaultResynthesisRequest = request;
+  analysisStatus.textContent = "Loading default sample…";
+  try {
+    const file = await fetchDefaultSource(request.signal);
+    const decoder = new OfflineAudioContext(2, 1, TARGET_SAMPLE_RATE);
+    const decoded = await decoder.decodeAudioData(await file.arrayBuffer());
+    const input = await prepareResynthesisInput(file, decoded);
+    if (!request.current() || soundMode !== "resynthesis" || analysisSamples) return;
+    ensureResynthesisState();
+    analysisSamples = input.samples;
+    analysisSource = input.source;
+    resynthesisSource.textContent = file.name;
+    sourceOverview.setBuffer(decoded);
+    await runResynthesisAnalysis();
+    sendSettings();
+  } catch (error) {
+    if (!request.current()) return;
+    analysisStatus.textContent = "Default sample unavailable. Open an audio file to begin.";
+  } finally {
+    if (defaultResynthesisRequest === request) defaultResynthesisRequest = null;
+  }
 }

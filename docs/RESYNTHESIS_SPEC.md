@@ -38,3 +38,8 @@ Validation: pending-play-context, convolution (including bypass WAV identity), r
 Remove Reanalyze: importing a file and changing32/64 already trigger analysis. On a partial-count change with an existing result, keep the old result and transport running until the latest generation completes, then send updated settings without seek/restart. Preserve base curve, paused position, and paused state. Failure retains the old playable result and shows an error. Initial import retains its existing stop/invalidation contract. Remove the redundant Estimated base completion sentence; pending/error text remains and actual counts/base values stay in the monitor. This supersedes the earlier Reanalyze-label note.
 
 Validation: live-partial-switch controlled race/failure tests and pending-play-context/resynthesis regressions pass. Browser32→64 at7.20s continued through7.36s with Play active and64/64; paused64→32 stayed paused at7.42s. This proves transport continuity, not artifact-free perceptual switching; comparison listening remains deferred.
+
+
+## 2026-10-29 — Built-in analysis example
+
+The first File Resynthesis selection with no source loads the approved shared15-second MP3 through the existing48kHz decode and `prepareResynthesisInput` analysis path. It sets only analysis samples/source and the source overview; IR buffers/bytes, dry oscillator defaults and modulation are unchanged. User imports supersede pending example requests. Failed loading retains Open Audio recovery. This example produces a static partial bank; it does not perform time-varying playback of Bach. See [default source](DEFAULT_SOURCE.md).

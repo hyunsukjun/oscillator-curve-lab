@@ -1,5 +1,7 @@
 # Oscillator Curve Lab
 
+Current default/example: [Bach Prelude No.1 · mallet ·72BPM ·15s MP3](docs/DEFAULT_SOURCE.md). File Resynthesis example only; initial oscillator and IR defaults stay unchanged.
+
 Early v1 prototype for the EEAMS Curve Lab family.
 
 ## Product record and future Standalone
