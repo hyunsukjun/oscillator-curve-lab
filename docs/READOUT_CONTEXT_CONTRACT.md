@@ -32,3 +32,8 @@ Reuse existing Graphite/caption/tabular-number roles. Narrow range text may wrap
 Compare equal-sized before/after frames and equal source data; separate actual zoom from CSS-width fixtures, and long Korean layout text from actual import/error reproduction. Check selection/mode, pause/seek, no-file/file-present state, source metadata and relevant cancellation/recovery. Preserve processing hashes and compare prior numeric/value functions. Only scoped paths may be committed. Require completed Pages runs and public/local parity for release.
 
 Standalone should preserve these semantic distinctions and read-only observation, using native text/accessibility/input roles rather than copying web pixels. No continuous live announcement on every drag sample is added. Physical touch, listening, CPU headroom and unsupported environments remain unverified unless separately observed.
+
+
+## Oscillator readout order — approved web UI — 2026-10-28
+
+Retained direct readout identifiers in order: modeReadout → pointsReadout → basePitchReadout → deviationReadout → slopeReadout → stackReadout → voicesReadout → safetyReadout. Curve values are before modulation and file IR. Output progress includes the existing tail; it does not imply arbitrary tail seeking. Keep 11px captions/14px values. Wrap long retained values without ellipsis; adapt column counts to available width, never hide a field or relabel its origin. Implementation is scoped to this Lab; native/family acceptance remains separate.

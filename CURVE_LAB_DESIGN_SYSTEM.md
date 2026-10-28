@@ -276,3 +276,8 @@ Use the existing common footer CSS/icons and one elapsed/total clock, without a 
 ## Shift group / Option erase — 2026-10-27
 
 APPROVED INTERACTION / UI-only addition. Preserve existing point and hit geometry. A thin ring and count communicate the temporary Shift group; vertical cursor communicates the constrained action. Keep axes/focus/data colors and surrounding layout. Option temporary erase supersedes Mac Command erase. Touch is not assigned a desktop modifier gesture. See [gesture contract](docs/CURVE_GESTURE_CONTRACT.md).
+
+
+## Readout groups and shortcut guide — 2026-10-28
+
+APPROVED WEB UI / STANDALONE ASSET. Apply Audio-approved role order/proximity with this Lab's own field count, units and colors. Keep edit context first, related musical values together and reference state last. Two semantic dividers on wide views; whitespace on narrow views. Reuse existing typography, Graphite, focus and file-help panel; all fields stay visible. Shortcuts follows the editing tools; Space/Granular retain the channel selector immediately before Pen/Eraser. Native dimensions/layout need independent validation.

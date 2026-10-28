@@ -314,3 +314,10 @@ This supersedes only the source-scaled slider/dual-clock presentation in the 202
 ## Shift group / Option erase — 2026-10-27
 
 2026-10-27 — User approved extending the released Audio gesture contract to the other five Labs, preserving each Lab mapping and ordinary editor constraints, with web review before commit. The user subsequently reported no major issues in individual tests and explicitly authorized the five-Lab UI commit/deployment. Reuse only the proven normalized group transaction; do not merge differing coordinate decoders or engine paths. No DSP change. See [gesture contract](CURVE_GESTURE_CONTRACT.md).
+
+
+## Readout and shortcut scope — 2026-10-28
+
+User approved continuation after the Audio visual pilot and its release. After the five-Lab local review, the user explicitly authorized commit and deployment on 2026-10-28. Reuse the existing readout/disclosure components and copy the now-shared presentation helper; no dependency/infrastructure refactor. Preserve all app/source/DSP/gesture/transport/channel/IR logic. Guide content follows actual supported commands, with no new key policy, curve Undo or numeric editing.
+
+Scoped UI evidence: 30 focused command checks, 15 same-size before/after pairs, 25 candidate layouts and 15 help-boundary states passed. Actual native zoom, new Granular file playback, listening and native acceptance were not repeated. Publication success is verified separately; approval does not certify those untested areas.

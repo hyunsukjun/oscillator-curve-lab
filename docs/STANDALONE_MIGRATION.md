@@ -154,3 +154,8 @@ This supersedes only the source-scaled slider/dual-clock presentation in the 202
 ## Shift group / Option erase — 2026-10-27
 
 STANDALONE ASSET / approved web gesture. Retain active-curve ordered suffix, fixed-time X, common normalized delta/clamp and cancellable gesture transaction, separate from selection, audition position and output freshness. Use native modifiers and access semantics; do not transfer web pixels as native metrics. See [gesture contract](CURVE_GESTURE_CONTRACT.md).
+
+
+## Readout hierarchy and key context — 2026-10-28
+
+STANDALONE ASSET / approved web UI. Preserve edit target, selected-point values, playhead/Preview values, input/output/IR time and engine/safety distinctions. Use role order/proximity and an optional context-specific shortcut reference. Curve values are before modulation and file IR. Output progress includes the existing tail; it does not imply arbitrary tail seeking. Native menus/tooltips/key conventions may replace web details/popover mechanics; web pixels/breakpoints are not native specifications. No native implementation or listening approval implied.
