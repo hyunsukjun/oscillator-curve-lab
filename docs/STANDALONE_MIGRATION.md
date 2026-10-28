@@ -159,3 +159,7 @@ STANDALONE ASSET / approved web gesture. Retain active-curve ordered suffix, fix
 ## Readout hierarchy and key context — 2026-10-28
 
 STANDALONE ASSET / approved web UI. Preserve edit target, selected-point values, playhead/Preview values, input/output/IR time and engine/safety distinctions. Use role order/proximity and an optional context-specific shortcut reference. Curve values are before modulation and file IR. Output progress includes the existing tail; it does not imply arbitrary tail seeking. Native menus/tooltips/key conventions may replace web details/popover mechanics; web pixels/breakpoints are not native specifications. No native implementation or listening approval implied.
+
+## Toolbar hierarchy and technical metadata — 2026-10-28
+
+STANDALONE ASSET / approved web UI. Move existing Clear Current/Reset All nodes to the first source-path row immediately below Open Audio/Download WAV. Keep IDs/listeners and source-path order. Shortcuts and Safety stay in their existing roles; there is no Engine readout to remove. Group editing help with editing tools and reset utilities with upper file/task actions. Separate fixed implementation identity from actionable state. Native layout, focus conventions and dimensions require independent validation; no native implementation or listening acceptance implied.

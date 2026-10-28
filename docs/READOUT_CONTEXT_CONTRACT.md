@@ -37,3 +37,7 @@ Standalone should preserve these semantic distinctions and read-only observation
 ## Oscillator readout order — approved web UI — 2026-10-28
 
 Retained direct readout identifiers in order: modeReadout → pointsReadout → basePitchReadout → deviationReadout → slopeReadout → stackReadout → voicesReadout → safetyReadout. Curve values are before modulation and file IR. Output progress includes the existing tail; it does not imply arbitrary tail seeking. Keep 11px captions/14px values. Wrap long retained values without ellipsis; adapt column counts to available width, never hide a field or relabel its origin. Implementation is scoped to this Lab; native/family acceptance remains separate.
+
+## Current-value visibility follow-up — 2026-10-28
+
+Move existing Clear Current/Reset All nodes to the first source-path row immediately below Open Audio/Download WAV. Keep IDs/listeners and source-path order. Shortcuts and Safety stay in their existing roles; there is no Engine readout to remove. Retained musical/readout IDs, text, units, precision, selected-point/playhead/Preview distinction and calculations remain unchanged. No Engine field or processor metadata was moved in this Lab; Safety remains visible.

@@ -173,3 +173,7 @@ Current gesture contract supersedes earlier Mac Command erase statements only. S
 ## Contextual shortcut guide — 2026-10-28
 
 APPROVED WEB UI. The native Shortcuts disclosure reuses file-information behavior and Graphite roles. Click/Enter/Space opens it without changing transport. Escape closes it before background gesture cancellation and returns summary focus; outside press, Tab leaving, outer scroll/resize dismiss; internal scrolling stays usable. Shortcuts follows the editing tools; Space/Granular retain the channel selector immediately before Pen/Eraser. No assignment, point/mapping, select/Space routing, chain keyboard logic or Preview/Render behavior changed.
+
+## Toolbar DOM order — 2026-10-28
+
+APPROVED WEB UI. Move existing Clear Current/Reset All nodes to the first source-path row immediately below Open Audio/Download WAV. Keep IDs/listeners and source-path order. Shortcuts and Safety stay in their existing roles; there is no Engine readout to remove. Move existing nodes instead of assigning CSS-only visual order. Pen/Eraser → Shortcuts remains the Tab sequence. Preserve Clear/Reset behavior, confirmation semantics and key routing; moving a button is not approval of native-confirm keyboard behavior.

@@ -321,3 +321,9 @@ This supersedes only the source-scaled slider/dual-clock presentation in the 202
 User approved continuation after the Audio visual pilot and its release. After the five-Lab local review, the user explicitly authorized commit and deployment on 2026-10-28. Reuse the existing readout/disclosure components and copy the now-shared presentation helper; no dependency/infrastructure refactor. Preserve all app/source/DSP/gesture/transport/channel/IR logic. Guide content follows actual supported commands, with no new key policy, curve Undo or numeric editing.
 
 Scoped UI evidence: 30 focused command checks, 15 same-size before/after pairs, 25 candidate layouts and 15 help-boundary states passed. Actual native zoom, new Granular file playback, listening and native acceptance were not repeated. Publication success is verified separately; approval does not certify those untested areas.
+
+## Toolbar placement and Engine scope — 2026-10-28
+
+User requested consistent Timbre Shortcuts placement and higher Oscillator clear/reset utilities, then chose: fixed processor names in information; useful dynamic status retained. Move existing Clear Current/Reset All nodes to the first source-path row immediately below Open Audio/Download WAV. Keep IDs/listeners and source-path order. Shortcuts and Safety stay in their existing roles; there is no Engine readout to remove. Preserve musical behavior and use web review before any new publication.
+
+The user confirmed both position changes and authorized commit/deployment on 2026-10-28, including the already-approved processor information scope. UI evidence does not certify new listening, native confirmation keyboard or Windows behavior.

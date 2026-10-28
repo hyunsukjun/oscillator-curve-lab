@@ -83,3 +83,8 @@
 @media(max-width:439px) {
   .shortcutHelp .fileHelpPanel dl { grid-template-columns:100px minmax(0,1fr); gap:7px 10px; }
 }
+
+/* Reset utilities occupy the first row below file actions, before synthesis settings. */
+.sourceBand { justify-content:space-between; }
+.sourceBand > .curveActions { padding:0; align-self:center; }
+.legend { grid-template-columns:minmax(0,1fr); }

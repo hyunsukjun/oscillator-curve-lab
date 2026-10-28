@@ -246,3 +246,7 @@ IMPLEMENTED / UI checks verified as stated in the contract. Add Shift suffix Y-o
 ## Readout hierarchy and shortcut reference — 2026-10-28
 
 IMPLEMENTED / USER-APPROVED WEB UI. Existing fields/IDs/labels/units/value origins retained; edit target and point count lead musical values, followed by input/engine/safety references. All values stay visible. An optional Shortcuts guide exposes only current per-Lab bindings; no source-volume/Undo feature is copied from Audio. Curve values are before modulation and file IR. Output progress includes the existing tail; it does not imply arbitrary tail seeking.
+
+## Toolbar and information visibility — 2026-10-28
+
+IMPLEMENTED / USER-APPROVED WEB UI. Move existing Clear Current/Reset All nodes to the first source-path row immediately below Open Audio/Download WAV. Keep IDs/listeners and source-path order. Shortcuts and Safety stay in their existing roles; there is no Engine readout to remove. No new controls, shortcuts, processing or value model. The user approved commit/deployment after visual review on 2026-10-28; publication success is verified separately.

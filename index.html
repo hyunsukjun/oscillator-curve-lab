@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="src/transport-polish.css?v=20261015-2">
   <link rel="stylesheet" href="src/transport-surface.css?v=20261015-3">
   <link rel="stylesheet" href="src/brand-layout.css?v=20261015-1">
-    <link rel="stylesheet" href="src/readout-layout.css?v=20261028-family-guide1">
+    <link rel="stylesheet" href="src/readout-layout.css?v=20261028-toolbar-context1">
     <link rel="stylesheet" href="src/header-rhythm.css?v=20261015-2">
     <link rel="stylesheet" href="src/expanded-editor.css?v=20261015-1">
     <link rel="stylesheet" href="src/settings-density.css?v=20261015-segments1">
@@ -66,6 +66,10 @@
             <button id="convolutionButton" class="active" type="button" aria-pressed="true">Oscillator + File IR</button>
           </div>
 
+          <div class="curveActions">
+            <button id="clearCurveButton" type="button">Clear Current</button>
+            <button id="resetButton" type="button">Reset All</button>
+          </div>
         </div>
         <div class="controlBand" id="oscillatorControls">
           <div class="synthesisGroup">
@@ -158,10 +162,6 @@
               <summary title="Existing shortcuts by editing area">Shortcuts</summary>
               <div class="fileHelpPanel" aria-label="Keyboard shortcuts"><strong>Keyboard shortcuts</strong><h3>Curve editing</h3><dl><dt>Shift-drag</dt><dd>Move this and following points vertically. X stays fixed.</dd><dt>Option-click</dt><dd>Mac: delete a point. PC: Ctrl-click. Endpoints stay protected.</dd><dt>Esc</dt><dd>Cancel the pending Shift group drag.</dd></dl><h3>Playback and controls</h3><dl><dt>Space</dt><dd>Play/pause after a selector is closed. Open menus, inputs and help keep their own keys.</dd><dt>Tab / Shift-Tab</dt><dd>Focus controls. Native range keys adjust the output slider; seeking into an IR tail remains unsupported.</dd></dl><p>Curve values are before modulation and file IR. Output progress includes the existing tail; it does not imply arbitrary tail seeking. Esc closes this guide.</p></div>
             </details>
-          </div>
-          <div class="curveActions">
-            <button id="clearCurveButton" type="button">Clear Current</button>
-            <button id="resetButton" type="button">Reset All</button>
           </div>
         </div>
 
