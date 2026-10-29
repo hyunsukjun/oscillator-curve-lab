@@ -264,3 +264,13 @@ IMPLEMENTED, USER-AUTHORIZED RELEASE. Reject empty/invalid decoded audio and non
 ## Local live transition / seek correction — 2026-10-29
 
 Live Waveform/Count/Frequency Layout now transition over10ms before the existing IR path. Playing Return to start/source-body seek crossfades positions and preserves Convolver/limiter history. Latest settings remain the Render target. No new visible control or parameter. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.
+
+
+## File Resynthesis startup default — 2026-10-30
+
+Local pre-commit candidate. Supersedes the historical Oscillator + File IR startup default: initial HTML/runtime select File Resynthesis and invoke the existing example analysis loader without autoplay. Default example is analysis-only; no implicit IR. Sound/analysis algorithms,32/64 selection,mode-specific curves,modulation,channels,time and IR handling are unchanged.8 Chrome/Brave lifecycle/error/ownership scenarios and900/390px layout checked; native zoom/listening remain unverified. [Contract and evidence](STARTUP_DEFAULT_2026-10-30.md).
+
+
+## IR body boundary and AC analysis guard — 2026-10-30 (local)
+
+Implemented locally: release the last10ms of generated excitation only for active wet IR with positive tail; keep the full retained tail and final transport envelope. Analysis-only AC centering/energy and an absolute bin floor reject DC/tiny numerical spectra without modifying PCM/IR. Dry/Wet0/one-tap paths, modes, maps and channels remain. No release/listening acceptance. See [scoped contract and evidence](IR_RELEASE_ANALYSIS_2026-10-30.md).

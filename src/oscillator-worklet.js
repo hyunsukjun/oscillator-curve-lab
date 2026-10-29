@@ -1,3 +1,4 @@
+import {irSourceReleaseGain} from "./ir-source-boundary.js?v=20261030-ir-end1";
 import {clamp, createSmoothingState, renderFrame, resetSmoothingState} from "./oscillator-core.js?v=20261026-harmonic-pan8";
 import {LOOKAHEAD_SECONDS} from "./safety-limiter.js?v=20261002-lookahead1";
 import {BOUNDARY_SECONDS} from './playback-boundary.js?v=20261029-live-crossfade1';
@@ -101,9 +102,13 @@ class OscillatorCurveProcessor extends AudioWorkletProcessor {
 
   sample(settings, seconds, phases, modPhases, smoothingState) {
     const duration = Math.max(0.1, settings.durationSeconds);
-    return seconds < duration
-      ? renderFrame(settings, clamp(seconds / duration), sampleRate, phases, modPhases, smoothingState)
-      : {left:0, right:0, voices:0};
+    if (seconds >= duration) return {left:0, right:0, voices:0};
+    const sample = renderFrame(settings, clamp(seconds / duration), sampleRate, phases, modPhases, smoothingState);
+    if (settings.convolutionEnabled && settings.convolutionWet > 0 && settings.tailSeconds > 0) {
+      const gain = irSourceReleaseGain(seconds * sampleRate, Math.ceil(duration * sampleRate), settings.tailSeconds * sampleRate, sampleRate);
+      sample.left *= gain; sample.right *= gain;
+    }
+    return sample;
   }
 
   process(_, outputs) {

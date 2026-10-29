@@ -24,7 +24,7 @@ import {
   valueAt
 } from "./oscillator-core.js?v=20261026-harmonic-pan8";
 
-import { renderOscillator } from "./offline-render.js?v=20261026-harmonic-pan8";
+import { renderOscillator } from "./offline-render.js?v=20261030-ir-analysis1";
 import { LOOKAHEAD_SECONDS } from "./safety-limiter.js?v=20261002-lookahead1";
 import { OutputMeterAnalyzer } from "./output-meter.js?v=20261001-playback1";
 import {
@@ -439,7 +439,7 @@ async function ensureAudio() {
 
 async function setupAudio() {
   if (!audioContext.audioWorklet) throw new Error("AudioWorklet is not available. Use a current browser over localhost or HTTPS.");
-  await audioContext.audioWorklet.addModule("src/oscillator-worklet.js?v=20261029-live-crossfade1");
+  await audioContext.audioWorklet.addModule("src/oscillator-worklet.js?v=20261030-ir-analysis1");
   await audioContext.audioWorklet.addModule("src/safety-limiter-worklet.js?v=20261029-live-crossfade1");
   node = new AudioWorkletNode(audioContext, "oscillator-curve-processor", {
     numberOfInputs: 0,
@@ -1242,7 +1242,7 @@ async function runResynthesisAnalysis({ preservePlayback = false } = {}) {
   if (!keepCurrent) analysisResult = null;
   analysisStatus.textContent = "Analyzing spectrum...";
   sendSettings();
-  const worker = new Worker(new URL("./resynthesis-worker.js?v=20260930-resynthesis2", import.meta.url), { type: "module" });
+  const worker = new Worker(new URL("./resynthesis-worker.js?v=20261030-ir-analysis1", import.meta.url), { type: "module" });
   analysisWorker = worker;
   worker.onmessage = ({ data }) => {
     if (generation !== analysisGeneration) return;
@@ -1647,13 +1647,14 @@ if ("ResizeObserver" in window) {
   [document.querySelector(".sourceBand"), oscillatorControls, document.querySelector(".impulseBand"), document.querySelector(".legend"), modulationInfo, durationPanel, document.querySelector(".topbar"), document.querySelector(".panel"), document.querySelector(".playbackBar")].forEach((element) => controlsObserver.observe(element));
 }
 if ("ResizeObserver" in window) new ResizeObserver(resizeCanvas).observe(canvas);
-setSoundMode("convolution");
+setSoundMode("resynthesis");
 fitEditorControls(true);
 updateTransport();
 requestAnimationFrame(updateMeter);
 
 
 mountTransport({onScrub:value=>{isScrubbing=value;},state:transportState,seek:p=>{playbackScrubber.value=String(p);seekFromScrubber();}});
+loadDefaultResynthesisSource();
 
 // Idle readiness is conveyed by the Download control; retain actionable feedback.
 function setExportStatus(message) {

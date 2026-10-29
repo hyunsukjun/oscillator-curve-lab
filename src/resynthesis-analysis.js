@@ -1,6 +1,9 @@
 import { FFT } from './fft.js';
 
 export const ANALYSIS_FFT_SIZE = 8192;
+// The existing window-energy floor now applies to AC, rather than a DC offset.
+export const ANALYSIS_MIN_AC_POWER = 1e-8;
+export const ANALYSIS_MIN_BAND_AMPLITUDE = 1e-6;
 
 export function analyzeSpectrum(samples, sampleRate, requestedPartials = 32, source = {}) {
   if (!samples?.length || !Number.isFinite(sampleRate) || sampleRate <= 0) throw new Error('No decoded audio to analyze');
@@ -15,14 +18,24 @@ export function analyzeSpectrum(samples, sampleRate, requestedPartials = 32, sou
   let usedWindows = 0;
   for (let w = 0; w < windows; w += 1) {
     const center = Math.round(samples.length * (0.1 + 0.8 * (w + 0.5) / windows));
-    let energy = 0;
+    let count = 0, mean = 0, acEnergy = 0;
     for (let i = 0; i < size; i += 1) {
-      const sample = samples[center - size / 2 + i] || 0;
+      const index = center - size / 2 + i;
+      if (index < 0 || index >= samples.length) continue;
+      const sample = samples[index];
+      if (!Number.isFinite(sample)) throw new Error('Non-finite analysis input');
+      const delta = sample - mean;
+      mean += delta / ++count;
+      acEnergy += delta * (sample - mean);
+    }
+    if (acEnergy / size < ANALYSIS_MIN_AC_POWER) continue;
+    for (let i = 0; i < size; i += 1) {
+      const index = center - size / 2 + i;
+      // Center only available samples; zero padding is not part of the mean.
+      const sample = index >= 0 && index < samples.length ? samples[index] - mean : 0;
       real[i] = sample * window[i];
       imag[i] = 0;
-      energy += sample * sample;
     }
-    if (energy / size < 1e-8) continue;
     fft.transform(real, imag);
     for (let bin = 1; bin < power.length; bin += 1) power[bin] += real[bin] ** 2 + imag[bin] ** 2;
     usedWindows += 1;
@@ -32,6 +45,10 @@ export function analyzeSpectrum(samples, sampleRate, requestedPartials = 32, sou
   const high = Math.min(power.length - 2, Math.floor(Math.min(20000, sampleRate * 0.45) * size / sampleRate));
   let maximum = 0;
   for (let bin = low; bin <= high; bin += 1) maximum = Math.max(maximum, power[bin]);
+  const coherentWindowGain = window.reduce((sum, value) => sum + value, 0);
+  if (2 * Math.sqrt(maximum / usedWindows) / coherentWindowGain < ANALYSIS_MIN_BAND_AMPLITUDE) {
+    throw new Error('Audio contains no analyzable signal');
+  }
   const candidates = [];
   for (let bin = low; bin <= high; bin += 1) {
     if (power[bin] < maximum * 1e-5 || power[bin] <= power[bin - 1] || power[bin] < power[bin + 1]) continue;

@@ -21,3 +21,8 @@ Shared local evidence: `work/CurveLabWebV1/qa/fade10/` in the Interface workspac
 ## Live bank and playing-seek transitions — 2026-10-29 (local)
 
 The existing transport boundary remains10ms. Playing bank changes now use a separate source crossfade; playing body seeks preserve limiter/IR buffers and rebase the output deadline from audio time. `PlaybackBoundary.start(initialGain)` can recover from current gain on a playing seek, while ordinary Play/resume retains initialGain0. Pause release ownership is preserved. Static WAV fades and safety-reset exceptions remain unchanged. See [live transition contract](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication and listening evidence remain separate.
+
+
+## IR body boundary and AC analysis guard — 2026-10-30 (local)
+
+A final complete-output envelope alone cannot remove an abrupt source-body cutoff before an IR tail. The current candidate therefore adds a source release only for positive wet IR tail, with no source attack and short-tail overlap compensation for the undelayed branch. Dry/disabled/Wet0/one-tap behavior and the final transport boundary remain; full tail length and retained histories remain, while last-body excitation intentionally changes. This supersedes any interpretation that all wet source-body boundaries can rely solely on the final envelope. See [scoped contract and evidence](IR_RELEASE_ANALYSIS_2026-10-30.md).

@@ -52,3 +52,13 @@ The entire decoded source is validated before preparing IR or the chosen analysi
 ## Local live transition / seek correction — 2026-10-29
 
 AnalysisResult, FFT/peak selection, partial mappings, automatic32/64 refresh and Resynthesis sound design are unchanged. The shared playing-body-seek path now crossfades source positions without clearing the limiter/effect history. This is not a new claim of click-free partial-analysis replacement. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.
+
+
+## File Resynthesis startup default — 2026-10-30
+
+Local pre-commit candidate. Supersedes the historical Oscillator + File IR startup default: initial HTML/runtime select File Resynthesis and invoke the existing example analysis loader without autoplay. Default example is analysis-only; no implicit IR. Sound/analysis algorithms,32/64 selection,mode-specific curves,modulation,channels,time and IR handling are unchanged.8 Chrome/Brave lifecycle/error/ownership scenarios and900/390px layout checked; native zoom/listening remain unverified. [Contract and evidence](STARTUP_DEFAULT_2026-10-30.md).
+
+
+## IR body boundary and AC analysis guard — 2026-10-30 (local)
+
+Current candidate supersedes the historical raw-energy-only analysis gate: center each available FFT window in temporary memory, apply the existing1e-8 energy/FFT-size floor to AC and add coherent-Hann-bin amplitude floor1e-6. Keep FFT8192/window placement/relative-50dB selection/separation/32–64 cap/schema/maps unchanged. Source PCM and IR remain immutable. DC-only/too-weak input reports no analyzable signal, with existing initial-failure and retained-refresh behavior. This does not improve static analysis into time-varying source reconstruction. See [scoped contract and evidence](IR_RELEASE_ANALYSIS_2026-10-30.md).

@@ -62,8 +62,8 @@
       <section class="editor">
         <div class="sourceBand" title="Choose a synthesis path. File IR processes the oscillator sound.">
           <div class="soundModes" role="group" aria-label="Sound generation mode">
-            <button id="resynthesisMode" type="button" aria-pressed="false">File Resynthesis</button>
-            <button id="convolutionButton" class="active" type="button" aria-pressed="true">Oscillator + File IR</button>
+            <button id="resynthesisMode" class="active" type="button" aria-pressed="true">File Resynthesis</button>
+            <button id="convolutionButton" type="button" aria-pressed="false">Oscillator + File IR</button>
           </div>
 
           <div class="curveActions">
@@ -71,7 +71,7 @@
             <button id="resetButton" type="button">Reset All</button>
           </div>
         </div>
-        <div class="controlBand" id="oscillatorControls">
+        <div class="controlBand resynthesisActive" id="oscillatorControls">
           <div class="synthesisGroup">
           <div class="waveformButtons" role="group" aria-label="Waveform">
             <span>Waveform</span>
@@ -115,12 +115,12 @@
             <input id="modulationRatioInput" type="number" min="0.25" max="8" step="0.25" value="1" inputmode="decimal">
           </label>
           </div>
-          <div id="resynthesisControls" class="resynthesisControls" hidden>
+          <div id="resynthesisControls" class="resynthesisControls">
             <span id="resynthesisSource" class="impulseStatus" role="status">No sound file loaded</span>
             <label class="compactField resynthesisCount">Partials
               <select id="partialCountSelect"><option value="32">32</option><option value="64">64</option></select>
             </label>
-            <span id="analysisStatus" role="status">Open a sound file to analyze</span>
+            <span id="analysisStatus" role="status">Loading default sample…</span>
           </div>
         </div>
 
@@ -226,7 +226,7 @@
     </main>
 
     <script src="src/file-help.js?v=20261028-family-guide1" type="module"></script>
-    <script src="src/app.js?v=20261029-live-crossfade1" type="module"></script>
+    <script src="src/app.js?v=20261030-ir-analysis1" type="module"></script>
   <div id="basePitchModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Base Frequency · 20–4000 Hz</strong><span>Set the base for the oscillator stack, or transpose the analyzed partials in File Resynthesis.</span><span class="helpState"></span></div>
 <div id="deviationModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Deviation · Depends on source and layout</strong><span>Unison spreads voices up to ±50 cents. Other layouts and File Resynthesis bend partial relationships with an amount of 0–0.38. Zero keeps the original layout.</span><span class="helpState"></span></div>
 <div id="slopeModeHelp" class="parameterHelp" role="tooltip" hidden><strong>Spectral Slope · −24 to +12 dB/oct</strong><span>Tilt voice or partial levels by frequency relative to the base. Negative values favor lower frequencies; positive values favor higher frequencies.</span><span class="helpState"></span></div>

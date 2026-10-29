@@ -1,4 +1,4 @@
-import { analyzeSpectrum } from './resynthesis-analysis.js';
+import { analyzeSpectrum } from './resynthesis-analysis.js?v=20261030-dc-ac1';
 
 self.onmessage = ({ data }) => {
   try {

@@ -170,3 +170,18 @@ The prior isolated eight-harmonic B listening was preferred by the user (steadie
 ## Local live transition / seek correction — 2026-10-29
 
 Evidence-backed local candidate:24 bank/rate cases,37 required tests, six static parity fixtures and actual dry/IR browser state/capture checks. No5ms rewind reset gap in candidate captures; static source/output policies preserved. Known old test-context omission repaired in fixture only. Listening, physical device and CPU-headroom judgments remain unverified. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.
+
+
+## File Resynthesis startup default — 2026-10-30
+
+Local pre-commit candidate. Supersedes the historical Oscillator + File IR startup default: initial HTML/runtime select File Resynthesis and invoke the existing example analysis loader without autoplay. Default example is analysis-only; no implicit IR. Sound/analysis algorithms,32/64 selection,mode-specific curves,modulation,channels,time and IR handling are unchanged.8 Chrome/Brave lifecycle/error/ownership scenarios and900/390px layout checked; native zoom/listening remain unverified. [Contract and evidence](STARTUP_DEFAULT_2026-10-30.md).
+
+
+## IR body boundary and AC analysis guard — 2026-10-30 (local)
+
+Confirmed two independent causes: wet-IR body cutoff inside retained tail; DC FFT residue promoted by relative normalization. Local72 paired native renders,8 browser lifecycle runs,16 UI/Worker scenarios and123 recorded analysis-matrix rows support the scoped corrections. Chrome native graph/render tolerance passes; Brave strict raw PCM parity remains unproven and differs in the unchanged baseline too. Existing VM Cancel test failure is baseline-only; actual Cancel/retry verified. No listening or device-headroom acceptance. See [scoped contract and evidence](IR_RELEASE_ANALYSIS_2026-10-30.md).
+
+
+## User release authorization — 2026-10-30
+
+Release authorized2026-10-30 for the reviewed startup/IR-body/AC-analysis candidate. Preserve the earlier non-listening evidence and unresolved Brave baseline raw parity, HRTF/other-DSP/device limits. Exact commit/Pages/public-browser evidence is recorded separately in Interface QA `oscillator-ir-analysis-release-20261030`.

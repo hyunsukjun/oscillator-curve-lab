@@ -19,7 +19,7 @@ Dependency flows from behavior to model to implementation, not the reverse. A CS
 - `index.html` defines controls and two main canvases. `src/styles.css` holds shared visual tokens plus Oscillator-specific colors.
 - `src/app.js` owns web UI state, pointer editing, rendering of curve/current-value canvases, transport, file loading, and AudioNode routing. It is presently coupled to the DOM; do not claim otherwise.
 - `src/oscillator-core.js` owns normalized curve interpolation, frequency/voice mapping, oscillator sampling, modulation, gain normalization, limiter, edge fade, and WAV encoding.
-- `src/oscillator-worklet.js` processes realtime oscillator frames. `src/offline-render.js` produces 48 kHz PCM data and WAV. Both use the core render function and the same edge fade.
+- `src/oscillator-worklet.js` processes realtime oscillator frames. `src/offline-render.js` produces 48 kHz PCM data and WAV. Both use the core render function and the shared active-wet-IR source-release helper. The final transport envelope follows convolution/limiting; see `docs/PLAYBACK_BOUNDARY.md` and `docs/IR_RELEASE_ANALYSIS_2026-10-30.md`.
 - `src/convolution.js` prepares local audio as an impulse response and provides Dry/Wet, native Convolver and offline convolution helpers.
 - `src/resynthesis-analysis.js` and its Worker extract a static, structured peak bank from a decoded local sound. `src/oscillator-core.js` applies non-destructive curve transformations to those peaks and renders sine voices through the shared realtime/offline paths; see `docs/RESYNTHESIS_SPEC.md`.
 - `src/fft-preview.js`, `src/fft-worker.js`, `src/spectrogram-core.js`, and `src/fft.js` provide an observational output overview, not another editing surface.

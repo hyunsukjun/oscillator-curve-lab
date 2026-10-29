@@ -341,3 +341,18 @@ USER-APPROVED SCOPE, IMPLEMENTED; release authorized2026-10-29. Extend the alrea
 ## Local live transition / seek correction — 2026-10-29
 
 Choose linear, unit-sum mixing to avoid adding coherent-source gain. Coalesce bursts to one latest request and at most two banks. Replace live seek limiter reset with history-preserving deadline rescheduling; preserve existing safety-reset exceptions. This is a local non-listening candidate, not listening or release acceptance. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.
+
+
+## File Resynthesis startup default — 2026-10-30
+
+Local pre-commit candidate. Supersedes the historical Oscillator + File IR startup default: initial HTML/runtime select File Resynthesis and invoke the existing example analysis loader without autoplay. Default example is analysis-only; no implicit IR. Sound/analysis algorithms,32/64 selection,mode-specific curves,modulation,channels,time and IR handling are unchanged.8 Chrome/Brave lifecycle/error/ownership scenarios and900/390px layout checked; native zoom/listening remain unverified. [Contract and evidence](STARTUP_DEFAULT_2026-10-30.md).
+
+
+## IR body boundary and AC analysis guard — 2026-10-30 (local)
+
+Decision: fix an internal source-body cutoff upstream of convolution, rather than shorten the IR tail or move the final output fade. Separately reject unsupported numerical spectra in analysis rather than mutate imported sound/IR or normalize FFT residue. Preserve dry bypass identity, timing, histories and musical parameter mappings. Local implementation/technical evidence only; no commit/deployment/listening approval. See [scoped contract and evidence](IR_RELEASE_ANALYSIS_2026-10-30.md).
+
+
+## User release authorization — 2026-10-30
+
+Release authorized2026-10-30: File Resynthesis startup default, IR-body source release and AC analysis guard. The authorization covers this Oscillator candidate; publication evidence and known baseline test/parity limitations remain separate.

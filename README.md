@@ -1,6 +1,6 @@
 # Oscillator Curve Lab
 
-Current default/example: [Bach Prelude No.1 · mallet ·72BPM ·15s MP3](docs/DEFAULT_SOURCE.md). File Resynthesis example only; initial oscillator and IR defaults stay unchanged.
+Current default/example: [Bach Prelude No.1 · mallet ·72BPM ·15s MP3](docs/DEFAULT_SOURCE.md). Initial File Resynthesis automatically analyzes this example without autoplay. The example is analysis-only and is not implicitly installed as an IR.
 
 Early v1 prototype for the EEAMS Curve Lab family.
 
@@ -22,7 +22,7 @@ Oscillator Curve Lab draws how a small oscillator stack changes over time. The f
 
 Set output time from the always-visible Output Duration row below the curve toolbar. It uses a single 0–10 minute slider in one-second steps with a mm:ss readout; zero disables playback/export. Duration stretches the same normalized curves; Convolution may add an IR tail beyond the selected time. WAV export compensates the limiter’s 5 ms latency while preserving that tail. Ten-minute renders can require substantially more working memory than the shown WAV size.
 
-The sound selector has File Resynthesis and Oscillator + File IR (default) paths. Without an IR, the latter retains dry basic synthesis; with an IR, Dry/Wet=0 retains dry synthesis. The separate Basic Waveform button and Synthesis source heading are removed. One Open Audio import serves both file-based modes: Resynthesis analyzes it into up to 32/64 significant sine partials, while Convolution uses it as an IR with the oscillator. Neither mode directly plays the imported recording. Resynthesis uses the fixed, user-approved C stereo placement. See the dedicated specification for analysis limits and unverified sonic questions.
+The sound selector has File Resynthesis (default) and Oscillator + File IR paths. Without an IR, the latter retains dry basic synthesis; with an IR, Dry/Wet=0 retains dry synthesis. The separate Basic Waveform button and Synthesis source heading are removed. One Open Audio import serves both file-based modes: Resynthesis analyzes it into up to 32/64 significant sine partials, while Convolution uses it as an IR with the oscillator. Neither mode directly plays the imported recording. Resynthesis uses the fixed, user-approved C stereo placement. See the dedicated specification for analysis limits and unverified sonic questions.
 
 ## v1 scope
 
@@ -44,7 +44,7 @@ The sound selector has File Resynthesis and Oscillator + File IR (default) paths
 - Nyquist Protection
 - Safety Limiter
 - 48 kHz WAV export at 24-bit PCM
-- 8 ms start and 12 ms end source fades in realtime playback and WAV; internal FFT reference checks are documented separately
+- Linear10ms final-output attack/release in realtime playback and WAV, plus a release-only10ms generated-body taper when an active wet IR has a retained tail; dry/Wet0 paths remain unchanged. See [boundary and analysis contract](docs/IR_RELEASE_ANALYSIS_2026-10-30.md).
 
 ## Out of scope for v1
 

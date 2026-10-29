@@ -1,3 +1,4 @@
+import {irSourceReleaseGain} from "./ir-source-boundary.js?v=20261030-ir-end1";
 import { fadeOutput } from "./playback-boundary.js";
 import { renderFrame, createSmoothingState, TARGET_SAMPLE_RATE, MAX_SOUND_DURATION_SECONDS, clamp, edgeFade, encodeWav24Steps, outputChannelCount } from "./oscillator-core.js?v=20261026-harmonic-pan8";
 import { renderConvolved } from "./convolution.js?v=20261006-cancel-drain1";
@@ -46,7 +47,7 @@ export async function renderOscillator({ settings, impulse, signal, onProgress, 
     if (signal?.aborted) throw new DOMException("Render cancelled", "AbortError");
     const t = frameCount <= 1 ? 0 : frame / (duration * sampleRate);
     const sample = renderFrame(settings, t, sampleRate, phases, modPhases, smoothingState);
-    const fade = 1; // Apply the boundary once, to completed output including the IR tail.
+    const fade = convolving ? irSourceReleaseGain(frame, frameCount, impulse.length - 1, sampleRate) : 1;
     const left = sample.left * fade;
     const right = sample.right * fade;
     peak = Math.max(peak, Math.abs(left), Math.abs(right));

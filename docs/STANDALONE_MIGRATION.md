@@ -177,3 +177,13 @@ Preserve candidate validation before ownership swap, full-channel/tail finite ch
 ## Local live transition / seek correction — 2026-10-29
 
 Asset: continuity at live bank/position transitions, independent old/new state and clocks, preserved effect memory, bounded latest queue, absolute end time and stale-token protection. AudioWorklet/MessagePort details are web implementation choices. Native implementation remains unchanged. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.
+
+
+## File Resynthesis startup default — 2026-10-30
+
+Local pre-commit candidate. Supersedes the historical Oscillator + File IR startup default: initial HTML/runtime select File Resynthesis and invoke the existing example analysis loader without autoplay. Default example is analysis-only; no implicit IR. Sound/analysis algorithms,32/64 selection,mode-specific curves,modulation,channels,time and IR handling are unchanged.8 Chrome/Brave lifecycle/error/ownership scenarios and900/390px layout checked; native zoom/listening remain unverified. [Contract and evidence](STARTUP_DEFAULT_2026-10-30.md).
+
+
+## IR body boundary and AC analysis guard — 2026-10-30 (local)
+
+Portable asset: model excitation-body end, retained effect-tail end and final transport envelope separately. Keep dry/Wet0 bypass identity and avoid overlapping complete release envelopes; validate short-tail cases. Separate immutable PCM admission from AC-spectrum suitability and analysis normalization. Candidate source/tests and fixtures are transferable evidence, not Native implementation or sonic acceptance. Older8/12ms source-fade descriptions are historical; use PLAYBACK_BOUNDARY and this current contract. See [scoped contract and evidence](IR_RELEASE_ANALYSIS_2026-10-30.md).

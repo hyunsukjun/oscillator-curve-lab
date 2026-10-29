@@ -68,3 +68,13 @@ The prior isolated eight-harmonic B listening was preferred by the user (steadie
 ## Local live transition / seek correction — 2026-10-29
 
 Ranges, defaults, IDs, units, pan and normalized mappings are unchanged. Add an implicit10ms live bank-transition policy for waveform/count/stack only; existing Deviation/modulation slews remain. Linear weights and a bounded latest-request queue are processing behavior, not stored curve edits. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.
+
+
+## File Resynthesis startup default — 2026-10-30
+
+Local pre-commit candidate. Supersedes the historical Oscillator + File IR startup default: initial HTML/runtime select File Resynthesis and invoke the existing example analysis loader without autoplay. Default example is analysis-only; no implicit IR. Sound/analysis algorithms,32/64 selection,mode-specific curves,modulation,channels,time and IR handling are unchanged.8 Chrome/Brave lifecycle/error/ownership scenarios and900/390px layout checked; native zoom/listening remain unverified. [Contract and evidence](STARTUP_DEFAULT_2026-10-30.md).
+
+
+## IR body boundary and AC analysis guard — 2026-10-30 (local)
+
+No UI parameter, normalized coordinate, range, unit, pan or time mapping changes. Internal IR source release uses the existing10ms boundary duration, active only for positive wet tail. Analysis constants: AC window energy/FFT-size floor1e-8 (existing threshold, now DC independent), coherent-Hann-bin amplitude floor1e-6 (new numeric guard; not a user loudness/noise meter). Exact valid-analysis floating values may change after centering; source data and AnalysisResult schema do not. See [scoped contract and evidence](IR_RELEASE_ANALYSIS_2026-10-30.md).

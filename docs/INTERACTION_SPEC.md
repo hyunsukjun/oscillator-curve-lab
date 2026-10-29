@@ -186,3 +186,13 @@ Supersedes earlier failed-decode behavior that cleared a source. File attempts s
 ## Local live transition / seek correction — 2026-10-29
 
 Live settings preserve position and graph history. Playing Return to start remains0s and shares the continuous playing-body-seek path. Paused/stopped reset and unsupported tail-seek semantics are unchanged. Late acknowledgments retain the actual audio-clock position and cannot cancel an active Pause. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.
+
+
+## File Resynthesis startup default — 2026-10-30
+
+Local pre-commit candidate. Supersedes the historical Oscillator + File IR startup default: initial HTML/runtime select File Resynthesis and invoke the existing example analysis loader without autoplay. Default example is analysis-only; no implicit IR. Sound/analysis algorithms,32/64 selection,mode-specific curves,modulation,channels,time and IR handling are unchanged.8 Chrome/Brave lifecycle/error/ownership scenarios and900/390px layout checked; native zoom/listening remain unverified. [Contract and evidence](STARTUP_DEFAULT_2026-10-30.md).
+
+
+## IR body boundary and AC analysis guard — 2026-10-30 (local)
+
+Initial DC/weak-spectrum analysis failure keeps Resynthesis Play unavailable and permits later valid file recovery. Valid finite PCM can still be used as explicitly imported IR. A failed32/64 refresh keeps the prior bank, running/paused position and edited curves. No new gesture or state transition; seek/pause retain their existing ownership and IR history. See [scoped contract and evidence](IR_RELEASE_ANALYSIS_2026-10-30.md).

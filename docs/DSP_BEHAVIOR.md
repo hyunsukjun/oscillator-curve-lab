@@ -75,3 +75,13 @@ The current local candidate supersedes earlier automatic transport-boundary dura
 ## Local live transition / seek correction — 2026-10-29
 
 Add source-stage two-bank linear10ms crossfade; keep core formulas, mappings, convolution and static WAV unchanged. Live seek keeps limiter buffers, updates the final-envelope deadline from the applied audio-clock seek, and recovers from current gain. Existing10ms Pause and WAV boundaries remain separate. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.
+
+
+## File Resynthesis startup default — 2026-10-30
+
+Local pre-commit candidate. Supersedes the historical Oscillator + File IR startup default: initial HTML/runtime select File Resynthesis and invoke the existing example analysis loader without autoplay. Default example is analysis-only; no implicit IR. Sound/analysis algorithms,32/64 selection,mode-specific curves,modulation,channels,time and IR handling are unchanged.8 Chrome/Brave lifecycle/error/ownership scenarios and900/390px layout checked; native zoom/listening remain unverified. [Contract and evidence](STARTUP_DEFAULT_2026-10-30.md).
+
+
+## IR body boundary and AC analysis guard — 2026-10-30 (local)
+
+Current local candidate adds a10ms source release only before active wet convolution with positive tail. No duplicate source attack; short-tail overlap is compensated on the undelayed branch. Existing final10ms complete-output envelope,5ms limiter delay and full tail length remain. Source excitation and its later tail contribution intentionally change in the last10ms. Temporary FFT windows are AC centered and numerically gated; source/IR PCM is unchanged. See [scoped contract and evidence](IR_RELEASE_ANALYSIS_2026-10-30.md).

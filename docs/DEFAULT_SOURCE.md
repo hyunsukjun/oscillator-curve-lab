@@ -14,7 +14,7 @@ Status: user-approved source asset and implementation; release evidence is recor
 
 ## Product role
 
-The initial oscillator path stays dry unless the musician supplies an IR. The first File Resynthesis selection with no user source fetches and analyzes this example; neither the MP3 nor its baked room becomes an IR. Analysis makes a static partial bank, not playback of the original melody. Switching away cancels a pending example. An explicit user import retains its existing dual Resynthesis/IR behavior.
+On startup File Resynthesis is selected and the existing example is fetched/analyzed automatically, without autoplay. Oscillator + File IR remains dry until the musician supplies an IR; neither the example MP3 nor its baked room becomes an IR. Analysis makes a static partial bank, not playback of the original melody. Switching away cancels a pending example. An explicit user import retains its existing dual Resynthesis/IR behavior.
 
 Existing chosen-energy-channel analysis,32/64 partial selection, separate mode curves, output duration, native synthesis, modulation, IR and safety algorithms are unchanged.
 
