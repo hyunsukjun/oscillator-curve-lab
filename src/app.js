@@ -3,7 +3,7 @@ import {beginVerticalGroup, moveVerticalGroup, restoreVerticalGroup, verticalGro
 import {canvasAxisWidth, drawEditorGrid, frequencyTicks, frequencyLabel, spacedMarks, canvasLabelFont} from "./canvas-grid.js?v=20261026-graphite1";
 import {createSourceOverview} from "./source-overview.js?v=20261018-axis64";
 import {mountTransport} from "./common-transport.js?v=20261013-1";
-import { readAudioFile } from "./audio-import.js?v=20261011-aiff1";
+import { readAudioFile, validateAudioBuffer } from "./audio-import.js?v=20261029-input-validation1";
 import {
   TARGET_SAMPLE_RATE,
   MAX_SOUND_DURATION_SECONDS,
@@ -507,6 +507,7 @@ async function installConvolver(prepared48k, bytes = impulseBytes, nativeSource 
   if (!node) return nativeSource;
   if (audioContext.sampleRate !== TARGET_SAMPLE_RATE && !nativeSource) {
     nativeSource = await audioContext.decodeAudioData(bytes.slice(0));
+    await validateAudioBuffer(nativeSource);
   }
   const source = audioContext.sampleRate === TARGET_SAMPLE_RATE
     ? prepared48k
@@ -1314,12 +1315,15 @@ impulseInput.addEventListener("change", async () => {
     const bytes = await readAudioFile(file, Math.max(TARGET_SAMPLE_RATE, audioContext?.sampleRate || TARGET_SAMPLE_RATE));
     const decoder = new OfflineAudioContext(2, 1, TARGET_SAMPLE_RATE);
     const decoded = await decoder.decodeAudioData(bytes.slice(0));
+    await validateAudioBuffer(decoded, { signal: sourceRequest.signal, isCurrent: sourceRequest.current });
     if (!sourceRequest.current()) return;
     const prepared = prepareImpulse(decoder, decoded, Number(impulseLengthInput.value));
     const input = await prepareResynthesisInput(file, decoded);
     if (!sourceRequest.current()) return;
     const nativeSource = node && soundMode === "convolution" && audioContext.sampleRate !== TARGET_SAMPLE_RATE
       ? await audioContext.decodeAudioData(bytes.slice(0)) : null;
+    if (nativeSource) await validateAudioBuffer(nativeSource, { signal: sourceRequest.signal, isCurrent: sourceRequest.current });
+    if (!sourceRequest.current()) return;
     const installedNative = node && soundMode === "convolution"
       ? await installConvolver(prepared, bytes, nativeSource) : nativeSource;
     impulseBytes = bytes;
@@ -1347,16 +1351,19 @@ impulseInput.addEventListener("change", async () => {
     await runResynthesisAnalysis();
     sendSettings();
   } catch (error) {
+    if (!sourceRequest.current()) return;
     console.error(error);
     const message = error.message || String(error);
     impulseStatus.textContent = impulseBuffer48k
       ? `${message} Previous audio remains available.`
       : message;
-    analysisStatus.textContent = message;
+    analysisStatus.textContent = `${message}${analysisSamples ? ` Previous audio remains available: ${analysisSource?.name || resynthesisSource.textContent}` : ""}`;
   } finally {
-    openAudioButton.disabled = false;
-    impulseLengthInput.disabled = false;
-    impulseInput.value = "";
+    if (sourceRequest.current()) {
+      openAudioButton.disabled = false;
+      impulseLengthInput.disabled = false;
+      impulseInput.value = "";
+    }
   }
 });
 
@@ -1654,6 +1661,7 @@ async function loadDefaultResynthesisSource() {
     const file = await fetchDefaultSource(request.signal);
     const decoder = new OfflineAudioContext(2, 1, TARGET_SAMPLE_RATE);
     const decoded = await decoder.decodeAudioData(await file.arrayBuffer());
+    await validateAudioBuffer(decoded, { signal: request.signal, isCurrent: request.current });
     const input = await prepareResynthesisInput(file, decoded);
     if (!request.current() || soundMode !== "resynthesis" || analysisSamples) return;
     ensureResynthesisState();

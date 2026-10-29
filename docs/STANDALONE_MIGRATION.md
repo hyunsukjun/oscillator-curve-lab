@@ -168,3 +168,7 @@ STANDALONE ASSET / approved web UI. Move existing Clear Current/Reset All nodes 
 ## 2026-10-29 — Shared musical default source
 
 STANDALONE ASSET: approved source identity, user-file precedence and source-vs-IR meaning are portable. HTTP loading/MP3 delivery are web choices, not native requirements. See [default source](DEFAULT_SOURCE.md).
+
+## Input admission transaction — STANDALONE ASSET (2026-10-29)
+
+Preserve candidate validation before ownership swap, full-channel/tail finite checks, bounded read-only access, stale-job cancellation, previous valid source/dependent state on failure, and explicit retry. Decode independently of device activation. Native adapter/batch sizes need separate measurements; do not copy browser getter quirks into the DSP model. Web implementation and silent evidence are not native integration or listening acceptance. See [input contract](INPUT_VALIDATION.md).

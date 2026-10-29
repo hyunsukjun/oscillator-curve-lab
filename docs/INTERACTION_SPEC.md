@@ -177,3 +177,7 @@ APPROVED WEB UI. The native Shortcuts disclosure reuses file-information behavio
 ## Toolbar DOM order — 2026-10-28
 
 APPROVED WEB UI. Move existing Clear Current/Reset All nodes to the first source-path row immediately below Open Audio/Download WAV. Keep IDs/listeners and source-path order. Shortcuts and Safety stay in their existing roles; there is no Engine readout to remove. Move existing nodes instead of assigning CSS-only visual order. Pen/Eraser → Shortcuts remains the Tab sequence. Preserve Clear/Reset behavior, confirmation semantics and key routing; moving a button is not approval of native-confirm keyboard behavior.
+
+## Failed input retains the valid source (2026-10-29)
+
+Supersedes earlier failed-decode behavior that cleared a source. File attempts still stop playback; rejected candidates do not reset source edits/window/curves or replace waveform/IR/analysis. Show the error and prior-source availability; do not autoplay. Completed old WAV availability follows unchanged source/settings; invalidate it on successful replacement. See [input contract](INPUT_VALIDATION.md).

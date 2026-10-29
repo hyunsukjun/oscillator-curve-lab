@@ -43,3 +43,7 @@ Validation: live-partial-switch controlled race/failure tests and pending-play-c
 ## 2026-10-29 — Built-in analysis example
 
 The first File Resynthesis selection with no source loads the approved shared15-second MP3 through the existing48kHz decode and `prepareResynthesisInput` analysis path. It sets only analysis samples/source and the source overview; IR buffers/bytes, dry oscillator defaults and modulation are unchanged. User imports supersede pending example requests. Failed loading retains Open Audio recovery. This example produces a static partial bank; it does not perform time-varying playback of Bach. See [default source](DEFAULT_SOURCE.md).
+
+## Source admission (2026-10-29)
+
+The entire decoded source is validated before preparing IR or the chosen analysis excerpt. Rejected nonfinite/invalid PCM preserves the previous analysis and source; valid finite PCM follows the unchanged analysis algorithm. Silence/DC analysis behavior remains separate from PCM admission. See [input contract](INPUT_VALIDATION.md).
