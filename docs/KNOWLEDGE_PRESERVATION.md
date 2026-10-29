@@ -165,3 +165,8 @@ Standalone should preserve these time/history/cancellation contracts with its ow
 User explicitly authorized implementation, commit and deployment: fundamental/harmonics 1–8 use equal-power center in Harmonic; 9 onward alternate L/R, starting 9=L and 10=R. Current maximum Harmonic count is 16; no count range was added. The original harmonic index is stable when Nyquist culls voices. Unison/Odd/Multiplier and File Resynthesis retain their existing mapping. Frequency, slope, phase, modulation, normalization, convolution, limiter and 10 ms boundary policies are preserved; the changed synthesis input also reaches convolution. Preview and offline share this core. This is a deliberate change to channel allocation, not global mono summing or a new gain compensation.
 
 The prior isolated eight-harmonic B listening was preferred by the user (steadier center, less unnatural panning, narrower width acceptable). That observation does not certify the new 9–16 placement or all musical material; numerical verification and publication are separate from new personal listening. See `HARMONIC_STEREO_2026-10-26.md` for the exact contract, verification and rollback scope.
+
+
+## Local live transition / seek correction — 2026-10-29
+
+Evidence-backed local candidate:24 bank/rate cases,37 required tests, six static parity fixtures and actual dry/IR browser state/capture checks. No5ms rewind reset gap in candidate captures; static source/output policies preserved. Known old test-context omission repaired in fixture only. Listening, physical device and CPU-headroom judgments remain unverified. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.

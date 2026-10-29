@@ -439,8 +439,8 @@ async function ensureAudio() {
 
 async function setupAudio() {
   if (!audioContext.audioWorklet) throw new Error("AudioWorklet is not available. Use a current browser over localhost or HTTPS.");
-  await audioContext.audioWorklet.addModule("src/oscillator-worklet.js?v=20261026-harmonic-pan8");
-  await audioContext.audioWorklet.addModule("src/safety-limiter-worklet.js?v=20261025-fade10");
+  await audioContext.audioWorklet.addModule("src/oscillator-worklet.js?v=20261029-live-crossfade1");
+  await audioContext.audioWorklet.addModule("src/safety-limiter-worklet.js?v=20261029-live-crossfade1");
   node = new AudioWorkletNode(audioContext, "oscillator-curve-processor", {
     numberOfInputs: 0,
     numberOfOutputs: 1,
@@ -467,7 +467,15 @@ async function setupAudio() {
   outputMeter.connect(audioContext.destination);
   node.port.onmessage = (event) => {
     if (event.data.token != null && event.data.token !== playbackToken) return;
-    if (event.data.type === "position") {
+    if (event.data.type === 'seeked') {
+      safetyLimiterNode?.port.postMessage({type:'boundarySeek', endTime:event.data.endTime});
+      playbackClock = {seconds:event.data.seconds, contextTime:event.data.contextTime, token:event.data.token};
+      if (!isScrubbing) {
+        playheadSeconds = Math.max(0, Math.min(outputDuration(), event.data.seconds + audioContext.currentTime - event.data.contextTime - LOOKAHEAD_SECONDS));
+        if (irControl.snapshot?.context === audioContext && irControl.snapshot.source === node) irControl.snapshot.position = playheadSeconds;
+      }
+      updateTransport(); draw();
+    } else if (event.data.type === "position") {
       playbackClock = {seconds:event.data.seconds, contextTime:event.data.contextTime, token:event.data.token};
       if (isPlaying && !isScrubbing) {
         playheadSeconds = Math.max(0, event.data.seconds - LOOKAHEAD_SECONDS);
@@ -646,8 +654,10 @@ function seekSourceSeconds(requested) {
  if(invalidates || requested===duration)stop(true);
  irControl.note=requested===duration?'발음 끝 · 다음 Play는 처음부터': '발음 위치 선택';
  playheadSeconds=requested;
- node?.port.postMessage({type:'seek',seconds:requested,token:nextPlaybackToken()});
- safetyLimiterNode?.port.postMessage({type:'reset'});updateTransport();draw();return true;
+ node?.port.postMessage({type:'seek',seconds:requested,token:nextPlaybackToken(),crossfade:isPlaying});
+ if(isPlaying)safetyLimiterNode?.port.postMessage({type:'boundarySeek',endTime:audioContext.currentTime+duration+Math.max(0,settings().tailSeconds||0)+LOOKAHEAD_SECONDS-requested});
+ else safetyLimiterNode?.port.postMessage({type:'reset'});
+ updateTransport();draw();return true;
 }
 function seekFromScrubber(){
  const current=settings();

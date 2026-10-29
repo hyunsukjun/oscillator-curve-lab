@@ -336,3 +336,8 @@ User approved the72BPM weak-room MP3 as the shared default/example asset and aut
 ## Read-only admission before source replacement (2026-10-29)
 
 USER-APPROVED SCOPE, IMPLEMENTED; release authorized2026-10-29. Extend the already shared audio-import module instead of creating another decoder or DSP sanitizer. Scan all decoded channels before adoption; reject nonfinite data rather than silently replacing samples. Preserve a previous valid input on failure. Bounded copy reads avoid mutating view readback in the observed Brave environment. Normal hot/clipped/DC/silent audio keeps its existing processing meaning. Verification/release/listening are separate. See [input contract](INPUT_VALIDATION.md).
+
+
+## Local live transition / seek correction — 2026-10-29
+
+Choose linear, unit-sum mixing to avoid adding coherent-source gain. Coalesce bursts to one latest request and at most two banks. Replace live seek limiter reset with history-preserving deadline rescheduling; preserve existing safety-reset exceptions. This is a local non-listening candidate, not listening or release acceptance. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.

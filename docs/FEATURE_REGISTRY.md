@@ -259,3 +259,8 @@ Use the approved shared Bach mallet MP3 in the role documented in [default sourc
 ## Safe decoded input admission (2026-10-29)
 
 IMPLEMENTED, USER-AUTHORIZED RELEASE. Reject empty/invalid decoded audio and nonfinite PCM before source adoption. A failed import retains the previous valid source and its editing/IR/analysis state; a later valid file recovers. Finite PCM and existing DSP/limits remain unchanged. See [input contract](INPUT_VALIDATION.md).
+
+
+## Local live transition / seek correction — 2026-10-29
+
+Live Waveform/Count/Frequency Layout now transition over10ms before the existing IR path. Playing Return to start/source-body seek crossfades positions and preserves Convolver/limiter history. Latest settings remain the Render target. No new visible control or parameter. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.

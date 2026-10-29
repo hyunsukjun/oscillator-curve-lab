@@ -70,3 +70,8 @@ Output Duration now uses one 0–600s slider (zero disables playback/export); FF
 ## 10 ms playback boundary candidate — 2026-10-25
 
 The current local candidate supersedes earlier automatic transport-boundary durations with the [10 ms playback/WAV contract](PLAYBACK_BOUNDARY.md). Source/effect envelopes are separate. See that contract for pause-state retention, existing tail-length limits and verification status. Uncommitted; listening acceptance pending.
+
+
+## Local live transition / seek correction — 2026-10-29
+
+Add source-stage two-bank linear10ms crossfade; keep core formulas, mappings, convolution and static WAV unchanged. Live seek keeps limiter buffers, updates the final-envelope deadline from the applied audio-clock seek, and recovers from current gain. Existing10ms Pause and WAV boundaries remain separate. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.

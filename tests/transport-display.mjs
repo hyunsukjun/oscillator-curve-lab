@@ -11,7 +11,7 @@ const pick=name=>{
 const element=()=>({attrs:{},style:{},value:'0',disabled:false,setAttribute(k,v){this.attrs[k]=v;}});
 function harness(duration=20,tail=0){
  const calls=[],snapshot={retained:true};
- const c={Math,Number,String,LOOKAHEAD_SECONDS:.005,
+ const c={Math,Number,String,LOOKAHEAD_SECONDS:.005,audioContext:{currentTime:5},
   current:{durationSeconds:duration,tailSeconds:tail},settings(){return c.current;},
   playheadSeconds:0,isPlaying:false,isScrubbing:false,soundMode:'convolution',analysisResult:null,
   irControl:{phase:'idle',snapshot:null,note:''},irBusy(){return ['pausing','resuming'].includes(c.irControl.phase);},
@@ -50,6 +50,8 @@ console.log('PASS shared clock format and output-progress basis through dry/body
  assert(c.isPlaying);
  assert.equal(calls.filter(x=>x[0]==='stop').length,0);
  assert(Math.abs(calls.find(x=>x[0]==='node')[1].seconds-1.001)<1e-12);
+ assert.equal(calls.find(x=>x[0]==='node')[1].crossfade,true);
+ const envelope=calls.find(x=>x[0]==='limiter')[1];assert.equal(envelope.type,'boundarySeek');assert(Math.abs(envelope.endTime-9.004)<1e-12);
 }
 {
  const {c,calls,snapshot}=harness(2,3);c.playheadSeconds=3.5;c.irControl.phase='pausedRetained';c.irControl.snapshot=snapshot;c.isScrubbing=true;c.playbackScrubber.value='0.8';

@@ -1,4 +1,4 @@
-import { PlaybackBoundary } from "./playback-boundary.js";
+import { PlaybackBoundary } from "./playback-boundary.js?v=20261029-live-crossfade1";
 import { LookaheadSafetyLimiter } from "./safety-limiter.js?v=20261002-lookahead1";
 
 class SafetyLimiterProcessor extends AudioWorkletProcessor {
@@ -13,6 +13,11 @@ class SafetyLimiterProcessor extends AudioWorkletProcessor {
       if (data.type === "boundaryStart") { this.boundary.start(); this.remaining = Math.ceil(data.seconds * sampleRate); this.startDelay = this.limiter.ahead; }
       if (data.type === "boundaryPause") { this.pauseId = data.id; this.boundary.release(); }
       if (data.type === "boundaryResume") this.boundary.start();
+      if (data.type === 'boundarySeek') {
+        this.remaining = Math.max(0, Math.ceil((data.endTime - (globalThis.currentTime || 0)) * sampleRate));
+        // Keep limiter/IR history and never cancel a Pause already releasing to zero.
+        if (this.boundary.releaseAge === null) this.boundary.start(this.boundary.gain);
+      }
     };
   }
 

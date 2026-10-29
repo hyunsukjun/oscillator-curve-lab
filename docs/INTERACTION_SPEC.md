@@ -181,3 +181,8 @@ APPROVED WEB UI. Move existing Clear Current/Reset All nodes to the first source
 ## Failed input retains the valid source (2026-10-29)
 
 Supersedes earlier failed-decode behavior that cleared a source. File attempts still stop playback; rejected candidates do not reset source edits/window/curves or replace waveform/IR/analysis. Show the error and prior-source availability; do not autoplay. Completed old WAV availability follows unchanged source/settings; invalidate it on successful replacement. See [input contract](INPUT_VALIDATION.md).
+
+
+## Local live transition / seek correction — 2026-10-29
+
+Live settings preserve position and graph history. Playing Return to start remains0s and shares the continuous playing-body-seek path. Paused/stopped reset and unsupported tail-seek semantics are unchanged. Late acknowledgments retain the actual audio-clock position and cannot cancel an active Pause. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.

@@ -16,3 +16,8 @@ The former 8 ms/12 ms source envelope and 3 ms Play ramp are replaced by one pos
 ## Verification and limits
 
 Shared local evidence: `work/CurveLabWebV1/qa/fade10/` in the Interface workspace. Includes finite-output/short-file tests, release-frame and resume checks, completed browser WAV checks for six Labs and dry/IR Oscillator, plus affected regression logs. Browser/device listening is not inferred from these numeric checks. Release authorization does not imply subjective listening acceptance.
+
+
+## Live bank and playing-seek transitions — 2026-10-29 (local)
+
+The existing transport boundary remains10ms. Playing bank changes now use a separate source crossfade; playing body seeks preserve limiter/IR buffers and rebase the output deadline from audio time. `PlaybackBoundary.start(initialGain)` can recover from current gain on a playing seek, while ordinary Play/resume retains initialGain0. Pause release ownership is preserved. Static WAV fades and safety-reset exceptions remain unchanged. See [live transition contract](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication and listening evidence remain separate.

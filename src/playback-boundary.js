@@ -15,11 +15,11 @@ export function fadeOutput(channels, rate) {
 }
 export class PlaybackBoundary {
   constructor(rate) { this.span = Math.max(1, Math.round(rate * BOUNDARY_SECONDS)); this.start(); }
-  start() { this.age = 0; this.attackSpan = this.span; this.gain = 0; this.releaseAge = null; this.done = false; }
+  start(initialGain = 0) { this.age = 0; this.attackSpan = this.span; this.startGain = Math.max(0, Math.min(1, initialGain)); this.gain = this.startGain; this.releaseAge = null; this.done = false; }
   release() { if (this.releaseAge === null) { this.releaseAge = 0; this.releaseGain = this.gain; } }
   next(remaining = Infinity) {
     if (this.age === 0) this.attackSpan = Math.max(1, Math.min(this.span, Math.floor((remaining - 1) / 2)));
-    const attack = Math.min(1, this.age++ / this.attackSpan);
+    const attack = this.startGain + (1 - this.startGain) * Math.min(1, this.age++ / this.attackSpan);
     const end = Math.max(0, Math.min(1, (remaining - 1) / this.attackSpan));
     let gain = Math.min(attack, end);
     if (this.releaseAge !== null) {

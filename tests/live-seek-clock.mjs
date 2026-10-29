@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+const app=readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
+const a=app.indexOf('node.port.onmessage = (event) => {'),b=app.indexOf('\n  };\n  try {',a);assert(a>=0&&b>a);
+const messages=[],node={port:{}},context={currentTime:10};
+const c={node,audioContext:context,safetyLimiterNode:{port:{postMessage:m=>messages.push(m)}},playbackToken:4,playbackClock:null,playheadSeconds:2,isPlaying:true,isScrubbing:false,LOOKAHEAD_SECONDS:.005,irControl:{phase:'idle',snapshot:null},outputDuration:()=>20.005,updateTransport(){},draw(){},irForget(){},disconnectConvolver(){}};
+vm.createContext(c);vm.runInContext(app.slice(a,b+5),c);
+node.port.onmessage({data:{type:'seeked',token:4,seconds:0,contextTime:9.9,endTime:29.905}});
+assert(Math.abs(c.playheadSeconds-.095)<1e-12,'delayed acknowledgment does not reset elapsed audio time');
+c.isPlaying=false;c.irControl.snapshot={context,source:node,position:0};
+node.port.onmessage({data:{type:'seeked',token:4,seconds:0,contextTime:9.9,endTime:29.905}});
+assert(Math.abs(c.irControl.snapshot.position-.095)<1e-12,'paused snapshot retains the actual suspended position');
+c.isScrubbing=true;c.playheadSeconds=.7;node.port.onmessage({data:{type:'seeked',token:4,seconds:0,contextTime:9.9,endTime:29.905}});assert.equal(c.playheadSeconds,.7);
+const n=messages.length;node.port.onmessage({data:{type:'seeked',token:3,seconds:0,contextTime:0,endTime:20}});assert.equal(messages.length,n,'stale seek cannot rearm a newer envelope');
+console.log('PASS delayed seek clock, paused snapshot, pointer ownership and stale-token protection');

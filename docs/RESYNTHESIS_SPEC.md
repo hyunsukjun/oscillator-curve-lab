@@ -47,3 +47,8 @@ The first File Resynthesis selection with no source loads the approved shared15-
 ## Source admission (2026-10-29)
 
 The entire decoded source is validated before preparing IR or the chosen analysis excerpt. Rejected nonfinite/invalid PCM preserves the previous analysis and source; valid finite PCM follows the unchanged analysis algorithm. Silence/DC analysis behavior remains separate from PCM admission. See [input contract](INPUT_VALIDATION.md).
+
+
+## Local live transition / seek correction — 2026-10-29
+
+AnalysisResult, FFT/peak selection, partial mappings, automatic32/64 refresh and Resynthesis sound design are unchanged. The shared playing-body-seek path now crossfades source positions without clearing the limiter/effect history. This is not a new claim of click-free partial-analysis replacement. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.

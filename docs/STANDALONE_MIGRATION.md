@@ -172,3 +172,8 @@ STANDALONE ASSET: approved source identity, user-file precedence and source-vs-I
 ## Input admission transaction — STANDALONE ASSET (2026-10-29)
 
 Preserve candidate validation before ownership swap, full-channel/tail finite checks, bounded read-only access, stale-job cancellation, previous valid source/dependent state on failure, and explicit retry. Decode independently of device activation. Native adapter/batch sizes need separate measurements; do not copy browser getter quirks into the DSP model. Web implementation and silent evidence are not native integration or listening acceptance. See [input contract](INPUT_VALIDATION.md).
+
+
+## Local live transition / seek correction — 2026-10-29
+
+Asset: continuity at live bank/position transitions, independent old/new state and clocks, preserved effect memory, bounded latest queue, absolute end time and stale-token protection. AudioWorklet/MessagePort details are web implementation choices. Native implementation remains unchanged. See [contract and verification limits](LIVE_TRANSITION_2026-10-29.md). User approved commit/deployment on2026-10-29; publication proof is separate.
